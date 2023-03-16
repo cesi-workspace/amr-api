@@ -2,76 +2,89 @@
 
 namespace App\Entity;
 
+use App\Repository\CadeauRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Cadeau
- *
- * @ORM\Table(name="cadeau", indexes={@ORM\Index(name="FK_CADEAU_PARTENAIRE", columns={"cadeau_partenaire_id"})})
- * @ORM\Entity
- */
+#[ORM\Table(name:"cadeau")]
+#[ORM\Index(name:"FK_CADEAU_PARTENAIRE", columns:["cadeau_partenaire_id"])]
+#[ORM\Entity(repositoryClass: CadeauRepository::class)]
 class Cadeau
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="cadeau_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $cadeauId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy:"IDENTITY")]
+    #[ORM\Column(name:"cadeau_id", type:"integer", nullable:false)]
+    private int $cadeauId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="cadeau_libelle", type="string", length=3000, nullable=false)
-     */
-    private $cadeauLibelle;
+    #[ORM\Column(name:"cadeau_libelle", type:"string", length:3000, nullable:false)]
+    private string $cadeauLibelle;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="cadeau_nbpointcout", type="integer", nullable=false)
-     */
-    private $cadeauNbpointcout;
+    #[ORM\Column(name:"cadeau_nbpointcout", type:"integer", nullable:false)]
+    private int $cadeauNbpointcout;
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="cadeau_datedebut", type="datetime", nullable=true)
-     */
-    private $cadeauDatedebut;
+    #[ORM\Column(name:"cadeau_datedebut", type:"datetime", nullable:true)]
+    private ?\DateTime $cadeauDatedebut;
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="cadeau_datefin", type="datetime", nullable=true)
-     */
-    private $cadeauDatefin;
+    #[ORM\Column(name:"cadeau_datefin", type:"datetime", nullable:true)]
+    private ?\DateTime $cadeauDatefin;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cadeau_partenaire_id", referencedColumnName="utilisateur_id")
-     * })
-     */
-    private $cadeauPartenaire;
+    #[ORM\ManyToOne(targetEntity:Utilisateur::class)]
+    #[ORM\JoinColumn(name:"cadeau_partenaire_id", referencedColumnName:"utilisateur_id", nullable:false)]
+    private Utilisateur $cadeauPartenaire;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Utilisateur", mappedBy="achatCadeau")
-     */
+    #[ORM\ManyToMany(targetEntity:Utilisateur::class, mappedBy:"achatCadeau")]
     private $achatMembrevolontaire = array();
 
+    public function getId(): int
+    {
+        return $this->cadeauId;
+    }
+    public function getLibelle(): string
+    {
+        return $this->cadeauLibelle;
+    }
+    public function setLibelle(string $cadeauLibelle): self
+    {
+        $this->cadeauLibelle = $cadeauLibelle;
+
+        return $this;
+    }
+    public function getNbpointcout(): int
+    {
+        return $this->cadeauNbpointcout;
+    }
+    public function setNbpointcout(int $cadeauNbpointcout): self
+    {
+        $this->cadeauNbpointcout = $cadeauNbpointcout;
+
+        return $this;
+    }
+    public function getDatedebut(): ?\DateTime
+    {
+        return $this->cadeauDatedebut;
+    }
+    public function setDatedebut(?\DateTime $cadeauDatedebut): self
+    {
+        $this->cadeauDatedebut = $cadeauDatedebut;
+
+        return $this;
+    }
+    public function getDatefin(): ?\DateTime
+    {
+        return $this->cadeauDatefin;
+    }
+    public function setDatefin(?\DateTime $cadeauDatefin): self
+    {
+        $this->cadeauDatefin = $cadeauDatefin;
+
+        return $this;
+    }
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->achatMembrevolontaire = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->achatMembrevolontaire = new ArrayCollection();
     }
 
 }

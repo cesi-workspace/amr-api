@@ -2,118 +2,169 @@
 
 namespace App\Entity;
 
+use App\Repository\UtilisateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * Utilisateur
- *
- * @ORM\Table(name="utilisateur", indexes={@ORM\Index(name="FK_UTILISATEUR_TYPEUTILISATEUR", columns={"utilisateur_typeutilisateur_id"})})
- * @ORM\Entity
- */
-class Utilisateur
+#[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="utilisateur_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $utilisateurId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name:"utilisateur_id")]
+    private ?int $utilisateurId = null;
+
+    #[ORM\Column(name:"utilisateur_email", length: 180, unique: true)]
+    private ?string $utilisateurEmail = null;
+
+    #[ORM\ManyToOne(targetEntity:Typeutilisateur::class)]
+    #[ORM\JoinColumn(name:"utilisateur_typeutilisateur_id", referencedColumnName:"typeutilisateur_id", nullable:false)]
+    private Typeutilisateur $utilisateurTypeutilisateur;
+
+    #[ORM\Column(name:"utilisateur_nom", nullable:true)]
+    private ?string $utilisateurNom = null;
+
+    #[ORM\Column(name:"utilisateur_prenom", nullable:true)]
+    private ?string $utilisateurPrenom = null;
 
     /**
-     * @var binary|null
-     *
-     * @ORM\Column(name="utilisateur_nom", type="binary", nullable=true)
+     * @var string The hashed password
      */
-    private $utilisateurNom;
+    #[ORM\Column(name:"utilisateur_motdepasse")]
+    private ?string $utilisateurMotdepasse = null;
+
+    #[ORM\Column(name:"utilisateur_ville", nullable:true)]
+    private ?string $utilisateurVille = null;
+
+    #[ORM\Column(name:"utilisateur_codepostal", nullable:true)]
+    private ?string $utilisateurCodepostal = null;
+
+    #[ORM\Column(name:"utilisateur_active")]
+    private ?bool $utilisateurActive = null;
+
+    #[ORM\Column(name:"utilisateur_tokenapi", nullable:true)]
+    private ?string $utilisateurTokenapi = null;
+
+    #[ORM\Column(name:"utilisateur_point", nullable:true)]
+    private ?int $utilisateurPoint = null;
+
+    public function getId(): ?int
+    {
+        return $this->utilisateurId;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->utilisateurEmail;
+    }
+
+    public function setEmail(string $utilisateurEmail): self
+    {
+        $this->utilisateurEmail = $utilisateurEmail;
+
+        return $this;
+    }
 
     /**
-     * @var binary|null
+     * A visual identifier that represents this user.
      *
-     * @ORM\Column(name="utilisateur_prenom", type="binary", nullable=true)
+     * @see UserInterface
      */
-    private $utilisateurPrenom;
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->utilisateurEmail;
+    }
 
     /**
-     * @var binary|null
-     *
-     * @ORM\Column(name="utilisateur_motdepasse", type="binary", nullable=true)
+     * @see UserInterface
      */
-    private $utilisateurMotdepasse;
+    public function getRoles(): array
+    {
+        $utilisateurTypeutilisateur = $this->utilisateurTypeutilisateur;
+        // guarantee every user at least has ROLE_USER
+        // $utilisateurTypeutilisateur[] = 'ROLE_USER';
+
+        return array_unique([$utilisateurTypeutilisateur->typeutilisateurLibelle]);
+    }
+
+    public function setRoles(Typeutilisateur $utilisateurTypeutilisateur): self
+    {
+        $this->utilisateurTypeutilisateur = $utilisateurTypeutilisateur;
+
+        return $this;
+    }
 
     /**
-     * @var binary
-     *
-     * @ORM\Column(name="utilisateur_email", type="binary", nullable=false)
+     * @see PasswordAuthenticatedUserInterface
      */
-    private $utilisateurEmail;
+    public function getPassword(): string
+    {
+        return $this->utilisateurMotdepasse;
+    }
+
+    public function setPassword(string $utilisateurMotdepasse): self
+    {
+        $this->utilisateurMotdepasse = $utilisateurMotdepasse;
+
+        return $this;
+    }
+    public function getVille(): ?string
+    {
+        return $this->utilisateurVille;
+    }
+
+    public function setVille(string $utilisateurVille): self
+    {
+        $this->utilisateurVille = $utilisateurVille;
+
+        return $this;
+    }
+    public function getCodePostal(): ?string
+    {
+        return $this->utilisateurCodepostal;
+    }
+
+    public function setCodePostal(string $utilisateurCodepostal): self
+    {
+        $this->utilisateurCodepostal = $utilisateurCodepostal;
+
+        return $this;
+    }
+    public function getActive(): ?bool
+    {
+        return $this->utilisateurActive;
+    }
+
+    public function setActive(bool $utilisateurActive): self
+    {
+        $this->utilisateurActive = $utilisateurActive;
+
+        return $this;
+    }
 
     /**
-     * @var binary|null
-     *
-     * @ORM\Column(name="utilisateur_ville", type="binary", nullable=true)
+     * @see UserInterface
      */
-    private $utilisateurVille;
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
 
-    /**
-     * @var binary|null
-     *
-     * @ORM\Column(name="utilisateur_codepostal", type="binary", nullable=true)
-     */
-    private $utilisateurCodepostal;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="utilisateur_active", type="boolean", nullable=false)
-     */
-    private $utilisateurActive;
-
-    /**
-     * @var binary|null
-     *
-     * @ORM\Column(name="utilisateur_tokenapi", type="binary", nullable=true)
-     */
-    private $utilisateurTokenapi;
-
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="utilisateur_point", type="integer", nullable=true)
-     */
-    private $utilisateurPoint;
-
-    /**
-     * @var \Typeutilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Typeutilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="utilisateur_typeutilisateur_id", referencedColumnName="typeutilisateur_id")
-     * })
-     */
-    private $utilisateurTypeutilisateur;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Cadeau", inversedBy="achatMembrevolontaire")
-     * @ORM\JoinTable(name="achat",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="achat_membrevolontaire_id", referencedColumnName="utilisateur_id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="achat_cadeau_id", referencedColumnName="cadeau_id")
-     *   }
-     * )
-     */
+    /*
+    #[ORM\ManyToMany(targetEntity:Cadeau::class, inversedBy:"achatMembrevolontaire")]
+    #[ORM\JoinTable(name: "achat")]
+    #[ORM\JoinColumn(name: "achat_membrevolontaire_id", referencedColumnName: "utilisateur_id")]
+    #[ORM\InverseJoinColumn(name: "achat_cadeau_id", referencedColumnName: "cadeau_id")]
     private $achatCadeau = array();
+    */
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="Utilisateur", mappedBy="favoriMembremr")
-     */
+    #[ORM\ManyToMany(targetEntity:Utilisateur::class, mappedBy:"favoriMembremr")]
+    #[ORM\JoinTable(name: "utilisateur")]
+    #[ORM\JoinColumn(name: "utilisateur_id", referencedColumnName: "utilisateur_id")]
+    #[ORM\InverseJoinColumn(name: "utilisateur_id", referencedColumnName: "utilisateur")]
     private $favoriMembrevolontaire = array();
 
     /**
@@ -121,8 +172,7 @@ class Utilisateur
      */
     public function __construct()
     {
-        $this->achatCadeau = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->favoriMembrevolontaire = new \Doctrine\Common\Collections\ArrayCollection();
+        //$this->achatCadeau = new ArrayCollection();
+        $this->favoriMembrevolontaire = new ArrayCollection();
     }
-
 }

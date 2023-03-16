@@ -3,30 +3,32 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TypetraitementdemandeRepository;
 
-/**
- * Typetraitementdemande
- *
- * @ORM\Table(name="typetraitementdemande")
- * @ORM\Entity
- */
+#[ORM\Table(name:"typetraitementdemande")]
+#[ORM\Entity(repositoryClass: TypetraitementdemandeRepository::class)]
 class Typetraitementdemande
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="typetraitementdemande_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $typetraitementdemandeId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy:"IDENTITY")]
+    #[ORM\Column(name:"typetraitementdemande_id", type:"integer", nullable:false)]
+    private ?int $typetraitementdemandeId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="typetraitementdemande_libelle", type="string", length=300, nullable=false)
-     */
-    private $typetraitementdemandeLibelle;
+    #[ORM\Column(name:"typetraitementdemande_libelle", type:"string", length:300, nullable:false)]
+    private ?string $typetraitementdemandeLibelle;
 
+    public function getId(): ?int
+    {
+        return $this->typetraitementdemandeId;
+    }
+    public function getLibelle(): string
+    {
+        return $this->typetraitementdemandeLibelle;
+    }
+    public function setLibelle(string $typetraitementdemandeLibelle): self
+    {
+        $this->typetraitementdemandeLibelle = $typetraitementdemandeLibelle;
 
+        return $this;
+    }
 }

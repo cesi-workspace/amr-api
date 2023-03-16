@@ -2,31 +2,33 @@
 
 namespace App\Entity;
 
+use App\Repository\TypeutilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Typeutilisateur
- *
- * @ORM\Table(name="typeutilisateur")
- * @ORM\Entity
- */
+#[ORM\Table(name:"typeutilisateur")]
+#[ORM\Entity(repositoryClass: TypeutilisateurRepository::class)]
 class Typeutilisateur
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="typeutilisateur_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $typeutilisateurId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy:"IDENTITY")]
+    #[ORM\Column(name:"typeutilisateur_id", type:"integer", nullable:false)]
+    private ?int $typeutilisateurId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="typeutilisateur_libelle", type="string", length=300, nullable=false)
-     */
-    private $typeutilisateurLibelle;
+    #[ORM\Column(name:"typeutilisateur_libelle", type:"string", length:300, nullable:false)]
+    private ?string $typeutilisateurLibelle;
+    public function getId(): ?int
+    {
+        return $this->typeutilisateurId;
+    }
+    public function getLibelle(): string
+    {
+        return $this->typeutilisateurLibelle;
+    }
+    public function setLibelle(string $typeutilisateurLibelle): self
+    {
+        $this->typeutilisateurLibelle = $typeutilisateurLibelle;
 
+        return $this;
+    }
 
 }

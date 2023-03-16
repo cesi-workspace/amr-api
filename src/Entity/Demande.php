@@ -3,128 +3,197 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\DemandeRepository;
 
-/**
- * Demande
- *
- * @ORM\Table(name="demande", indexes={@ORM\Index(name="FK_DEMANDE_STATUTDEMANDE", columns={"demande_statutdemande_id"}), @ORM\Index(name="FK_DEMANDE_MEMBREVOLONTAIRE", columns={"demande_effectue_membrevolontaire_id"}), @ORM\Index(name="FK_DEMANDE_MEMBREMR", columns={"demande_membremr_id"}), @ORM\Index(name="FK_DEMANDE_CATEGORIEDEMANDE", columns={"demande_categoriedemande_id"})})
- * @ORM\Entity
- */
+#[ORM\Table(name:"demande")]
+#[ORM\Index(name:"FK_DEMANDE_CATEGORIEDEMANDE", columns:["demande_categoriedemande_id"])]
+#[ORM\Index(name:"FK_DEMANDE_MEMBREMR", columns:["demande_membremr_id"])]
+#[ORM\Index(name:"FK_DEMANDE_STATUTDEMANDE", columns:["demande_statutdemande_id"])]
+#[ORM\Index(name:"FK_DEMANDE_MEMBREVOLONTAIRE", columns:["demande_effectue_membrevolontaire_id"])]
+#[ORM\Entity(repositoryClass: DemandeRepository::class)]
 class Demande
 {
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="demande_id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
-     */
-    private $demandeId;
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy:"IDENTITY")]
+    #[ORM\Column(name:"demande_id", type:"integer", nullable:false)]
+    private int $demandeId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="demande_titretache", type="string", length=300, nullable=false)
-     */
-    private $demandeTitretache;
+    #[ORM\Column(name:"demande_titretache", type:"string", length:300, nullable:false)]
+    private string $demandeTitretache;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="demande_tempsestime", type="time", nullable=false)
-     */
-    private $demandeTempsestime;
+    #[ORM\Column(name:"demande_tempsestime", type:"time", nullable:false)]
+    private \DateTime $demandeTempsestime;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="demande_date", type="datetime", nullable=false)
-     */
-    private $demandeDate;
+    #[ORM\Column(name:"demande_date", type:"datetime", nullable:false)]
+    private \DateTime $demandeDate;
 
-    /**
-     * @var binary
-     *
-     * @ORM\Column(name="demande_ville", type="binary", nullable=false)
-     */
-    private $demandeVille;
+    #[ORM\Column(name:"demande_ville", type:"string", nullable:false)]
+    private string $demandeVille;
 
-    /**
-     * @var binary
-     *
-     * @ORM\Column(name="demande_codepostal", type="binary", nullable=false)
-     */
-    private $demandeCodepostal;
+    #[ORM\Column(name:"demande_codepostal", type:"string", nullable:false)]
+    private string $demandeCodepostal;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="demande_note", type="integer", nullable=true)
-     */
-    private $demandeNote;
+    #[ORM\Column(name:"demande_note", type:"integer", nullable:true)]
+    private ?int $demandeNote;
 
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="demande_commentaire", type="string", length=3000, nullable=true)
-     */
-    private $demandeCommentaire;
+    #[ORM\Column(name:"demande_commentaire", type:"string", length:3000,nullable:true)]
+    private ?string $demandeCommentaire;
 
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="demande_datecommentaire", type="datetime", nullable=true)
-     */
-    private $demandeDatecommentaire;
+    #[ORM\Column(name:"demande_datecommentaire", type:"datetime", nullable:true)]
+    private ?\DateTime $demandeDatecommentaire;
 
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(name="demande_commentaireestsignale", type="boolean", nullable=true)
-     */
-    private $demandeCommentaireestsignale;
+    #[ORM\Column(name:"demande_commentaireestsignale", type:"boolean", nullable:true)]
+    private ?bool $demandeCommentaireestsignale;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
-     * @ORM\OneToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="demande_membremr_id", referencedColumnName="utilisateur_id")
-     * })
-     */
-    private $demandeMembremr;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: "demande_membremr_id", referencedColumnName: "utilisateur_id", nullable:false)]
+    private Utilisateur $demandeMembremr;
 
-    /**
-     * @var \Utilisateur
-     *
-     * @ORM\ManyToOne(targetEntity="Utilisateur")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="demande_effectue_membrevolontaire_id", referencedColumnName="utilisateur_id")
-     * })
-     */
-    private $demandeEffectueMembrevolontaire;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(name: "demande_effectue_membrevolontaire_id", referencedColumnName: "utilisateur_id")]
+    private ?Utilisateur $demandeEffectueMembrevolontaire;
 
-    /**
-     * @var \Categoriedemande
-     *
-     * @ORM\ManyToOne(targetEntity="Categoriedemande")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="demande_categoriedemande_id", referencedColumnName="categoriedemande_id")
-     * })
-     */
-    private $demandeCategoriedemande;
+    #[ORM\ManyToOne(targetEntity: Categoriedemande::class)]
+    #[ORM\JoinColumn(name: "demande_categoriedemande_id", referencedColumnName: "categoriedemande_id", nullable:false)]
+    private Categoriedemande $demandeCategoriedemande;
 
-    /**
-     * @var \Statutdemande
-     *
-     * @ORM\ManyToOne(targetEntity="Statutdemande")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="demande_statutdemande_id", referencedColumnName="statutdemande_id")
-     * })
-     */
-    private $demandeStatutdemande;
+    #[ORM\ManyToOne(targetEntity: Statutdemande::class)]
+    #[ORM\JoinColumn(name: "demande_statutdemande_id", referencedColumnName: "statutdemande_id", nullable:false)]
+    private Statutdemande $demandeStatutdemande;
 
 
+    public function getId(): int
+    {
+        return $this->demandeId;
+    }
+    public function getTitretache(): string
+    {
+        return $this->demandeTitretache;
+    }
+    public function setTitretache(string $demandeTitretache): self
+    {
+        $this->demandeTitretache = $demandeTitretache;
+
+        return $this;
+    }
+    public function getTempsestime(): \DateTime
+    {
+        return $this->demandeTempsestime;
+    }
+    public function setTempsestime(\DateTime $demandeTempsestime): self
+    {
+        $this->demandeTempsestime = $demandeTempsestime;
+
+        return $this;
+    }
+    public function getDate(): \DateTime
+    {
+        return $this->demandeDate;
+    }
+    public function setDate(\DateTime $demandeDate): self
+    {
+        $this->demandeDate = $demandeDate;
+
+        return $this;
+    }
+    public function getVille(): string
+    {
+        return $this->demandeVille;
+    }
+    public function setVille(string $demandeVille): self
+    {
+        $this->demandeVille = $demandeVille;
+
+        return $this;
+    }
+    public function getCodepostal(): string
+    {
+        return $this->demandeCodepostal;
+    }
+    public function setCodepostal(string $demandeCodepostal): self
+    {
+        $this->demandeCodepostal = $demandeCodepostal;
+
+        return $this;
+    }
+    public function getNote(): ?int
+    {
+        return $this->demandeNote;
+    }
+    public function setNote(?int $demandeNote): self
+    {
+        $this->demandeNote = $demandeNote;
+
+        return $this;
+    }
+    public function getCommentaire(): ?string
+    {
+        return $this->demandeCommentaire;
+    }
+    public function setCommentaire(?string $demandeCommentaire): self
+    {
+        $this->demandeCommentaire = $demandeCommentaire;
+
+        return $this;
+    }
+    public function getDatecommentaire(): ?\DateTime
+    {
+        return $this->demandeDatecommentaire;
+    }
+    public function setDatecommentaire(?\DateTime $demandeDatecommentaire): self
+    {
+        $this->demandeDatecommentaire = $demandeDatecommentaire;
+
+        return $this;
+    }
+    public function getCommentaireestsignale(): ?bool
+    {
+        return $this->demandeCommentaireestsignale;
+    }
+    public function setCommentaireestsignale(?bool $demandeCommentaireestsignale): self
+    {
+        $this->demandeCommentaireestsignale = $demandeCommentaireestsignale;
+
+        return $this;
+    }
+    public function getMembremr(): Utilisateur
+    {
+        return $this->demandeMembremr;
+    }
+    public function setMembremr(Utilisateur $demandeMembremr): self
+    {
+        $this->demandeMembremr = $demandeMembremr;
+
+        return $this;
+    }
+    public function getEffectueMembrevolontaire(): ?Utilisateur
+    {
+        return $this->demandeEffectueMembrevolontaire;
+    }
+    public function setEffectueMembrevolontaire(?Utilisateur $demandeEffectueMembrevolontaire): self
+    {
+        $this->demandeEffectueMembrevolontaire = $demandeEffectueMembrevolontaire;
+
+        return $this;
+    }
+    public function getCategoriedemande(): Categoriedemande
+    {
+        return $this->demandeCategoriedemande;
+    }
+    public function setCategoriedemande(Categoriedemande $demandeCategoriedemande): self
+    {
+        $this->demandeCategoriedemande = $demandeCategoriedemande;
+
+        return $this;
+    }
+    public function getStatutdemande(): Statutdemande
+    {
+        return $this->demandeStatutdemande;
+    }
+    public function setStatutdemande(Statutdemande $demandeStatutdemande): self
+    {
+        $this->demandeStatutdemande = $demandeStatutdemande;
+
+        return $this;
+    }
 }
