@@ -45,7 +45,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $utilisateurActive = null;
 
     #[ORM\Column(name:"utilisateur_tokenapi", nullable:true)]
-    private ?string $utilisateurTokenapi = null;
+    public ?string $utilisateurTokenapi = null;
 
     #[ORM\Column(name:"utilisateur_point", nullable:true)]
     private ?int $utilisateurPoint = null;
@@ -85,8 +85,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $utilisateurTypeutilisateur = $this->utilisateurTypeutilisateur;
         // guarantee every user at least has ROLE_USER
         // $utilisateurTypeutilisateur[] = 'ROLE_USER';
-
-        return array_unique([$utilisateurTypeutilisateur->typeutilisateurLibelle]);
+        return array_unique([$utilisateurTypeutilisateur->getLibelle()]);
     }
 
     public function setRoles(Typeutilisateur $utilisateurTypeutilisateur): self
@@ -143,6 +142,28 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getTokenapi(): ?string
+    {
+        return $this->utilisateurTokenapi;
+    }
+
+    public function setTokenapi(string $utilisateurTokenapi): self
+    {
+        $this->utilisateurTokenapi = $utilisateurTokenapi;
+
+        return $this;
+    }
+    public function getPoint(): ?int
+    {
+        return $this->utilisateurPoint;
+    }
+
+    public function setPoint(int $utilisateurPoint): self
+    {
+        $this->utilisateurPoint = $utilisateurPoint;
+
+        return $this;
+    }
 
     /**
      * @see UserInterface
@@ -159,13 +180,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: "achat_membrevolontaire_id", referencedColumnName: "utilisateur_id")]
     #[ORM\InverseJoinColumn(name: "achat_cadeau_id", referencedColumnName: "cadeau_id")]
     private $achatCadeau = array();
-    */
 
     #[ORM\ManyToMany(targetEntity:Utilisateur::class, mappedBy:"favoriMembremr")]
     #[ORM\JoinTable(name: "utilisateur")]
     #[ORM\JoinColumn(name: "utilisateur_id", referencedColumnName: "utilisateur_id")]
     #[ORM\InverseJoinColumn(name: "utilisateur_id", referencedColumnName: "utilisateur")]
     private $favoriMembrevolontaire = array();
+    */
 
     /**
      * Constructor
@@ -173,6 +194,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         //$this->achatCadeau = new ArrayCollection();
-        $this->favoriMembrevolontaire = new ArrayCollection();
+        //$this->favoriMembrevolontaire = new ArrayCollection();
     }
 }
