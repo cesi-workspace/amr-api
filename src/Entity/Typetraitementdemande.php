@@ -12,10 +12,10 @@ class Typetraitementdemande
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"IDENTITY")]
     #[ORM\Column(name:"typetraitementdemande_id", type:"integer", nullable:false)]
-    private ?int $typetraitementdemandeId;
+    private int $typetraitementdemandeId;
 
     #[ORM\Column(name:"typetraitementdemande_libelle", type:"string", length:300, nullable:false)]
-    private ?string $typetraitementdemandeLibelle;
+    private string $typetraitementdemandeLibelle;
 
     public function getId(): ?int
     {

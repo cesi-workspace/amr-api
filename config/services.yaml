@@ -19,6 +19,13 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
+    App\Subscriber\UtilisateurSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Service\CryptService:
+        arguments:
+            $cryptkey: '%env(APP_SECRET)%'
+            $cryptalgo: '%env(APP_CRYPTALGO)%'

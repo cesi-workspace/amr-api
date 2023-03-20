@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name:"message")]
 #[ORM\Index(name:"FK_MESSAGE_UTILISATEURFROM", columns:["message_from_utilisateur_id"])]
+#[ORM\Index(name:"FK_MESSAGE_UTILISATEURTO", columns:["message_to_utilisateur_id"])]
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
 {
@@ -15,10 +16,10 @@ class Message
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"NONE")]
     #[ORM\Column(name:"message_date", type:"datetime", nullable:false)]
-    private ?\DateTime $messageDate;
+    private \DateTime $messageDate;
 
     #[ORM\Column(name:"message_contenu", type:"string", length:3000, nullable:false)]
-    private ?string $messageContenu;
+    private string $messageContenu;
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"NONE")]

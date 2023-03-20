@@ -71,9 +71,10 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
 //        ;
 //    }
 
-public function findByApiToken(string $apiToken) : ?Utilisateur{
-    return $this->findOneBy(['utilisateurTokenapi' => $apiToken]);
-}
+    public function findByApiToken(string $apiToken) : ?Utilisateur
+    {
+        return $this->findOneBy(['utilisateurTokenapi' => $apiToken]);
+    }
 
 //    public function findOneBySomeField($value): ?Utilisateur
 //    {

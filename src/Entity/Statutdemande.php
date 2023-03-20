@@ -12,11 +12,11 @@ class Statutdemande
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"IDENTITY")]
     #[ORM\Column(name:"statutdemande_id", type:"integer", nullable:false)]
-    private ?int $statutdemandeId;
+    private int $statutdemandeId;
 
     #[ORM\Column(name:"statutdemande_libelle", type:"string", length:300, nullable:false)]
-    private ?string $statutdemandeLibelle;
-    public function getId(): ?int
+    private string $statutdemandeLibelle;
+    public function getId(): int
     {
         return $this->statutdemandeId;
     }

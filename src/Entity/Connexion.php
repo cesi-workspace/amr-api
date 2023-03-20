@@ -19,12 +19,15 @@ class Connexion
     #[ORM\Column(name:"connexion_resultat", type:"boolean", nullable:false)]
     private bool $connexionResultat;
 
-    #[ORM\Column(name:"connexion_date", type:"datetime", nullable:false)]
-    private \DateTime $connexionDate;
+    #[ORM\Column(name:"connexion_datedebut", type:"datetime", nullable:false)]
+    private \DateTime $connexionDatedebut;
+
+    #[ORM\Column(name:"connexion_datefin", type:"datetime", nullable:true)]
+    private ?\DateTime $connexionDatefin;
 
     #[ORM\ManyToOne(targetEntity:Utilisateur::class)]
     #[ORM\JoinColumn(name: "connexion_utilisateur_id", referencedColumnName: "utilisateur_id")]
-    private Utilisateur $connexionUtilisateur;
+    private ?Utilisateur $connexionUtilisateur;
 
     public function getId(): int
     {
@@ -40,21 +43,31 @@ class Connexion
 
         return $this;
     }
-    public function getDate(): \DateTime
+    public function getDatedebut(): \DateTime
     {
-        return $this->connexionDate;
+        return $this->connexionDatedebut;
     }
-    public function setDate(\DateTime $connexionDate): self
+    public function setDatedebut(\DateTime $connexionDatedebut): self
     {
-        $this->connexionDate = $connexionDate;
+        $this->connexionDatedebut = $connexionDatedebut;
 
         return $this;
     }
-    public function getUtilisateur(): Utilisateur
+    public function getDatefin(): ?\DateTime
+    {
+        return $this->connexionDatefin;
+    }
+    public function setDatefin(?\DateTime $connexionDatefin): self
+    {
+        $this->connexionDatefin = $connexionDatefin;
+
+        return $this;
+    }
+    public function getUtilisateur(): ?Utilisateur
     {
         return $this->connexionUtilisateur;
     }
-    public function setUtilisateur(Utilisateur $connexionUtilisateur): self
+    public function setUtilisateur(?Utilisateur $connexionUtilisateur): self
     {
         $this->connexionUtilisateur = $connexionUtilisateur;
 

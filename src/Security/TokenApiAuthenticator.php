@@ -31,8 +31,7 @@ class TokenApiAuthenticator extends AbstractAuthenticator
     */
    public function supports(Request $request): ?bool
    {
-       //return $request->headers->has('X-AUTH-TOKEN');
-       return true;
+       return $request->headers->has('X-AUTH-TOKEN');
    }
 
    public function authenticate(Request $request): Passport

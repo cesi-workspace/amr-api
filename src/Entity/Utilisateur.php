@@ -9,12 +9,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+#[ORM\Index(name:"FK_UTILISATEUR_TYPEUTILISATEUR", columns:["utilisateur_typeutilisateur_id"])]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name:"utilisateur_id")]
-    private ?int $utilisateurId = null;
+    private int $utilisateurId;
 
     #[ORM\Column(name:"utilisateur_email", length: 180, unique: true)]
     private ?string $utilisateurEmail = null;
@@ -60,7 +61,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurEmail;
     }
 
-    public function setEmail(string $utilisateurEmail): self
+    public function setEmail(?string $utilisateurEmail): self
     {
         $this->utilisateurEmail = $utilisateurEmail;
 
@@ -114,7 +115,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurVille;
     }
 
-    public function setVille(string $utilisateurVille): self
+    public function setVille(?string $utilisateurVille): self
     {
         $this->utilisateurVille = $utilisateurVille;
 
@@ -125,7 +126,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurCodepostal;
     }
 
-    public function setCodePostal(string $utilisateurCodepostal): self
+    public function setCodePostal(?string $utilisateurCodepostal): self
     {
         $this->utilisateurCodepostal = $utilisateurCodepostal;
 
@@ -136,7 +137,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurActive;
     }
 
-    public function setActive(bool $utilisateurActive): self
+    public function setActive(?bool $utilisateurActive): self
     {
         $this->utilisateurActive = $utilisateurActive;
 
@@ -147,7 +148,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurTokenapi;
     }
 
-    public function setTokenapi(string $utilisateurTokenapi): self
+    public function setTokenapi(?string $utilisateurTokenapi): self
     {
         $this->utilisateurTokenapi = $utilisateurTokenapi;
 
@@ -158,7 +159,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->utilisateurPoint;
     }
 
-    public function setPoint(int $utilisateurPoint): self
+    public function setPoint(?int $utilisateurPoint): self
     {
         $this->utilisateurPoint = $utilisateurPoint;
 

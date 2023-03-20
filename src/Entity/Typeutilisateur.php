@@ -12,11 +12,11 @@ class Typeutilisateur
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"IDENTITY")]
     #[ORM\Column(name:"typeutilisateur_id", type:"integer", nullable:false)]
-    private ?int $typeutilisateurId;
+    private int $typeutilisateurId;
 
     #[ORM\Column(name:"typeutilisateur_libelle", type:"string", length:300, nullable:false)]
-    private ?string $typeutilisateurLibelle;
-    public function getId(): ?int
+    private string $typeutilisateurLibelle;
+    public function getId(): int
     {
         return $this->typeutilisateurId;
     }

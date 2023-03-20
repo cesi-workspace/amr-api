@@ -20,13 +20,13 @@ class Traitementdemande
     #[ORM\GeneratedValue(strategy:"NONE")]
     #[ORM\OneToOne(targetEntity:Demande::class)]
     #[ORM\JoinColumn(name:"traitementdemande_demande_id", referencedColumnName:"demande_id")]
-    private ?Demande $traitementdemandeDemande;
+    private Demande $traitementdemandeDemande;
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"NONE")]
     #[ORM\OneToOne(targetEntity:Utilisateur::class)]
     #[ORM\JoinColumn(name:"traitementdemande_membrevolontaire_id", referencedColumnName:"utilisateur_id")]
-    private ?Utilisateur $traitementdemandeMembrevolontaire;
+    private Utilisateur $traitementdemandeMembrevolontaire;
 
     public function getTypetraitementdemande(): Typetraitementdemande
     {

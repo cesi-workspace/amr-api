@@ -27,10 +27,10 @@ class Demande
     #[ORM\Column(name:"demande_date", type:"datetime", nullable:false)]
     private \DateTime $demandeDate;
 
-    #[ORM\Column(name:"demande_ville", type:"string", nullable:false)]
+    #[ORM\Column(name:"demande_ville", type:"string", length:300, nullable:false)]
     private string $demandeVille;
 
-    #[ORM\Column(name:"demande_codepostal", type:"string", nullable:false)]
+    #[ORM\Column(name:"demande_codepostal", type:"string", length:300, nullable:false)]
     private string $demandeCodepostal;
 
     #[ORM\Column(name:"demande_note", type:"integer", nullable:true)]
