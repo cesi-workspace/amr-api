@@ -86,7 +86,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $utilisateurTypeutilisateur = $this->utilisateurTypeutilisateur;
         // guarantee every user at least has ROLE_USER
         // $utilisateurTypeutilisateur[] = 'ROLE_USER';
-        return array_unique([$utilisateurTypeutilisateur->getLibelle()]);
+        return array_unique(['ROLE_USER', $utilisateurTypeutilisateur->getLibelle()]);
     }
 
     public function setRoles(Typeutilisateur $utilisateurTypeutilisateur): self

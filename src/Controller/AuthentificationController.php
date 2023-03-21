@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class AuthentificationController extends AbstractController
 {
@@ -47,6 +48,31 @@ class AuthentificationController extends AbstractController
         $data = ['utilisateur_tokenapi' => $authToken];
         $retour = ['code' => 0 , 'message' => 'Authentification réussie', 'data' => $data];
         
+        return new JsonResponse($retour, Response::HTTP_OK);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/logout', name: 'authentification_logout', methods: ['POST'])]
+    public function logout(Request $userrequest, EntityManagerInterface $em): Response
+    {
+        $userconnect = $this->getUser();
+
+        $connexion=$em->getRepository(Connexion::class)->findBy([
+            'connexionUtilisateur'=>$userconnect,
+            'connexionResultat' => true
+        ], [
+            'connexionDatedebut' => 'DESC'
+        ],1)[0];
+        
+        $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
+        $connexion->setDateFin(new \DateTime($datetimenow));
+        
+        $userconnect->setTokenapi(null);
+
+        $em->flush();
+
+        $retour = ['code' => 0 , 'message' => 'Déconnexion réussie'];
+
         return new JsonResponse($retour, Response::HTTP_OK);
     }
 }
