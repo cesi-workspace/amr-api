@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Index(name:"FK_UTILISATEUR_TYPEUTILISATEUR", columns:["utilisateur_typeutilisateur_id"])]
+#[ORM\Index(name:"FK_UTILISATEUR_STATUTUTILISATEUR", columns:["utilisateur_statututilisateur_id"])]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -34,7 +35,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column(name:"utilisateur_motdepasse")]
-    private ?string $utilisateurMotdepasse = null;
+    private string $utilisateurMotdepasse;
 
     #[ORM\Column(name:"utilisateur_ville", nullable:true)]
     private ?string $utilisateurVille = null;
@@ -42,8 +43,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name:"utilisateur_codepostal", nullable:true)]
     private ?string $utilisateurCodepostal = null;
 
-    #[ORM\Column(name:"utilisateur_active")]
-    private ?bool $utilisateurActive = null;
+    #[ORM\ManyToOne(targetEntity:Statututilisateur::class)]
+    #[ORM\JoinColumn(name:"utilisateur_statututilisateur_id", referencedColumnName:"statututilisateur_id", nullable:false)]
+    private Statututilisateur $utilisateurStatututilisateur;
 
     #[ORM\Column(name:"utilisateur_tokenapi", nullable:true)]
     public ?string $utilisateurTokenapi = null;
@@ -86,12 +88,34 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $utilisateurTypeutilisateur = $this->utilisateurTypeutilisateur;
         // guarantee every user at least has ROLE_USER
         // $utilisateurTypeutilisateur[] = 'ROLE_USER';
-        return array_unique(['ROLE_USER', $utilisateurTypeutilisateur->getLibelle()]);
+        return array_unique(['ROLE_USER', $utilisateurTypeutilisateur->getRole()]);
     }
 
     public function setRoles(Typeutilisateur $utilisateurTypeutilisateur): self
     {
         $this->utilisateurTypeutilisateur = $utilisateurTypeutilisateur;
+
+        return $this;
+    }
+    public function getNom(): ?string
+    {
+        return $this->utilisateurNom;
+    }
+
+    public function setNom(?string $utilisateurNom): self
+    {
+        $this->utilisateurNom = $utilisateurNom;
+
+        return $this;
+    }
+    public function getPrenom(): ?string
+    {
+        return $this->utilisateurPrenom;
+    }
+
+    public function setPrenom(?string $utilisateurPrenom): self
+    {
+        $this->utilisateurPrenom = $utilisateurPrenom;
 
         return $this;
     }
@@ -132,14 +156,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getActive(): ?bool
+    public function getStatututilisateur(): Statututilisateur
     {
-        return $this->utilisateurActive;
+        return $this->utilisateurStatututilisateur;
     }
 
-    public function setActive(?bool $utilisateurActive): self
+    public function setStatututilisateur(Statututilisateur $utilisateurStatututilisateur): self
     {
-        $this->utilisateurActive = $utilisateurActive;
+        $this->utilisateurStatututilisateur = $utilisateurStatututilisateur;
 
         return $this;
     }

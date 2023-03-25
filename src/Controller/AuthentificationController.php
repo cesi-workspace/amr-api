@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Connexion;
+use App\Entity\Statututilisateur;
 use App\Entity\Utilisateur;
 use App\Service\CryptService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +27,8 @@ class AuthentificationController extends AbstractController
         
         $user = $em->getRepository(Utilisateur::class)->findOneBy([
             'utilisateurEmail' => $cryptService->encrypt($parameters['utilisateur_email']),
-            'utilisateurMotdepasse' => hash('sha512',$parameters['utilisateur_motdepasse'])
+            'utilisateurMotdepasse' => hash('sha512',$parameters['utilisateur_motdepasse']),
+            'utilisateurStatututilisateur' => $em->getRepository(Statututilisateur::class)->find(1)
         ]);
 
         if($user == null){
