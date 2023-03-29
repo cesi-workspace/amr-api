@@ -29,3 +29,7 @@ services:
         arguments:
             $cryptkey: '%env(APP_SECRET)%'
             $cryptalgo: '%env(APP_CRYPTALGO)%'
+    App\Service\EmailService:
+        arguments:
+            $to: '%env(MAIL_ADDRESS_TO)%'
+            $from: '%env(MAIL_ADDRESS_FROM)%'

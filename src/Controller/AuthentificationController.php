@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class AuthentificationController extends AbstractController
 {
-    #[Route('/login', name: 'authentification_login', methods: ['POST'])]
+    #[Route('/session', name: 'authentification_login', methods: ['POST'])]
     public function login(Request $userrequest, EntityManagerInterface $em, CryptService $cryptService): Response
     {
         $connexion = new Connexion();
@@ -35,7 +35,7 @@ class AuthentificationController extends AbstractController
             $connexion->setResultat(false);
             $em->persist($connexion);
             $em->flush();
-            $retour = ['code' => 1, 'message' => 'Authentification échouée, vérifiez le login et le mot de passe'];
+            $retour = ['message' => 'Authentification échouée, vérifiez le login et le mot de passe'];
             return new JsonResponse($retour, Response::HTTP_UNAUTHORIZED);
         }
 
@@ -48,13 +48,13 @@ class AuthentificationController extends AbstractController
         $em->flush();
 
         $data = ['utilisateur_tokenapi' => $authToken];
-        $retour = ['code' => 0 , 'message' => 'Authentification réussie', 'data' => $data];
+        $retour = ['message' => 'Authentification réussie', 'data' => $data];
         
         return new JsonResponse($retour, Response::HTTP_OK);
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/logout', name: 'authentification_logout', methods: ['POST'])]
+    #[Route('/session', name: 'authentification_logout', methods: ['DELETE'])]
     public function logout(Request $userrequest, EntityManagerInterface $em): Response
     {
         $userconnect = $this->getUser();
@@ -73,7 +73,7 @@ class AuthentificationController extends AbstractController
 
         $em->flush();
 
-        $retour = ['code' => 0 , 'message' => 'Déconnexion réussie'];
+        $retour = ['message' => 'Déconnexion réussie'];
 
         return new JsonResponse($retour, Response::HTTP_OK);
     }

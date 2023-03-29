@@ -61,7 +61,6 @@ class TokenApiAuthenticator extends AbstractAuthenticator
        $data = [
            // you may want to customize or obfuscate the message first
            //'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
-           'code' => -1,
            'message' => 'Jeton de connexion invalide'
 
            // or to translate this message

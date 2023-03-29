@@ -97,6 +97,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getTypeutilisateur(): Typeutilisateur
+    {
+        return $this->utilisateurTypeutilisateur;
+    }
+
+    public function setTypeutilisateur(Typeutilisateur $utilisateurTypeutilisateur): self
+    {
+        $this->utilisateurTypeutilisateur = $utilisateurTypeutilisateur;
+
+        return $this;
+    }
     public function getNom(): ?string
     {
         return $this->utilisateurNom;

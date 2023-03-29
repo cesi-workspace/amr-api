@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Statututilisateur;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -19,7 +21,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UtilisateurRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, public EntityManagerInterface $em)
     {
         parent::__construct($registry, Utilisateur::class);
     }
@@ -75,7 +77,11 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
     {
         return $this->findOneBy([
             'utilisateurTokenapi' => $apiToken,
-            'utilisateurActive' => true
+            'utilisateurStatututilisateur' => $this->em->getRepository(Statututilisateur::class)->findOneBy(
+                [
+                    'statututilisateurLibelle' => 'Actif'
+                ]
+            )
         ]);
     }
 
