@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\DemandeRepository;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Table(name:"demande")]
 #[ORM\Index(name:"FK_DEMANDE_CATEGORIEDEMANDE", columns:["demande_categoriedemande_id"])]
@@ -36,15 +37,6 @@ class Demande
     #[ORM\Column(name:"demande_note", type:"integer", nullable:true)]
     private ?int $demandeNote;
 
-    #[ORM\Column(name:"demande_commentaire", type:"string", length:3000,nullable:true)]
-    private ?string $demandeCommentaire;
-
-    #[ORM\Column(name:"demande_datecommentaire", type:"datetime", nullable:true)]
-    private ?\DateTime $demandeDatecommentaire;
-
-    #[ORM\Column(name:"demande_commentaireestsignale", type:"boolean", nullable:true)]
-    private ?bool $demandeCommentaireestsignale;
-
     #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
     #[ORM\JoinColumn(name: "demande_membremr_id", referencedColumnName: "utilisateur_id", nullable:false)]
     private Utilisateur $demandeMembremr;
@@ -60,6 +52,14 @@ class Demande
     #[ORM\ManyToOne(targetEntity: Statutdemande::class)]
     #[ORM\JoinColumn(name: "demande_statutdemande_id", referencedColumnName: "statutdemande_id", nullable:false)]
     private Statutdemande $demandeStatutdemande;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"demande_dateinsert", type:"datetime", nullable:false)]
+    private \DateTime $demandeDateinsert;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"demande_dateupdate", type:"datetime", nullable:true)]
+    private ?\DateTime $demandeDateupdate;
 
 
     public function getId(): int
@@ -126,36 +126,6 @@ class Demande
 
         return $this;
     }
-    public function getCommentaire(): ?string
-    {
-        return $this->demandeCommentaire;
-    }
-    public function setCommentaire(?string $demandeCommentaire): self
-    {
-        $this->demandeCommentaire = $demandeCommentaire;
-
-        return $this;
-    }
-    public function getDatecommentaire(): ?\DateTime
-    {
-        return $this->demandeDatecommentaire;
-    }
-    public function setDatecommentaire(?\DateTime $demandeDatecommentaire): self
-    {
-        $this->demandeDatecommentaire = $demandeDatecommentaire;
-
-        return $this;
-    }
-    public function getCommentaireestsignale(): ?bool
-    {
-        return $this->demandeCommentaireestsignale;
-    }
-    public function setCommentaireestsignale(?bool $demandeCommentaireestsignale): self
-    {
-        $this->demandeCommentaireestsignale = $demandeCommentaireestsignale;
-
-        return $this;
-    }
     public function getMembremr(): Utilisateur
     {
         return $this->demandeMembremr;
@@ -195,5 +165,13 @@ class Demande
         $this->demandeStatutdemande = $demandeStatutdemande;
 
         return $this;
+    }
+    public function getDateinsert(): \DateTime
+    {
+        return $this->demandeDateinsert;
+    }
+    public function getDateupdate(): ?\DateTime
+    {
+        return $this->demandeDateupdate;
     }
 }

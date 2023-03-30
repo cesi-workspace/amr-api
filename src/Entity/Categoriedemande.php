@@ -14,6 +14,9 @@ class Categoriedemande
     #[ORM\Column(name:"categoriedemande_id", type:"integer", nullable:false)]
     private int $categoriedemandeId;
 
+    #[ORM\Column(name:"categoriedemande_titre", type:"string", nullable:false)]
+    private string $categoriedemandeTitre;
+
     #[ORM\Column(name:"categoriedemande_heuremin", type:"time", nullable:false)]
     private \DateTime $categoriedemandeHeuremin;
 
@@ -26,6 +29,16 @@ class Categoriedemande
     public function getId(): int
     {
         return $this->categoriedemandeId;
+    }
+    public function getTitre(): string
+    {
+        return $this->categoriedemandeTitre;
+    }
+    public function setTitre(string $categoriedemandeTitre): self
+    {
+        $this->categoriedemandeTitre = $categoriedemandeTitre;
+
+        return $this;
     }
     public function getHeuremin(): \DateTime
     {

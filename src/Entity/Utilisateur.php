@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Index(name:"FK_UTILISATEUR_TYPEUTILISATEUR", columns:["utilisateur_typeutilisateur_id"])]
@@ -15,43 +16,51 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name:"utilisateur_id")]
+    #[ORM\Column(name:"utilisateur_id", type:"integer")]
     private int $utilisateurId;
 
-    #[ORM\Column(name:"utilisateur_email", length: 180, unique: true)]
+    #[ORM\Column(name:"utilisateur_email", type:"string", length: 180, unique: true)]
     private ?string $utilisateurEmail = null;
 
     #[ORM\ManyToOne(targetEntity:Typeutilisateur::class)]
     #[ORM\JoinColumn(name:"utilisateur_typeutilisateur_id", referencedColumnName:"typeutilisateur_id", nullable:false)]
     private Typeutilisateur $utilisateurTypeutilisateur;
 
-    #[ORM\Column(name:"utilisateur_nom", nullable:true)]
+    #[ORM\Column(name:"utilisateur_nom", type:"string", nullable:true)]
     private ?string $utilisateurNom = null;
 
-    #[ORM\Column(name:"utilisateur_prenom", nullable:true)]
+    #[ORM\Column(name:"utilisateur_prenom", type:"string", nullable:true)]
     private ?string $utilisateurPrenom = null;
 
     /**
      * @var string The hashed password
      */
-    #[ORM\Column(name:"utilisateur_motdepasse")]
+    #[ORM\Column(name:"utilisateur_motdepasse", type:"string")]
     private string $utilisateurMotdepasse;
 
-    #[ORM\Column(name:"utilisateur_ville", nullable:true)]
+    #[ORM\Column(name:"utilisateur_ville", type:"string", nullable:true)]
     private ?string $utilisateurVille = null;
 
-    #[ORM\Column(name:"utilisateur_codepostal", nullable:true)]
+    #[ORM\Column(name:"utilisateur_codepostal", type:"string", nullable:true)]
     private ?string $utilisateurCodepostal = null;
 
     #[ORM\ManyToOne(targetEntity:Statututilisateur::class)]
     #[ORM\JoinColumn(name:"utilisateur_statututilisateur_id", referencedColumnName:"statututilisateur_id", nullable:false)]
     private Statututilisateur $utilisateurStatututilisateur;
 
-    #[ORM\Column(name:"utilisateur_tokenapi", nullable:true)]
+    #[ORM\Column(name:"utilisateur_tokenapi", type:"string", nullable:true)]
     public ?string $utilisateurTokenapi = null;
 
-    #[ORM\Column(name:"utilisateur_point", nullable:true)]
+    #[ORM\Column(name:"utilisateur_point", type:"integer", nullable:true)]
     private ?int $utilisateurPoint = null;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"utilisateur_dateinsert", type:"datetime", nullable:false)]
+    private \DateTime $utilisateurDateinsert;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"utilisateur_dateupdate", type:"datetime", nullable:true)]
+    private ?\DateTime $utilisateurDateupdate;
 
     public function getId(): ?int
     {
@@ -199,6 +208,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->utilisateurPoint = $utilisateurPoint;
 
         return $this;
+    }
+    public function getDateinsert(): \DateTime
+    {
+        return $this->utilisateurDateinsert;
+    }
+    public function getDateupdate(): ?\DateTime
+    {
+        return $this->utilisateurDateupdate;
     }
 
     /**
