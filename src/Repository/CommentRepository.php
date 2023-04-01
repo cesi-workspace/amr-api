@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Typetraitementdemande;
+use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Typetraitementdemande>
+ * @extends ServiceEntityRepository<Comment>
  *
- * @method Typetraitementdemande|null find($id, $lockMode = null, $lockVersion = null)
- * @method Typetraitementdemande|null findOneBy(array $criteria, array $orderBy = null)
- * @method Typetraitementdemande[]    findAll()
- * @method Typetraitementdemande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Comment|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Comment|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Comment[]    findAll()
+ * @method Comment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TypetraitementdemandeRepository extends ServiceEntityRepository
+class CommentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Typetraitementdemande::class);
+        parent::__construct($registry, Comment::class);
     }
 
-    public function save(Typetraitementdemande $entity, bool $flush = false): void
+    public function save(Comment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TypetraitementdemandeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Typetraitementdemande $entity, bool $flush = false): void
+    public function remove(Comment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class TypetraitementdemandeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Typetraitementdemande[] Returns an array of Typetraitementdemande objects
+//     * @return Comment[] Returns an array of Comment objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class TypetraitementdemandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Typetraitementdemande
+//    public function findOneBySomeField($value): ?Comment
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

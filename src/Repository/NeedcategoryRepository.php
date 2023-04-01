@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Typeutilisateur;
+use App\Entity\Needcategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Typeutilisateur>
+ * @extends ServiceEntityRepository<Needcategory>
  *
- * @method Typeutilisateur|null find($id, $lockMode = null, $lockVersion = null)
- * @method Typeutilisateur|null findOneBy(array $criteria, array $orderBy = null)
- * @method Typeutilisateur[]    findAll()
- * @method Typeutilisateur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Needcategory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Needcategory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Needcategory[]    findAll()
+ * @method Needcategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TypeutilisateurRepository extends ServiceEntityRepository
+class NeedcategoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Typeutilisateur::class);
+        parent::__construct($registry, Needcategory::class);
     }
 
-    public function save(Typeutilisateur $entity, bool $flush = false): void
+    public function save(Needcategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TypeutilisateurRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Typeutilisateur $entity, bool $flush = false): void
+    public function remove(Needcategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class TypeutilisateurRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Typeutilisateur[] Returns an array of Typeutilisateur objects
+//     * @return Needcategory[] Returns an array of Needcategory objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class TypeutilisateurRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Typeutilisateur
+//    public function findOneBySomeField($value): ?Needcategory
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

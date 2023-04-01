@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Repository\UserRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,8 +20,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class TokenApiAuthenticator extends AbstractAuthenticator
 { 
-    private UtilisateurRepository $userRepository;
-    public function __construct(UtilisateurRepository $userRepository){
+    private UserRepository $userRepository;
+    public function __construct(UserRepository $userRepository){
         $this->userRepository = $userRepository;
     }
     

@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Statutdemande;
+use App\Entity\Need;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Statutdemande>
+ * @extends ServiceEntityRepository<Need>
  *
- * @method Statutdemande|null find($id, $lockMode = null, $lockVersion = null)
- * @method Statutdemande|null findOneBy(array $criteria, array $orderBy = null)
- * @method Statutdemande[]    findAll()
- * @method Statutdemande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Need|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Need|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Need[]    findAll()
+ * @method Need[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StatutdemandeRepository extends ServiceEntityRepository
+class NeedRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Statutdemande::class);
+        parent::__construct($registry, Need::class);
     }
 
-    public function save(Statutdemande $entity, bool $flush = false): void
+    public function save(Need $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class StatutdemandeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Statutdemande $entity, bool $flush = false): void
+    public function remove(Need $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class StatutdemandeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Statutdemande[] Returns an array of Statutdemande objects
+//     * @return Need[] Returns an array of Need objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class StatutdemandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Statutdemande
+//    public function findOneBySomeField($value): ?Need
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Categoriedemande;
+use App\Entity\Needtreatmenttype;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Categoriedemande>
+ * @extends ServiceEntityRepository<Needtreatmenttype>
  *
- * @method Categoriedemande|null find($id, $lockMode = null, $lockVersion = null)
- * @method Categoriedemande|null findOneBy(array $criteria, array $orderBy = null)
- * @method Categoriedemande[]    findAll()
- * @method Categoriedemande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Needtreatmenttype|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Needtreatmenttype|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Needtreatmenttype[]    findAll()
+ * @method Needtreatmenttype[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CategoriedemandeRepository extends ServiceEntityRepository
+class NeedtreatmenttypeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Categoriedemande::class);
+        parent::__construct($registry, Needtreatmenttype::class);
     }
 
-    public function save(Categoriedemande $entity, bool $flush = false): void
+    public function save(Needtreatmenttype $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CategoriedemandeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Categoriedemande $entity, bool $flush = false): void
+    public function remove(Needtreatmenttype $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class CategoriedemandeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Categoriedemande[] Returns an array of Categoriedemande objects
+//     * @return Needtreatmenttype[] Returns an array of Needtreatmenttype objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class CategoriedemandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Categoriedemande
+//    public function findOneBySomeField($value): ?Needtreatmenttype
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

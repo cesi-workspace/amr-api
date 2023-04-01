@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Achat;
+use App\Entity\Usertype;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Achat>
+ * @extends ServiceEntityRepository<Usertype>
  *
- * @method Achat|null find($id, $lockMode = null, $lockVersion = null)
- * @method Achat|null findOneBy(array $criteria, array $orderBy = null)
- * @method Achat[]    findAll()
- * @method Achat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Usertype|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Usertype|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Usertype[]    findAll()
+ * @method Usertype[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AchatRepository extends ServiceEntityRepository
+class UsertypeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Achat::class);
+        parent::__construct($registry, Usertype::class);
     }
 
-    public function save(Achat $entity, bool $flush = false): void
+    public function save(Usertype $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class AchatRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Achat $entity, bool $flush = false): void
+    public function remove(Usertype $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class AchatRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Achat[] Returns an array of Achat objects
+//     * @return Usertype[] Returns an array of Usertype objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class AchatRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Achat
+//    public function findOneBySomeField($value): ?Usertype
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Traitementdemande;
+use App\Entity\Connection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Traitementdemande>
+ * @extends ServiceEntityRepository<Connection>
  *
- * @method Traitementdemande|null find($id, $lockMode = null, $lockVersion = null)
- * @method Traitementdemande|null findOneBy(array $criteria, array $orderBy = null)
- * @method Traitementdemande[]    findAll()
- * @method Traitementdemande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Connection|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Connection|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Connection[]    findAll()
+ * @method Connection[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TraitementdemandeRepository extends ServiceEntityRepository
+class ConnectionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Traitementdemande::class);
+        parent::__construct($registry, Connection::class);
     }
 
-    public function save(Traitementdemande $entity, bool $flush = false): void
+    public function save(Connection $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class TraitementdemandeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Traitementdemande $entity, bool $flush = false): void
+    public function remove(Connection $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class TraitementdemandeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Traitementdemande[] Returns an array of Traitementdemande objects
+//     * @return Connection[] Returns an array of Connection objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class TraitementdemandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Traitementdemande
+//    public function findOneBySomeField($value): ?Connection
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

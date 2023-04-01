@@ -12,10 +12,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 class ExceptionSubscriber implements EventSubscriberInterface
 {
 
-    public function __construct(private Security $security){
+    public function __construct(private Security $security, private TranslatorInterface $translator){
 
     }
 
@@ -32,7 +33,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         $user = $this->security->getUser();
-
         $exception = $event->getThrowable();
 
         // Récupération de l'erreur 404 

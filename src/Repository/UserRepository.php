@@ -3,7 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Statututilisateur;
-use App\Entity\Utilisateur;
+use App\Entity\User;
+use App\Entity\Userstatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,21 +13,21 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
- * @extends ServiceEntityRepository<Utilisateur>
+ * @extends ServiceEntityRepository<User>
  *
- * @method Utilisateur|null find($id, $lockMode = null, $lockVersion = null)
- * @method Utilisateur|null findOneBy(array $criteria, array $orderBy = null)
- * @method Utilisateur[]    findAll()
- * @method Utilisateur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User|null find($id, $lockMode = null, $lockVersion = null)
+ * @method User|null findOneBy(array $criteria, array $orderBy = null)
+ * @method User[]    findAll()
+ * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UtilisateurRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry, public EntityManagerInterface $em)
     {
-        parent::__construct($registry, Utilisateur::class);
+        parent::__construct($registry, User::class);
     }
 
-    public function save(Utilisateur $entity, bool $flush = false): void
+    public function save(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -35,7 +36,7 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         }
     }
 
-    public function remove(Utilisateur $entity, bool $flush = false): void
+    public function remove(User $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -49,7 +50,7 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!$user instanceof Utilisateur) {
+        if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
@@ -59,7 +60,7 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
     }
 
 //    /**
-//     * @return Utilisateur[] Returns an array of Utilisateur objects
+//     * @return User[] Returns an array of User objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -73,19 +74,19 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
 //        ;
 //    }
 
-    public function findByApiToken(string $apiToken) : ?Utilisateur
+    public function findByApiToken(string $apiToken) : ?User
     {
         return $this->findOneBy([
-            'utilisateurTokenapi' => $apiToken,
-            'utilisateurStatututilisateur' => $this->em->getRepository(Statututilisateur::class)->findOneBy(
+            'tokenapi' => $apiToken,
+            'status' => $this->em->getRepository(Userstatus::class)->findOneBy(
                 [
-                    'statututilisateurLibelle' => 'Actif'
+                    'label' => 'Actif'
                 ]
             )
         ]);
     }
 
-//    public function findOneBySomeField($value): ?Utilisateur
+//    public function findOneBySomeField($value): ?User
 //    {
 //        return $this->createQueryBuilder('u')
 //            ->andWhere('u.exampleField = :val')

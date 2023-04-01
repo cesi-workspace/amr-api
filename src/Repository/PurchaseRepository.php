@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Cadeau;
+use App\Entity\Purchase;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Cadeau>
+ * @extends ServiceEntityRepository<Purchase>
  *
- * @method Cadeau|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cadeau|null findOneBy(array $criteria, array $orderBy = null)
- * @method Cadeau[]    findAll()
- * @method Cadeau[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Purchase|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Purchase|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Purchase[]    findAll()
+ * @method Purchase[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CadeauRepository extends ServiceEntityRepository
+class PurchaseRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Cadeau::class);
+        parent::__construct($registry, Purchase::class);
     }
 
-    public function save(Cadeau $entity, bool $flush = false): void
+    public function save(Purchase $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CadeauRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Cadeau $entity, bool $flush = false): void
+    public function remove(Purchase $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class CadeauRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Cadeau[] Returns an array of Cadeau objects
+//     * @return Purchase[] Returns an array of Purchase objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class CadeauRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Cadeau
+//    public function findOneBySomeField($value): ?Purchase
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

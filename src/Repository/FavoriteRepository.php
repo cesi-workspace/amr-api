@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Connexion;
+use App\Entity\Favorite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Connexion>
+ * @extends ServiceEntityRepository<Favorite>
  *
- * @method Connexion|null find($id, $lockMode = null, $lockVersion = null)
- * @method Connexion|null findOneBy(array $criteria, array $orderBy = null)
- * @method Connexion[]    findAll()
- * @method Connexion[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Favorite|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Favorite|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Favorite[]    findAll()
+ * @method Favorite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ConnexionRepository extends ServiceEntityRepository
+class FavoriteRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Connexion::class);
+        parent::__construct($registry, Favorite::class);
     }
 
-    public function save(Connexion $entity, bool $flush = false): void
+    public function save(Favorite $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class ConnexionRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Connexion $entity, bool $flush = false): void
+    public function remove(Favorite $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class ConnexionRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Connexion[] Returns an array of Connexion objects
+//     * @return Favorite[] Returns an array of Favorite objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class ConnexionRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Connexion
+//    public function findOneBySomeField($value): ?Favorite
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

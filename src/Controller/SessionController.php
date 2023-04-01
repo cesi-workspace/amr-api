@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Connexion;
-use App\Entity\Statututilisateur;
-use App\Entity\Utilisateur;
+use App\Entity\Connection;
+use App\Entity\Userstatus;
+use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,20 +16,20 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AuthentificationController extends AbstractController
+class SessionController extends AbstractController
 {
     #[Route('/session', name: 'authentification_login', methods: ['POST'])]
     public function login(Request $userrequest, EntityManagerInterface $em, CryptService $cryptService, ResponseValidatorService $responseValidatorService): Response
     {
-        $connexion = new Connexion();
+        $connexion = new Connection();
         $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
-        $connexion->setDatedebut(new \DateTime($datetimenow));
+        $connexion->setDatebegin(new \DateTime($datetimenow));
 
         $parameters = json_decode($userrequest->getContent(), true);
         
         $constraints = new Assert\Collection([
-            'utilisateur_email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank],
-            'utilisateur_motdepasse' => [new Assert\Type('string'), new Assert\NotBlank]
+            'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank],
+            'password' => [new Assert\Type('string'), new Assert\NotBlank]
         ]);
 
         $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
@@ -38,29 +38,29 @@ class AuthentificationController extends AbstractController
             return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
         }
 
-        $user = $em->getRepository(Utilisateur::class)->findOneBy([
-            'utilisateurEmail' => $cryptService->encrypt($parameters['utilisateur_email']),
-            'utilisateurMotdepasse' => hash('sha512',$parameters['utilisateur_motdepasse']),
-            'utilisateurStatututilisateur' => $em->getRepository(Statututilisateur::class)->find(1)
+        $user = $em->getRepository(User::class)->findOneBy([
+            'email' => $cryptService->encrypt($parameters['email']),
+            'password' => hash('sha512',$parameters['password']),
+            'status' => $em->getRepository(Userstatus::class)->find(1)
         ]);
 
         if($user == null){
-            $connexion->setResultat(false);
+            $connexion->setSuccess(false);
             $em->persist($connexion);
             $em->flush();
             $retour = ['message' => 'Authentification échouée, vérifiez le login et le mot de passe'];
             return new JsonResponse($retour, Response::HTTP_UNAUTHORIZED);
         }
 
-        $connexion->setUtilisateur($user);
-        $connexion->setResultat(true);
+        $connexion->setUser($user);
+        $connexion->setSuccess(true);
         $em->persist($connexion);
 
         $authToken=base64_encode(random_bytes(50));
         $user->setTokenapi($authToken);
         $em->flush();
 
-        $data = ['utilisateur_tokenapi' => $authToken];
+        $data = ['tokenapi' => $authToken];
         $retour = ['message' => 'Authentification réussie', 'data' => $data];
         
         return new JsonResponse($retour, Response::HTTP_OK);
@@ -72,15 +72,15 @@ class AuthentificationController extends AbstractController
     {
         $userconnect = $this->getUser();
 
-        $connexion=$em->getRepository(Connexion::class)->findBy([
-            'connexionUtilisateur'=>$userconnect,
-            'connexionResultat' => true
+        $connexion=$em->getRepository(Connection::class)->findBy([
+            'user'=>$userconnect,
+            'success' => true
         ], [
-            'connexionDatedebut' => 'DESC'
+            'datebegin' => 'DESC'
         ],1)[0];
         
         $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
-        $connexion->setDateFin(new \DateTime($datetimenow));
+        $connexion->setDateend(new \DateTime($datetimenow));
         
         $userconnect->setTokenapi(null);
 

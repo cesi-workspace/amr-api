@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Demande;
+use App\Entity\Userstatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Demande>
+ * @extends ServiceEntityRepository<Userstatus>
  *
- * @method Demande|null find($id, $lockMode = null, $lockVersion = null)
- * @method Demande|null findOneBy(array $criteria, array $orderBy = null)
- * @method Demande[]    findAll()
- * @method Demande[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Userstatus|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Userstatus|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Userstatus[]    findAll()
+ * @method Userstatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DemandeRepository extends ServiceEntityRepository
+class UserstatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Demande::class);
+        parent::__construct($registry, Userstatus::class);
     }
 
-    public function save(Demande $entity, bool $flush = false): void
+    public function save(Userstatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class DemandeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Demande $entity, bool $flush = false): void
+    public function remove(Userstatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class DemandeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Demande[] Returns an array of Demande objects
+//     * @return Userstatus[] Returns an array of Userstatus objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class DemandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Demande
+//    public function findOneBySomeField($value): ?Userstatus
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

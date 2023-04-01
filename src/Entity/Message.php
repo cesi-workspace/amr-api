@@ -7,69 +7,69 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 #[ORM\Table(name:"message")]
-#[ORM\Index(name:"FK_MESSAGE_UTILISATEURFROM", columns:["message_from_utilisateur_id"])]
-#[ORM\Index(name:"FK_MESSAGE_UTILISATEURTO", columns:["message_to_utilisateur_id"])]
+#[ORM\Index(name:"FK_MESSAGE_USERFROM", columns:["from_user_id"])]
+#[ORM\Index(name:"FK_MESSAGE_USERTO", columns:["to_user_id"])]
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
 {
     
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"NONE")]
-    #[ORM\Column(name:"message_date", type:"datetime", nullable:false)]
-    private \DateTime $messageDate;
+    #[ORM\Column(name:"date", type:"datetime", nullable:false)]
+    private \DateTime $date;
 
-    #[ORM\Column(name:"message_contenu", type:"string", length:3000, nullable:false)]
-    private string $messageContenu;
-
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy:"NONE")]
-    #[ORM\OneToOne(targetEntity:Utilisateur::class)]
-    #[ORM\JoinColumn(name: "message_to_utilisateur_id", referencedColumnName: "utilisateur_id")]
-    private Utilisateur $messageToUtilisateur;
+    #[ORM\Column(name:"content", type:"string", length:3000, nullable:false)]
+    private string $content;
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"NONE")]
-    #[ORM\OneToOne(targetEntity:Utilisateur::class)]
-    #[ORM\JoinColumn(name: "message_from_utilisateur_id", referencedColumnName: "utilisateur_id")]
-    private Utilisateur $messageFromUtilisateur;
+    #[ORM\OneToOne(targetEntity:User::class)]
+    #[ORM\JoinColumn(name: "to_user_id", referencedColumnName: "id", onDelete:"CASCADE")]
+    private User $toUser;
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy:"NONE")]
+    #[ORM\OneToOne(targetEntity:User::class)]
+    #[ORM\JoinColumn(name: "from_user_id", referencedColumnName: "id", onDelete:"CASCADE")]
+    private User $fromUser;
 
     public function getDate(): \DateTime
     {
-        return $this->messageDate;
+        return $this->date;
     }
-    public function setDate(\DateTime $messageDate): self
+    public function setDate(\DateTime $date): self
     {
-        $this->messageDate = $messageDate;
+        $this->date = $date;
 
         return $this;
     }
-    public function getContenu(): string
+    public function getContent(): string
     {
-        return $this->messageContenu;
+        return $this->content;
     }
-    public function setContenu(string $messageContenu): self
+    public function setContent(string $content): self
     {
-        $this->messageContenu = $messageContenu;
+        $this->content = $content;
 
         return $this;
     }
-    public function getToUtilisateur(): Utilisateur
+    public function getToUser(): User
     {
-        return $this->messageToUtilisateur;
+        return $this->toUser;
     }
-    public function setToUtilisateur(Utilisateur $messageToUtilisateur): self
+    public function setToUser(User $toUser): self
     {
-        $this->messageToUtilisateur = $messageToUtilisateur;
+        $this->toUser = $toUser;
 
         return $this;
     }
-    public function getFromUtilisateur(): Utilisateur
+    public function getFromUser(): User
     {
-        return $this->messageFromUtilisateur;
+        return $this->fromUser;
     }
-    public function setFromUtilisateur(Utilisateur $messageFromUtilisateur): self
+    public function setFromUser(User $fromUser): self
     {
-        $this->messageFromUtilisateur = $messageFromUtilisateur;
+        $this->fromUser = $fromUser;
 
         return $this;
     }

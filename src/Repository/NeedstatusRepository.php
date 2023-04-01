@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Favori;
+use App\Entity\Needstatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Favori>
+ * @extends ServiceEntityRepository<Needstatus>
  *
- * @method Favori|null find($id, $lockMode = null, $lockVersion = null)
- * @method Favori|null findOneBy(array $criteria, array $orderBy = null)
- * @method Favori[]    findAll()
- * @method Favori[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Needstatus|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Needstatus|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Needstatus[]    findAll()
+ * @method Needstatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class FavoriRepository extends ServiceEntityRepository
+class NeedstatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Favori::class);
+        parent::__construct($registry, Needstatus::class);
     }
 
-    public function save(Favori $entity, bool $flush = false): void
+    public function save(Needstatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class FavoriRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Favori $entity, bool $flush = false): void
+    public function remove(Needstatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class FavoriRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Favori[] Returns an array of Favori objects
+//     * @return Needstatus[] Returns an array of Needstatus objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class FavoriRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Favori
+//    public function findOneBySomeField($value): ?Needstatus
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

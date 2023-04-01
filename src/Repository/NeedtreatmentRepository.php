@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Statututilisateur;
+use App\Entity\Needtreatment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Statututilisateur>
+ * @extends ServiceEntityRepository<Needtreatment>
  *
- * @method Statututilisateur|null find($id, $lockMode = null, $lockVersion = null)
- * @method Statututilisateur|null findOneBy(array $criteria, array $orderBy = null)
- * @method Statututilisateur[]    findAll()
- * @method Statututilisateur[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Needtreatment|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Needtreatment|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Needtreatment[]    findAll()
+ * @method Needtreatment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StatututilisateurRepository extends ServiceEntityRepository
+class NeedtreatmentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Statututilisateur::class);
+        parent::__construct($registry, Needtreatment::class);
     }
 
-    public function save(Statututilisateur $entity, bool $flush = false): void
+    public function save(Needtreatment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class StatututilisateurRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Statututilisateur $entity, bool $flush = false): void
+    public function remove(Needtreatment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class StatututilisateurRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Statututilisateur[] Returns an array of Statututilisateur objects
+//     * @return Needtreatment[] Returns an array of Needtreatment objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class StatututilisateurRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Statututilisateur
+//    public function findOneBySomeField($value): ?Needtreatment
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

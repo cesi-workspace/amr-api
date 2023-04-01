@@ -2,7 +2,7 @@
 
 namespace App\Subscriber;
 
-use App\Entity\Utilisateur;
+use App\Entity\User;
 use App\Service\CryptService;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -29,62 +29,62 @@ class UtilisateurSubscriber implements EventSubscriber
     public function prePersist(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
-        if (!$entity instanceof Utilisateur) {
+        if (!$entity instanceof User) {
             return;
         }
-        $this->encryptUtilisateur($entity);
+        $this->encryptUser($entity);
     }
 
     public function preUpdate(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
-        if (!$entity instanceof Utilisateur) {
+        if (!$entity instanceof User) {
             return;
         }
-        $this->encryptUtilisateur($entity);
+        $this->encryptUser($entity);
     }
 
     public function postLoad(LifecycleEventArgs $args): void
     {
         $entity = $args->getObject();
-        if (!$entity instanceof Utilisateur) {
+        if (!$entity instanceof User) {
             return;
         }
-        $this->decryptUtilisateur($entity);
+        $this->decryptUser($entity);
     }
 
-    public function decryptUtilisateur(Utilisateur $utilisateur)
+    public function decryptUser(User $user)
     {
 
-        $email = $utilisateur->getEmail();
-        $codepostal = $utilisateur->getCodePostal();
-        $ville = $utilisateur->getVille();
+        $email = $user->getEmail();
+        $codepostal = $user->getPostalcode();
+        $ville = $user->getCity();
 
-        $utilisateur->setEmail(
+        $user->setEmail(
             $this->cryptService->decrypt($email)
         );
-        $utilisateur->setCodePostal(
+        $user->setPostalcode(
             $this->cryptService->decrypt($codepostal)
         );
-        $utilisateur->setVille(
+        $user->setCity(
             $this->cryptService->decrypt($ville)
         );
     }
 
-    public function encryptUtilisateur(Utilisateur $utilisateur)
+    public function encryptUser(User $user)
     {
 
-        $email = $utilisateur->getEmail();
-        $codepostal = $utilisateur->getCodePostal();
-        $ville = $utilisateur->getVille();
+        $email = $user->getEmail();
+        $codepostal = $user->getPostalcode();
+        $ville = $user->getCity();
 
-        $utilisateur->setEmail(
+        $user->setEmail(
             $this->cryptService->encrypt($email)
         );
-        $utilisateur->setCodePostal(
+        $user->setPostalcode(
             $this->cryptService->encrypt($codepostal)
         );
-        $utilisateur->setVille(
+        $user->setCity(
             $this->cryptService->encrypt($ville)
         );
     }
