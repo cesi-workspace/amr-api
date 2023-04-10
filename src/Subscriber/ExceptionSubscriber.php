@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTFailureException;
 class ExceptionSubscriber implements EventSubscriberInterface
 {
 

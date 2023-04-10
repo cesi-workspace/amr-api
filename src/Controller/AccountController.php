@@ -9,13 +9,16 @@ use App\Service\EmailService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Usertype;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -25,8 +28,8 @@ class AccountController extends AbstractController
 {
 
     // Route seulement pour ajouter des comptes MembreMr et MembreVolontaire, les autres types de comptes ne peuvent être ajoutées que par l'administrateur via la route POST /users
-    #[Route('/account', name: 'account_add', methods: ['POST'])]
-    public function addcompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
+    #[Route('/api/account', name: 'account_add', methods: ['POST'])]
+    public function addcompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $parameters = json_decode($request->getContent(), true);
 
@@ -55,7 +58,6 @@ class AccountController extends AbstractController
         $user->setEmail($parameters["email"]);
         $user->setSurname($parameters["surname"]);
         $user->setFirstname($parameters["firstname"]);
-        $user->setPassword(hash('SHA512',$parameters["password"]));
         $user->setCity($parameters["city"]);
         $user->setPostalcode($parameters["postalcode"]);
         $user->setRoles($em->getRepository(Usertype::class)->findOneBy([
@@ -68,7 +70,7 @@ class AccountController extends AbstractController
         if($parameters["usertype"] == 'MembreVolontaire'){
             $user->setPoint(0);
         }
-
+        $user->setPassword($userPasswordHasher->hashPassword($user, $parameters["password"]));
         $em->persist($user);
         $em->flush();
 
@@ -78,8 +80,8 @@ class AccountController extends AbstractController
     }
     // Récupérer les données de l'utilisateur connecté seulement
     #[IsGranted('ROLE_USER')]
-    #[Route('/account', name: 'account_get', methods: ['GET'])]
-    public function getmycompte(Request $request, ResponseValidatorService $responseValidatorService): Response
+    #[Route('/api/account', name: 'account_get', methods: ['GET'])]
+    public function getmycompte(Request $request, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
     {
         $parametersURL = $request->query->all();
 
@@ -92,7 +94,7 @@ class AccountController extends AbstractController
         if(count($errorMessages) != 0){
             return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
         }
-
+        
         $userconnect = $this->getUser();
         
         $myuser = [
@@ -110,7 +112,7 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/account', name: 'account_edit', methods: ['PUT'])]
+    #[Route('/api/account', name: 'account_edit', methods: ['PUT'])]
     public function editmycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
     {
         $parameters = json_decode($request->getContent(), true);
@@ -158,7 +160,7 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/account', name: 'account_delete', methods: ['DELETE'])]
+    #[Route('/api/account', name: 'account_delete', methods: ['DELETE'])]
     public function removemycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, CryptService $cryptService): Response
     {
         $parameters = json_decode($request->getContent(), true);

@@ -36,3 +36,7 @@ services:
         arguments:
             $to: '%env(MAIL_ADDRESS_TO)%'
             $from: '%env(MAIL_ADDRESS_FROM)%'
+
+    App\Subscriber\JWTSubscriber:
+        tags:
+            - { name: kernel.event_listener }

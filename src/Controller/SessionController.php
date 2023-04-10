@@ -8,23 +8,26 @@ use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class SessionController extends AbstractController
 {
-    #[Route('/session', name: 'authentification_login', methods: ['POST'])]
-    public function login(Request $userrequest, EntityManagerInterface $em, CryptService $cryptService, ResponseValidatorService $responseValidatorService): Response
+    #[Route('/api/session', name: 'authentification_login', methods: ['POST'])]
+    public function login(Request $userrequest, EntityManagerInterface $em, CryptService $cryptService, ResponseValidatorService $responseValidatorService, JWTTokenManagerInterface $JWTManager, TokenStorageInterface $tokenStorageInterface, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $connexion = new Connection();
         $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
         $connexion->setDatebegin(new \DateTime($datetimenow));
-
+        $connexion->setIpaddress($userrequest->getClientIp());
         $parameters = json_decode($userrequest->getContent(), true);
         
         $constraints = new Assert\Collection([
@@ -40,10 +43,8 @@ class SessionController extends AbstractController
 
         $user = $em->getRepository(User::class)->findOneBy([
             'email' => $cryptService->encrypt($parameters['email']),
-            'password' => hash('sha512',$parameters['password']),
             'status' => $em->getRepository(Userstatus::class)->find(1)
         ]);
-
         if($user == null){
             $connexion->setSuccess(false);
             $em->persist($connexion);
@@ -51,23 +52,32 @@ class SessionController extends AbstractController
             $retour = ['message' => 'Authentification échouée, vérifiez le login et le mot de passe'];
             return new JsonResponse($retour, Response::HTTP_UNAUTHORIZED);
         }
-
+        if (!$userPasswordHasher->isPasswordValid($user, $parameters["password"])) {
+            $connexion->setSuccess(false);
+            $em->persist($connexion);
+            $em->flush();
+            $retour = ['message' => 'Authentification échouée, vérifiez le login et le mot de passe'];
+            return new JsonResponse($retour, Response::HTTP_UNAUTHORIZED);
+        }
         $connexion->setUser($user);
         $connexion->setSuccess(true);
         $em->persist($connexion);
-
-        $authToken=base64_encode(random_bytes(50));
-        $user->setTokenapi($authToken);
         $em->flush();
+        $authToken=$JWTManager->create($user);
+        $tokenParts = explode(".", $authToken);  
+        $tokenHeader = base64_decode($tokenParts[0]);
+        $tokenPayload = base64_decode($tokenParts[1]);
+        $jwtHeader = json_decode($tokenHeader);
+        $jwtPayload = json_decode($tokenPayload);
 
-        $data = ['tokenapi' => $authToken];
+        $data = ['tokenapi' => $authToken, 'test' => $jwtPayload];
         $retour = ['message' => 'Authentification réussie', 'data' => $data];
         
         return new JsonResponse($retour, Response::HTTP_OK);
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/session', name: 'authentification_logout', methods: ['DELETE'])]
+    #[Route('/api/session', name: 'authentification_logout', methods: ['DELETE'])]
     public function logout(Request $userrequest, EntityManagerInterface $em): Response
     {
         $userconnect = $this->getUser();
@@ -81,8 +91,6 @@ class SessionController extends AbstractController
         
         $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
         $connexion->setDateend(new \DateTime($datetimenow));
-        
-        $userconnect->setTokenapi(null);
 
         $em->flush();
 

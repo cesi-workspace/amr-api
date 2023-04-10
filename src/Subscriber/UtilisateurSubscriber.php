@@ -55,7 +55,8 @@ class UtilisateurSubscriber implements EventSubscriber
 
     public function decryptUser(User $user)
     {
-
+        $surname=$user->getSurname();
+        $firstname=$user->getFirstname();
         $email = $user->getEmail();
         $codepostal = $user->getPostalcode();
         $ville = $user->getCity();
@@ -69,11 +70,18 @@ class UtilisateurSubscriber implements EventSubscriber
         $user->setCity(
             $this->cryptService->decrypt($ville)
         );
+        $user->setSurname(
+            $this->cryptService->decrypt($surname)
+        );
+        $user->setFirstname(
+            $this->cryptService->decrypt($firstname)
+        );
     }
 
     public function encryptUser(User $user)
     {
-
+        $surname=$user->getSurname();
+        $firstname=$user->getFirstname();
         $email = $user->getEmail();
         $codepostal = $user->getPostalcode();
         $ville = $user->getCity();
@@ -86,6 +94,12 @@ class UtilisateurSubscriber implements EventSubscriber
         );
         $user->setCity(
             $this->cryptService->encrypt($ville)
+        );
+        $user->setSurname(
+            $this->cryptService->encrypt($surname)
+        );
+        $user->setFirstname(
+            $this->cryptService->encrypt($firstname)
         );
     }
 }

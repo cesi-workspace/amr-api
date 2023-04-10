@@ -48,9 +48,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name:"status_id", referencedColumnName:"id", nullable:false)]
     private Userstatus $status;
 
-    #[ORM\Column(name:"tokenapi", type:"string", nullable:true)]
-    public ?string $tokenapi = null;
-
     #[ORM\Column(name:"point", type:"integer", nullable:true)]
     private ?int $point = null;
 
@@ -184,17 +181,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStatus(Userstatus $status): self
     {
         $this->status = $status;
-
-        return $this;
-    }
-    public function getTokenapi(): ?string
-    {
-        return $this->tokenapi;
-    }
-
-    public function setTokenapi(?string $tokenapi): self
-    {
-        $this->tokenapi = $tokenapi;
 
         return $this;
     }

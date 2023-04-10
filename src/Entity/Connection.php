@@ -16,6 +16,9 @@ class Connection
     #[ORM\Column(name:"id", type:"integer", nullable:false)]
     private int $id;
 
+    #[ORM\Column(name:"ipaddress", type:"string", length:300, nullable:false)]
+    private string $ipaddress;
+
     #[ORM\Column(name:"success", type:"boolean", nullable:false)]
     private bool $success;
 
@@ -32,6 +35,16 @@ class Connection
     public function getId(): int
     {
         return $this->id;
+    }
+    public function getIpaddress(): string
+    {
+        return $this->ipaddress;
+    }
+    public function setIpaddress(string $ipaddress): self
+    {
+        $this->ipaddress = $ipaddress;
+
+        return $this;
     }
     public function getSuccess(): bool
     {
