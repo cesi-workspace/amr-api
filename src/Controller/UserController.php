@@ -29,7 +29,7 @@ class UserController extends AbstractController
 {
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/users', name: 'users_add', methods: ['POST'])]
+    #[Route('/users', name: 'users_add', methods: ['POST'])]
     public function adduser(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $parameters = json_decode($request->getContent(), true);
@@ -107,21 +107,21 @@ class UserController extends AbstractController
     }/*
     // Récupérer les données de l'utilisateur connecté seulement
     #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
-    #[Route('/api/users', name: 'users_get', methods: ['GET'])]
+    #[Route('/users', name: 'users_get', methods: ['GET'])]
     public function getallusers(Request $request, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
     {
         return new JsonResponse(['message' => 'Utilisateur récupéré'], Response::HTTP_OK);
     }
 
     #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
-    #[Route('/api/users/{iduser}', name: 'user_edit', methods: ['PUT'])]
+    #[Route('/users/{iduser}', name: 'user_edit', methods: ['PUT'])]
     public function editauser(Request $request, int $iduser, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
     {
         return new JsonResponse(['message' => 'Données de l\'utilisateur connecté avec succès'], Response::HTTP_OK);
     }
 
     #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
-    #[Route('/api/users/{iduser}', name: 'user_delete', methods: ['DELETE'])]
+    #[Route('/users/{iduser}', name: 'user_delete', methods: ['DELETE'])]
     public function removeauser(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, CryptService $cryptService): Response
     {
         return new JsonResponse(['message' => 'L\'utilisateur a bien été supprimé'], Response::HTTP_OK);

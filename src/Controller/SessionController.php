@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class SessionController extends AbstractController
 {
-    #[Route('/api/session', name: 'authentification_login', methods: ['POST'])]
+    #[Route('/session', name: 'authentification_login', methods: ['POST'])]
     public function login(Request $userrequest, EntityManagerInterface $em, CryptService $cryptService, ResponseValidatorService $responseValidatorService, JWTTokenManagerInterface $JWTManager, TokenStorageInterface $tokenStorageInterface, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $connexion = new Connection();
@@ -77,7 +77,7 @@ class SessionController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/session', name: 'authentification_logout', methods: ['DELETE'])]
+    #[Route('/session', name: 'authentification_logout', methods: ['DELETE'])]
     public function logout(Request $userrequest, EntityManagerInterface $em): Response
     {
         $userconnect = $this->getUser();

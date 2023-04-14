@@ -28,7 +28,7 @@ class AccountController extends AbstractController
 {
 
     // Route seulement pour ajouter des comptes MembreMr et MembreVolontaire, les autres types de comptes ne peuvent être ajoutées que par l'administrateur via la route POST /users
-    #[Route('/api/account', name: 'account_add', methods: ['POST'])]
+    #[Route('/account', name: 'account_add', methods: ['POST'])]
     public function addcompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $parameters = json_decode($request->getContent(), true);
@@ -80,7 +80,7 @@ class AccountController extends AbstractController
     }
     // Récupérer les données de l'utilisateur connecté seulement
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_get', methods: ['GET'])]
+    #[Route('/account', name: 'account_get', methods: ['GET'])]
     public function getmycompte(Request $request, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
     {
         $parametersURL = $request->query->all();
@@ -112,7 +112,7 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_edit', methods: ['PUT'])]
+    #[Route('/account', name: 'account_edit', methods: ['PUT'])]
     public function editmycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
     {
         $parameters = json_decode($request->getContent(), true);
@@ -160,7 +160,7 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_delete', methods: ['DELETE'])]
+    #[Route('/account', name: 'account_delete', methods: ['DELETE'])]
     public function removemycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, CryptService $cryptService): Response
     {
         $parameters = json_decode($request->getContent(), true);
