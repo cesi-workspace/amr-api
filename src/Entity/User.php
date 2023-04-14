@@ -10,8 +10,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Index(name:"FK_USER_USERTYPE", columns:["type_id"])]
-#[ORM\Index(name:"FK_USER_USERSTATUS", columns:["status_id"])]
+#[ORM\Index(columns: ["type_id"], name: "FK_USER_USERTYPE")]
+#[ORM\Index(columns: ["status_id"], name: "FK_USER_USER_STATUS")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,9 +22,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name:"email", type:"string", length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\ManyToOne(targetEntity:Usertype::class)]
+    #[ORM\ManyToOne(targetEntity:UserType::class)]
     #[ORM\JoinColumn(name:"type_id", referencedColumnName:"id", nullable:false)]
-    private Usertype $type;
+    private UserType $type;
 
     #[ORM\Column(name:"surname", type:"string", nullable:true)]
     private ?string $surname = null;
@@ -41,23 +41,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name:"city", type:"string", nullable:true)]
     private ?string $city = null;
 
-    #[ORM\Column(name:"postalcode", type:"string", nullable:true)]
-    private ?string $postalcode = null;
+    #[ORM\Column(name:"postal_code", type:"string", nullable:true)]
+    private ?string $postal_code = null;
 
-    #[ORM\ManyToOne(targetEntity:Userstatus::class)]
+    #[ORM\ManyToOne(targetEntity:UserStatus::class)]
     #[ORM\JoinColumn(name:"status_id", referencedColumnName:"id", nullable:false)]
-    private Userstatus $status;
+    private UserStatus $status;
 
     #[ORM\Column(name:"point", type:"integer", nullable:true)]
     private ?int $point = null;
 
     #[Gedmo\Timestampable(on: 'create')]
-    #[ORM\Column(name:"dateinsert", type:"datetime", nullable:false)]
-    private \DateTime $dateinsert;
+    #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
+    private \DateTime $createdAt;
 
     #[Gedmo\Timestampable(on: 'update')]
-    #[ORM\Column(name:"dateupdate", type:"datetime", nullable:true)]
-    private ?\DateTime $dateupdate;
+    #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
+    private ?\DateTime $updatedAt;
 
     public function getId(): ?int
     {
@@ -97,18 +97,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique(['ROLE_USER', $type->getRole()]);
     }
 
-    public function setRoles(Usertype $type): self
+    public function setRoles(UserType $type): self
     {
         $this->type = $type;
 
         return $this;
     }
-    public function getType(): Usertype
+    public function getType(): UserType
     {
         return $this->type;
     }
 
-    public function setType(Usertype $type): self
+    public function setType(UserType $type): self
     {
         $this->type = $type;
 
@@ -164,21 +164,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     public function getPostalcode(): ?string
     {
-        return $this->postalcode;
+        return $this->postal_code;
     }
 
-    public function setPostalcode(?string $postalcode): self
+    public function setPostalcode(?string $postal_code): self
     {
-        $this->postalcode = $postalcode;
+        $this->postal_code = $postal_code;
 
         return $this;
     }
-    public function getStatus(): Userstatus
+    public function getStatus(): UserStatus
     {
         return $this->status;
     }
 
-    public function setStatus(Userstatus $status): self
+    public function setStatus(UserStatus $status): self
     {
         $this->status = $status;
 
@@ -195,13 +195,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getDateinsert(): \DateTime
+    public function getCreatedAt(): \DateTime
     {
-        return $this->dateinsert;
+        return $this->createdAt;
     }
-    public function getDateupdate(): ?\DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
-        return $this->dateupdate;
+        return $this->updatedAt;
     }
 
     /**

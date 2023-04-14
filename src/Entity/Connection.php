@@ -2,84 +2,93 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ConnectionRepository;
+use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name:"connection")]
+#[ORM\Table(name: "connection")]
 #[ORM\Entity(repositoryClass: ConnectionRepository::class)]
-#[ORM\Index(name:"FK_CONNECTION_USER", columns:["user_id"])]
-
+#[ORM\Index(columns: ["user_id"], name: "FK_CONNECTION_USER")]
 class Connection
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy:"IDENTITY")]
-    #[ORM\Column(name:"id", type:"integer", nullable:false)]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
     private int $id;
 
-    #[ORM\Column(name:"ipaddress", type:"string", length:300, nullable:false)]
-    private string $ipaddress;
+    #[ORM\Column(name: "ip_address", type: "string", length: 300, nullable: false)]
+    private string $ipAddress;
 
-    #[ORM\Column(name:"success", type:"boolean", nullable:false)]
+    #[ORM\Column(name: "success", type: "boolean", nullable: false)]
     private bool $success;
 
-    #[ORM\Column(name:"datebegin", type:"datetime", nullable:false)]
-    private \DateTime $datebegin;
+    #[ORM\Column(name: "login_date", type: "datetime", nullable: false)]
+    private \DateTime $loginDate;
 
-    #[ORM\Column(name:"dateend", type:"datetime", nullable:true)]
-    private ?\DateTime $dateend;
+    #[ORM\Column(name: "logout_date", type: "datetime", nullable: true)]
+    private ?\DateTime $logoutDate;
 
-    #[ORM\ManyToOne(targetEntity:User::class)]
-    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete:"SET NULL")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private ?User $user;
 
     public function getId(): int
     {
         return $this->id;
     }
-    public function getIpaddress(): string
+
+    public function getIpAddress(): string
     {
-        return $this->ipaddress;
+        return $this->ipAddress;
     }
-    public function setIpaddress(string $ipaddress): self
+
+    public function setIpAddress(string $ipAddress): self
     {
-        $this->ipaddress = $ipaddress;
+        $this->ipAddress = $ipAddress;
 
         return $this;
     }
+
     public function getSuccess(): bool
     {
         return $this->success;
     }
+
     public function setSuccess(bool $success): self
     {
         $this->success = $success;
 
         return $this;
     }
-    public function getDatebegin(): \DateTime
+
+    public function getLoginDate(): \DateTime
     {
-        return $this->datebegin;
+        return $this->loginDate;
     }
-    public function setDatebegin(\DateTime $datebegin): self
+
+    public function setLoginDate(\DateTime $loginDate): self
     {
-        $this->datebegin = $datebegin;
+        $this->loginDate = $loginDate;
 
         return $this;
     }
-    public function getDateend(): ?\DateTime
+
+    public function getLogoutDate(): ?\DateTime
     {
-        return $this->dateend;
+        return $this->logoutDate;
     }
-    public function setDateend(?\DateTime $dateend): self
+
+    public function setLogoutDate(?\DateTime $logoutDate): self
     {
-        $this->dateend = $dateend;
+        $this->logoutDate = $logoutDate;
 
         return $this;
     }
+
     public function getUser(): ?User
     {
         return $this->user;
     }
+
     public function setUser(?User $user): self
     {
         $this->user = $user;

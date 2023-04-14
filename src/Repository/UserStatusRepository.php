@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Usertype;
+use App\Entity\UserStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Usertype>
+ * @extends ServiceEntityRepository<UserStatus>
  *
- * @method Usertype|null find($id, $lockMode = null, $lockVersion = null)
- * @method Usertype|null findOneBy(array $criteria, array $orderBy = null)
- * @method Usertype[]    findAll()
- * @method Usertype[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method UserStatus|null find($id, $lockMode = null, $lockVersion = null)
+ * @method UserStatus|null findOneBy(array $criteria, array $orderBy = null)
+ * @method UserStatus[]    findAll()
+ * @method UserStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UsertypeRepository extends ServiceEntityRepository
+class UserStatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Usertype::class);
+        parent::__construct($registry, UserStatus::class);
     }
 
-    public function save(Usertype $entity, bool $flush = false): void
+    public function save(UserStatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class UsertypeRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Usertype $entity, bool $flush = false): void
+    public function remove(UserStatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class UsertypeRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Usertype[] Returns an array of Usertype objects
+//     * @return Userstatus[] Returns an array of Userstatus objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class UsertypeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Usertype
+//    public function findOneBySomeField($value): ?Userstatus
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

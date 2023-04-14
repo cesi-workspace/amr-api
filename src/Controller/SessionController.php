@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Connection;
-use App\Entity\Userstatus;
+use App\Entity\UserStatus;
 use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\ResponseValidatorService;
@@ -26,8 +26,8 @@ class SessionController extends AbstractController
     {
         $connexion = new Connection();
         $datetimenow = (new \DateTime('',new \DateTimeZone('Europe/Paris')))->format('Y-m-d H:i:s.u');
-        $connexion->setDatebegin(new \DateTime($datetimenow));
-        $connexion->setIpaddress($userrequest->getClientIp());
+        $connexion->setLoginDate(new \DateTime($datetimenow));
+        $connexion->setIpAddress($userrequest->getClientIp());
         $parameters = json_decode($userrequest->getContent(), true);
         
         $constraints = new Assert\Collection([
@@ -43,7 +43,7 @@ class SessionController extends AbstractController
 
         $user = $em->getRepository(User::class)->findOneBy([
             'email' => $cryptService->encrypt($parameters['email']),
-            'status' => $em->getRepository(Userstatus::class)->find(1)
+            'status' => $em->getRepository(UserStatus::class)->find(1)
         ]);
         if($user == null){
             $connexion->setSuccess(false);

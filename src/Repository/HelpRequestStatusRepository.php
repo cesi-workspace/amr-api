@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Needcategory;
+use App\Entity\HelpRequestStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Needcategory>
+ * @extends ServiceEntityRepository<HelpRequestStatus>
  *
- * @method Needcategory|null find($id, $lockMode = null, $lockVersion = null)
- * @method Needcategory|null findOneBy(array $criteria, array $orderBy = null)
- * @method Needcategory[]    findAll()
- * @method Needcategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HelpRequestStatus|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HelpRequestStatus|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HelpRequestStatus[]    findAll()
+ * @method HelpRequestStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class NeedcategoryRepository extends ServiceEntityRepository
+class HelpRequestStatusRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Needcategory::class);
+        parent::__construct($registry, HelpRequestStatus::class);
     }
 
-    public function save(Needcategory $entity, bool $flush = false): void
+    public function save(HelpRequestStatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class NeedcategoryRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Needcategory $entity, bool $flush = false): void
+    public function remove(HelpRequestStatus $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class NeedcategoryRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Needcategory[] Returns an array of Needcategory objects
+//     * @return Needstatus[] Returns an array of Needstatus objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class NeedcategoryRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Needcategory
+//    public function findOneBySomeField($value): ?Needstatus
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

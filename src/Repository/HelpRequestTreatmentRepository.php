@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Need;
+use App\Entity\HelpRequestTreatment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Need>
+ * @extends ServiceEntityRepository<HelpRequestTreatment>
  *
- * @method Need|null find($id, $lockMode = null, $lockVersion = null)
- * @method Need|null findOneBy(array $criteria, array $orderBy = null)
- * @method Need[]    findAll()
- * @method Need[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HelpRequestTreatment|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HelpRequestTreatment|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HelpRequestTreatment[]    findAll()
+ * @method HelpRequestTreatment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class NeedRepository extends ServiceEntityRepository
+class HelpRequestTreatmentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Need::class);
+        parent::__construct($registry, HelpRequestTreatment::class);
     }
 
-    public function save(Need $entity, bool $flush = false): void
+    public function save(HelpRequestTreatment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class NeedRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Need $entity, bool $flush = false): void
+    public function remove(HelpRequestTreatment $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class NeedRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Need[] Returns an array of Need objects
+//     * @return HelpRequestTreatment[] Returns an array of HelpRequestTreatment objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class NeedRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Need
+//    public function findOneBySomeField($value): ?HelpRequestTreatment
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

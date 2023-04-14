@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Needstatus;
+use App\Entity\HelpRequestTreatmentType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Needstatus>
+ * @extends ServiceEntityRepository<HelpRequestTreatmentType>
  *
- * @method Needstatus|null find($id, $lockMode = null, $lockVersion = null)
- * @method Needstatus|null findOneBy(array $criteria, array $orderBy = null)
- * @method Needstatus[]    findAll()
- * @method Needstatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HelpRequestTreatmentType|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HelpRequestTreatmentType|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HelpRequestTreatmentType[]    findAll()
+ * @method HelpRequestTreatmentType[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class NeedstatusRepository extends ServiceEntityRepository
+class HelpRequestTreatmentTypeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Needstatus::class);
+        parent::__construct($registry, HelpRequestTreatmentType::class);
     }
 
-    public function save(Needstatus $entity, bool $flush = false): void
+    public function save(HelpRequestTreatmentType $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class NeedstatusRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Needstatus $entity, bool $flush = false): void
+    public function remove(HelpRequestTreatmentType $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class NeedstatusRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Needstatus[] Returns an array of Needstatus objects
+//     * @return Needtreatmenttype[] Returns an array of Needtreatmenttype objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class NeedstatusRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Needstatus
+//    public function findOneBySomeField($value): ?Needtreatmenttype
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

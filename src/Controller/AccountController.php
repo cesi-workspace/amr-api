@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Userstatus;
+use App\Entity\UserStatus;
 use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\EmailService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Usertype;
+use App\Entity\UserType;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,7 +44,7 @@ class AccountController extends AbstractController
             'password' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
             'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(UserType::class, 'label', true)],
             'city,postalcode' => [new CustomAssert\CityCP]
         ]);
 
@@ -60,10 +60,10 @@ class AccountController extends AbstractController
         $user->setFirstname($parameters["firstname"]);
         $user->setCity($parameters["city"]);
         $user->setPostalcode($parameters["postalcode"]);
-        $user->setRoles($em->getRepository(Usertype::class)->findOneBy([
+        $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
-        $user->setStatus($em->getRepository(Userstatus::class)->findOneBy([
+        $user->setStatus($em->getRepository(UserStatus::class)->findOneBy([
             'label' => 'Demande d\'activation'
         ]));
 

@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Needtreatment;
+use App\Entity\HelpRequestCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Needtreatment>
+ * @extends ServiceEntityRepository<HelpRequestCategory>
  *
- * @method Needtreatment|null find($id, $lockMode = null, $lockVersion = null)
- * @method Needtreatment|null findOneBy(array $criteria, array $orderBy = null)
- * @method Needtreatment[]    findAll()
- * @method Needtreatment[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HelpRequestCategory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HelpRequestCategory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HelpRequestCategory[]    findAll()
+ * @method HelpRequestCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class NeedtreatmentRepository extends ServiceEntityRepository
+class HelpRequestCategoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Needtreatment::class);
+        parent::__construct($registry, HelpRequestCategory::class);
     }
 
-    public function save(Needtreatment $entity, bool $flush = false): void
+    public function save(HelpRequestCategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class NeedtreatmentRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Needtreatment $entity, bool $flush = false): void
+    public function remove(HelpRequestCategory $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class NeedtreatmentRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Needtreatment[] Returns an array of Needtreatment objects
+//     * @return Needcategory[] Returns an array of Needcategory objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class NeedtreatmentRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Needtreatment
+//    public function findOneBySomeField($value): ?Needcategory
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Userstatus;
+use App\Entity\UserStatus;
 use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\EmailService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Usertype;
+use App\Entity\UserType;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -49,7 +49,7 @@ class UserController extends AbstractController
                 'password' => [new Assert\Type('string'), new Assert\NotBlank],
                 'city' => [new Assert\Type('string'), new Assert\NotBlank],
                 'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
                 'city,postalcode' => [new CustomAssert\CityCP]
             ]);
         }else{
@@ -64,7 +64,7 @@ class UserController extends AbstractController
                 'postalcode' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
                 'city,postalcode' => [new Assert\Optional(
                     [new CustomAssert\CityCP]
                 )]
@@ -87,10 +87,10 @@ class UserController extends AbstractController
         if(array_key_exists('postalcode', $parameters)){
             $user->setPostalcode($parameters["postalcode"]);
         }
-        $user->setRoles($em->getRepository(Usertype::class)->findOneBy([
+        $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
-        $user->setStatus($em->getRepository(Userstatus::class)->findOneBy([
+        $user->setStatus($em->getRepository(UserStatus::class)->findOneBy([
             'label' => 'Actif'
         ]));
 
