@@ -33,8 +33,8 @@ class AccountController extends AbstractController
     {
         $parameters = json_decode($request->getContent(), true);
 
-        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
-            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
+            $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
         
         $constraints = new Assert\Collection([
@@ -43,9 +43,9 @@ class AccountController extends AbstractController
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
             'password' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
+            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
             'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(UserType::class, 'label', true)],
-            'city,postalcode' => [new CustomAssert\CityCP]
+            'city,postal_code' => [new CustomAssert\CityCP]
         ]);
 
         $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
