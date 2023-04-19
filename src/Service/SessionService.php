@@ -42,15 +42,15 @@ class SessionService implements ISessionService
             return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
         }
 
-        if($this->userService->isUserExists(['email' => $requestBody->email])){
+        if($this->userService->isUserExists(['email' => $requestBody['email']])){
             $connection->setSuccess(false);
             $this->connectionService->save($connection);
             return new JsonResponse(['message' => 'Authentification échouée, vérifiez le login et le mot de passe'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user = $this->userService->findUser(['email' => $requestBody->email]);
+        $user = $this->userService->findUser(['email' => $requestBody['email']]);
 
-        if (!$this->userPasswordHasher->isPasswordValid($user, $requestBody->password)) {
+        if (!$this->userPasswordHasher->isPasswordValid($user, $requestBody['password'])) {
             $connection->setSuccess(false);
             $this->connectionService->save($connection);
             return new JsonResponse(['message' => 'Authentification échouée, vérifiez le login et le mot de passe'], Response::HTTP_UNAUTHORIZED);
