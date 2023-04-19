@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class SessionService implements ISessionService
@@ -21,7 +22,7 @@ class SessionService implements ISessionService
         private readonly IConnectionService       $connectionService,
         private readonly IResponseValidatorService $responseValidatorService,
         private readonly IUserService             $userService,
-        private readonly UserPasswordHasher       $userPasswordHasher,
+        private readonly UserPasswordHasherInterface $userPasswordHasher,
         private readonly JWTTokenManagerInterface $JWTTokenManager
     ) {}
 
