@@ -59,7 +59,7 @@ class AccountController extends AbstractController
         $user->setSurname($parameters["surname"]);
         $user->setFirstname($parameters["firstname"]);
         $user->setCity($parameters["city"]);
-        $user->setpostal_code($parameters["postal_code"]);
+        $user->setPostalCode($parameters["postal_code"]);
         $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
@@ -149,7 +149,7 @@ class AccountController extends AbstractController
             $user->setCity($parameters["city"]);
         }
         if(array_key_exists('postal_code', $parameters)){
-            $user->setpostal_code($parameters["postal_code"]);
+            $user->setPostalCode($parameters["postal_code"]);
         }
         $em->persist($user);
         $em->flush();

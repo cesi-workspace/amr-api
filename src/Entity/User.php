@@ -162,12 +162,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    public function getPostalcode(): ?string
+    public function getPostalCode(): ?string
     {
         return $this->postal_code;
     }
 
-    public function setPostalcode(?string $postal_code): self
+    public function setPostalCode(?string $postal_code): self
     {
         $this->postal_code = $postal_code;
 

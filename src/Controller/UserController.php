@@ -85,7 +85,7 @@ class UserController extends AbstractController
             $user->setCity($parameters["city"]);
         }
         if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalcode($parameters["postalcode"]);
+            $user->setPostalCode($parameters["postalcode"]);
         }
         $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]

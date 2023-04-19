@@ -58,13 +58,13 @@ class UtilisateurSubscriber implements EventSubscriber
         $surname=$user->getSurname();
         $firstname=$user->getFirstname();
         $email = $user->getEmail();
-        $codepostal = $user->getPostalcode();
+        $codepostal = $user->getPostalCode();
         $ville = $user->getCity();
 
         $user->setEmail(
             $this->cryptService->decrypt($email)
         );
-        $user->setPostalcode(
+        $user->setPostalCode(
             $this->cryptService->decrypt($codepostal)
         );
         $user->setCity(
@@ -83,13 +83,13 @@ class UtilisateurSubscriber implements EventSubscriber
         $surname=$user->getSurname();
         $firstname=$user->getFirstname();
         $email = $user->getEmail();
-        $codepostal = $user->getPostalcode();
+        $codepostal = $user->getPostalCode();
         $ville = $user->getCity();
 
         $user->setEmail(
             $this->cryptService->encrypt($email)
         );
-        $user->setPostalcode(
+        $user->setPostalCode(
             $this->cryptService->encrypt($codepostal)
         );
         $user->setCity(
