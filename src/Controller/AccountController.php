@@ -59,7 +59,7 @@ class AccountController extends AbstractController
         $user->setSurname($parameters["surname"]);
         $user->setFirstname($parameters["firstname"]);
         $user->setCity($parameters["city"]);
-        $user->setPostalcode($parameters["postalcode"]);
+        $user->setpostal_code($parameters["postal_code"]);
         $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
@@ -103,7 +103,7 @@ class AccountController extends AbstractController
             'surname' => $userconnect->getSurname(),
             'firstname' => $userconnect->getFirstname(),
             'city' => $userconnect->getCity(),
-            'postalcode' => $userconnect->getPostalcode(),
+            'postal_code' => $userconnect->getpostal_code(),
             'point' => $userconnect->getPoint(),
             'usertype' => $userconnect->getType()->getLabel(),
         ];
@@ -117,8 +117,8 @@ class AccountController extends AbstractController
     {
         $parameters = json_decode($request->getContent(), true);
 
-        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
-            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
+            $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
         
         $constraints = new Assert\Collection(
@@ -126,8 +126,8 @@ class AccountController extends AbstractController
             'surname' => [new Assert\Type('string'), new Assert\NotBlank],
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-            'city,postalcode' => [new CustomAssert\CityCP]
+            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+            'city,postal_code' => [new CustomAssert\CityCP]
         ],
         allowMissingFields: true);
 
@@ -148,8 +148,8 @@ class AccountController extends AbstractController
         if(array_key_exists('city', $parameters)){
             $user->setCity($parameters["city"]);
         }
-        if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalCode($parameters["postalcode"]);
+        if(array_key_exists('postal_code', $parameters)){
+            $user->setpostal_code($parameters["postal_code"]);
         }
         $em->persist($user);
         $em->flush();
