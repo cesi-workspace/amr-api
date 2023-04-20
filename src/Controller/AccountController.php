@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Userstatus;
+use App\Entity\UserStatus;
 use App\Entity\User;
 use App\Service\CryptService;
 use App\Service\EmailService;
 use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Usertype;
+use App\Entity\UserType;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,13 +28,13 @@ class AccountController extends AbstractController
 {
 
     // Route seulement pour ajouter des comptes MembreMr et MembreVolontaire, les autres types de comptes ne peuvent être ajoutées que par l'administrateur via la route POST /users
-    #[Route('/api/account', name: 'account_add', methods: ['POST'])]
+    #[Route('/account', name: 'account_add', methods: ['POST'])]
     public function addcompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, UserPasswordHasherInterface $userPasswordHasher): Response
     {
         $parameters = json_decode($request->getContent(), true);
 
-        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
-            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
+            $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
         
         $constraints = new Assert\Collection([
@@ -43,9 +43,9 @@ class AccountController extends AbstractController
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
             'password' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(Usertype::class, 'label', true)],
-            'city,postalcode' => [new CustomAssert\CityCP]
+            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(UserType::class, 'label', true)],
+            'city,postal_code' => [new CustomAssert\CityCP]
         ]);
 
         $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
@@ -59,11 +59,11 @@ class AccountController extends AbstractController
         $user->setSurname($parameters["surname"]);
         $user->setFirstname($parameters["firstname"]);
         $user->setCity($parameters["city"]);
-        $user->setPostalcode($parameters["postalcode"]);
-        $user->setRoles($em->getRepository(Usertype::class)->findOneBy([
+        $user->setPostalCode($parameters["postal_code"]);
+        $user->setRoles($em->getRepository(UserType::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
-        $user->setStatus($em->getRepository(Userstatus::class)->findOneBy([
+        $user->setStatus($em->getRepository(UserStatus::class)->findOneBy([
             'label' => 'Demande d\'activation'
         ]));
 
@@ -80,7 +80,7 @@ class AccountController extends AbstractController
     }
     // Récupérer les données de l'utilisateur connecté seulement
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_get', methods: ['GET'])]
+    #[Route('/account', name: 'account_get', methods: ['GET'])]
     public function getmycompte(Request $request, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
     {
         $parametersURL = $request->query->all();
@@ -103,7 +103,7 @@ class AccountController extends AbstractController
             'surname' => $userconnect->getSurname(),
             'firstname' => $userconnect->getFirstname(),
             'city' => $userconnect->getCity(),
-            'postalcode' => $userconnect->getPostalcode(),
+            'postal_code' => $userconnect->getpostal_code(),
             'point' => $userconnect->getPoint(),
             'usertype' => $userconnect->getType()->getLabel(),
         ];
@@ -112,13 +112,13 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_edit', methods: ['PUT'])]
+    #[Route('/account', name: 'account_edit', methods: ['PUT'])]
     public function editmycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
     {
         $parameters = json_decode($request->getContent(), true);
 
-        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
-            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
+            $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
         
         $constraints = new Assert\Collection(
@@ -126,8 +126,8 @@ class AccountController extends AbstractController
             'surname' => [new Assert\Type('string'), new Assert\NotBlank],
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-            'city,postalcode' => [new CustomAssert\CityCP]
+            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+            'city,postal_code' => [new CustomAssert\CityCP]
         ],
         allowMissingFields: true);
 
@@ -148,8 +148,8 @@ class AccountController extends AbstractController
         if(array_key_exists('city', $parameters)){
             $user->setCity($parameters["city"]);
         }
-        if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalCode($parameters["postalcode"]);
+        if(array_key_exists('postal_code', $parameters)){
+            $user->setPostalCode($parameters["postal_code"]);
         }
         $em->persist($user);
         $em->flush();
@@ -160,7 +160,7 @@ class AccountController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route('/api/account', name: 'account_delete', methods: ['DELETE'])]
+    #[Route('/account', name: 'account_delete', methods: ['DELETE'])]
     public function removemycompte(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, CryptService $cryptService): Response
     {
         $parameters = json_decode($request->getContent(), true);

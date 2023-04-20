@@ -6,85 +6,94 @@ use App\Repository\GiftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name:"gift")]
-#[ORM\Index(name:"FK_GIFT_PARTNER", columns:["partner_id"])]
+#[ORM\Table(name: "gift")]
+#[ORM\Index(columns: ["partner_id"], name: "FK_GIFT_PARTNER")]
 #[ORM\Entity(repositoryClass: GiftRepository::class)]
 class Gift
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy:"IDENTITY")]
-    #[ORM\Column(name:"id", type:"integer", nullable:false)]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "id", type: "integer", nullable: false)]
     private int $id;
 
-    #[ORM\Column(name:"label", type:"string", length:3000, nullable:false)]
+    #[ORM\Column(name: "label", type: "string", length: 3000, nullable: false)]
     private string $label;
 
-    #[ORM\Column(name:"nbpointcost", type:"integer", nullable:false)]
-    private int $nbpointcost;
+    #[ORM\Column(name: "price", type: "integer", nullable: false)]
+    private int $price;
 
-    #[ORM\Column(name:"datebegin", type:"datetime", nullable:true)]
-    private ?\DateTime $datebegin;
+    #[ORM\Column(name: "from_date", type: "datetime", nullable: true)]
+    private ?\DateTime $fromDate;
 
-    #[ORM\Column(name:"dateend", type:"datetime", nullable:true)]
-    private ?\DateTime $dateend;
+    #[ORM\Column(name: "to_date", type: "datetime", nullable: true)]
+    private ?\DateTime $toDate;
 
-    #[ORM\ManyToOne(targetEntity:User::class)]
-    #[ORM\JoinColumn(name:"partner_id", referencedColumnName:"id", nullable:false, onDelete:"CASCADE")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "partner_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private User $partner;
 
-    #[ORM\ManyToMany(targetEntity:User::class, mappedBy:"gift")]
-    private $volunteermembergift = array();
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: "gift")]
+    private ArrayCollection $helpers;
 
     public function getId(): int
     {
         return $this->id;
     }
+
     public function getLabel(): string
     {
         return $this->label;
     }
+
     public function setLabel(string $label): self
     {
         $this->label = $label;
 
         return $this;
     }
-    public function getNbpointcost(): int
+
+    public function getPrice(): int
     {
-        return $this->nbpointcost;
+        return $this->price;
     }
-    public function setNbpointcost(int $nbpointcost): self
+
+    public function setPrice(int $price): self
     {
-        $this->nbpointcost = $nbpointcost;
+        $this->price = $price;
 
         return $this;
     }
-    public function getDatebegin(): ?\DateTime
+
+    public function getFromDate(): ?\DateTime
     {
-        return $this->datebegin;
+        return $this->fromDate;
     }
-    public function setDatebegin(?\DateTime $datebegin): self
+
+    public function setFromDate(?\DateTime $fromDate): self
     {
-        $this->datebegin = $datebegin;
+        $this->fromDate = $fromDate;
 
         return $this;
     }
-    public function getDateend(): ?\DateTime
+
+    public function getToDate(): ?\DateTime
     {
-        return $this->dateend;
+        return $this->toDate;
     }
-    public function setDateend(?\DateTime $dateend): self
+
+    public function setToDate(?\DateTime $toDate): self
     {
-        $this->dateend = $dateend;
+        $this->toDate = $toDate;
 
         return $this;
     }
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->volunteermembergift = new ArrayCollection();
+        $this->helpers = new ArrayCollection();
     }
 
 }

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\NeedstatusRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\HelpRequestTreatmentTypeRepository;
 
-#[ORM\Table(name:"needstatus")]
-#[ORM\Entity(repositoryClass: NeedstatusRepository::class)]
-class Needstatus
+#[ORM\Table(name:"help_request_treatment_type")]
+#[ORM\Entity(repositoryClass: HelpRequestTreatmentTypeRepository::class)]
+class HelpRequestTreatmentType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy:"IDENTITY")]
@@ -16,7 +16,8 @@ class Needstatus
 
     #[ORM\Column(name:"label", type:"string", length:300, nullable:false)]
     private string $label;
-    public function getId(): int
+
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -30,5 +31,4 @@ class Needstatus
 
         return $this;
     }
-
 }

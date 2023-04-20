@@ -1,19 +1,18 @@
 <?php
 
 namespace App\Service;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use App\Service\Contract\IResponseValidatorService;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ResponseValidatorService
+class ResponseValidatorService implements IResponseValidatorService
 {
 
     public function __construct(public ValidatorInterface $validator){
         
     }
 
-    public function getErrorMessagesValidation($parameters, $constraints)
+    public function getErrorMessagesValidation($parameters, $constraints): array
     {
         $violations = $this->validator->validate($parameters, $constraints);
         

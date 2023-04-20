@@ -6,42 +6,45 @@ use App\Repository\FavoriteRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 
-#[ORM\Table(name:"favorite")]
-#[ORM\Index(name:"FK_FAVORITE_VOLUNTEERMEMBER", columns:["volunteermember_id"])]
-#[ORM\Index(name:"FK_FAVORITE_RMMEMBER", columns:["rmmember_id"])]
+#[ORM\Table(name: "favorite")]
+#[ORM\Index(columns: ["helper_id"], name: "FK_FAVORITE_HELPER")]
+#[ORM\Index(columns: ["owner_id"], name: "FK_FAVORITE_OWNER")]
 #[ORM\Entity(repositoryClass: FavoriteRepository::class)]
 class Favorite
 {
 
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy:"NONE")]
-    #[ORM\OneToOne(targetEntity:User::class)]
-    #[ORM\JoinColumn(name: "volunteermember_id", referencedColumnName: "id", onDelete:"CASCADE")]
-    private User $volunteermember;
+    #[ORM\GeneratedValue(strategy: "NONE")]
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "helper_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private User $helper;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy:"NONE")]
-    #[ORM\OneToOne(targetEntity:User::class)]
-    #[ORM\JoinColumn(name: "rmmember_id", referencedColumnName: "id", onDelete:"CASCADE")]
-    private User $rmmember;
+    #[ORM\GeneratedValue(strategy: "NONE")]
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "owner_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private User $owner;
 
-    public function getVolunteermember(): User
+    public function getHelper(): User
     {
-        return $this->volunteermember;
+        return $this->helper;
     }
-    public function setVolunteermember(User $volunteermember): self
+
+    public function setHelper(User $helper): self
     {
-        $this->volunteermember = $volunteermember;
+        $this->helper = $helper;
 
         return $this;
     }
-    public function getRmmember(): User
+
+    public function getOwner(): User
     {
-        return $this->rmmember;
+        return $this->owner;
     }
-    public function setRmmember(User $rmmember): self
+
+    public function setOwner(User $owner): self
     {
-        $this->rmmember = $rmmember;
+        $this->owner = $owner;
 
         return $this;
     }

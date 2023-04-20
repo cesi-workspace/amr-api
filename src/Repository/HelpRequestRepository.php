@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Userstatus;
+use App\Entity\HelpRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Userstatus>
+ * @extends ServiceEntityRepository<HelpRequest>
  *
- * @method Userstatus|null find($id, $lockMode = null, $lockVersion = null)
- * @method Userstatus|null findOneBy(array $criteria, array $orderBy = null)
- * @method Userstatus[]    findAll()
- * @method Userstatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HelpRequest|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HelpRequest|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HelpRequest[]    findAll()
+ * @method HelpRequest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserstatusRepository extends ServiceEntityRepository
+class HelpRequestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Userstatus::class);
+        parent::__construct($registry, HelpRequest::class);
     }
 
-    public function save(Userstatus $entity, bool $flush = false): void
+    public function save(HelpRequest $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class UserstatusRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Userstatus $entity, bool $flush = false): void
+    public function remove(HelpRequest $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class UserstatusRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Userstatus[] Returns an array of Userstatus objects
+//     * @return Need[] Returns an array of Need objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class UserstatusRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Userstatus
+//    public function findOneBySomeField($value): ?Need
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

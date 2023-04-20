@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Statututilisateur;
 use App\Entity\User;
-use App\Entity\Userstatus;
+use App\Entity\UserStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -78,7 +78,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this->findOneBy([
             'tokenapi' => $apiToken,
-            'status' => $this->em->getRepository(Userstatus::class)->findOneBy(
+            'status' => $this->em->getRepository(UserStatus::class)->findOneBy(
                 [
                     'label' => 'Actif'
                 ]
