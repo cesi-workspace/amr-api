@@ -36,23 +36,20 @@ class AccountController extends AbstractController
         if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
             $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
-        
-        $constraints = new Assert\Collection([
-            'surname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
-            'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'password' => [new Assert\Type('string'), new Assert\NotBlank],
-            'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
-            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(UserType::class, 'label', true)],
-            'city,postal_code' => [new CustomAssert\CityCP]
-        ]);
 
-        $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
-        
-        if(count($errorMessages) !=0 ){
-            return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
-        }
+        $responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+                'surname' => [new Assert\Type('string'), new Assert\NotBlank],
+                'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
+                'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
+                'password' => [new Assert\Type('string'), new Assert\NotBlank],
+                'city' => [new Assert\Type('string'), new Assert\NotBlank],
+                'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Choice(["MembreVolontaire", "MembreMr"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new CustomAssert\ExistDB(UserType::class, 'label', true)],
+                'city,postal_code' => [new CustomAssert\CityCP]
+            ])
+        );
+
 
         $user = new User();
         $user->setEmail($parameters["email"]);
@@ -85,15 +82,11 @@ class AccountController extends AbstractController
     {
         $parametersURL = $request->query->all();
 
-        $constraints = new Assert\Collection([
-            'mode' => [new Assert\Choice(["0", "1"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new Assert\NotBlank]
-        ]);
-
-        $errorMessages = $responseValidatorService->getErrorMessagesValidation($parametersURL, $constraints);
-        
-        if(count($errorMessages) != 0){
-            return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
-        }
+        $responseValidatorService->checkContraintsValidation($parametersURL,
+            new Assert\Collection([
+                'mode' => [new Assert\Choice(["0", "1"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new Assert\NotBlank]
+            ])
+        );
         
         $userconnect = $this->getUser();
         
@@ -103,7 +96,7 @@ class AccountController extends AbstractController
             'surname' => $userconnect->getSurname(),
             'firstname' => $userconnect->getFirstname(),
             'city' => $userconnect->getCity(),
-            'postal_code' => $userconnect->getpostal_code(),
+            'postal_code' => $userconnect->getPostalCode(),
             'point' => $userconnect->getPoint(),
             'usertype' => $userconnect->getType()->getLabel(),
         ];
@@ -120,22 +113,18 @@ class AccountController extends AbstractController
         if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
             $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
-        
-        $constraints = new Assert\Collection(
-            fields: [
-            'surname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'city' => [new Assert\Type('string'), new Assert\NotBlank],
-            'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
-            'city,postal_code' => [new CustomAssert\CityCP]
-        ],
-        allowMissingFields: true);
 
-        $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
-        
-        if(count($errorMessages) !=0 ){
-            return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
-        }
+        $responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection(
+                fields: [
+                'surname' => [new Assert\Type('string'), new Assert\NotBlank],
+                'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
+                'city' => [new Assert\Type('string'), new Assert\NotBlank],
+                'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+                'city,postal_code' => [new CustomAssert\CityCP]
+            ],
+            allowMissingFields: true)
+        );
 
         $user = $this->getUser();
         $email = $user->getEmail();
@@ -167,15 +156,11 @@ class AccountController extends AbstractController
 
         $userconnect=$this->getUser();
 
-        $constraints = new Assert\Collection([
-            'password' => [new Assert\Type('string'), new Assert\NotBlank]
-        ]);
-        
-        $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
-
-        if(count($errorMessages) !=0 ){
-            return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
-        }
+        $responseValidatorService->checkContraintsValidation($parameters, 
+            new Assert\Collection([
+                'password' => [new Assert\Type('string'), new Assert\NotBlank]
+            ])
+        );
 
         $user = $em->getRepository(User::class)->findOneBy([
             'email' => $cryptService->encrypt($userconnect->getEmail()),

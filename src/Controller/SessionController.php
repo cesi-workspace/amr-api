@@ -26,6 +26,6 @@ class SessionController extends AbstractController
     #[Route('/session', name: 'session_logout', methods: ['DELETE'])]
     public function logout(): Response
     {
-        return $this->sessionService->logout();
+        return $this->sessionService->logout($this->getUser());
     }
 }

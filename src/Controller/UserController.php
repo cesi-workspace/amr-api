@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\UserStatus;
 use App\Entity\User;
+use App\Service\Contract\IUserService;
 use App\Service\CryptService;
 use App\Service\EmailService;
 use App\Service\ResponseValidatorService;
@@ -28,6 +29,11 @@ use App\Validator\Constraints as CustomAssert;
 class UserController extends AbstractController
 {
 
+    public function __construct(
+        private readonly IUserService $userService
+    ){}
+    
+    //Route pour ajouter un utilisateur
     #[IsGranted('ROLE_ADMIN')]
     #[Route('/users', name: 'users_add', methods: ['POST'])]
     public function adduser(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, UserPasswordHasherInterface $userPasswordHasher): Response
@@ -49,7 +55,7 @@ class UserController extends AbstractController
                 'password' => [new Assert\Type('string'), new Assert\NotBlank],
                 'city' => [new Assert\Type('string'), new Assert\NotBlank],
                 'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
                 'city,postalcode' => [new CustomAssert\CityCP]
             ]);
         }else{
@@ -64,18 +70,14 @@ class UserController extends AbstractController
                 'postalcode' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
                 'city,postalcode' => [new Assert\Optional(
                     [new CustomAssert\CityCP]
                 )]
             ]);
         }
 
-        $errorMessages = $responseValidatorService->getErrorMessagesValidation($parameters, $constraints);
-        
-        if(count($errorMessages) !=0 ){
-            return new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $errorMessages], Response::HTTP_BAD_REQUEST);
-        }
+        $responseValidatorService->checkContraintsValidation($parameters, $constraints);
 
         $user = new User();
         $user->setEmail($parameters["email"]);
@@ -85,12 +87,12 @@ class UserController extends AbstractController
             $user->setCity($parameters["city"]);
         }
         if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalCode($parameters["postalcode"]);
+            $user->setPostalcode($parameters["postalcode"]);
         }
-        $user->setRoles($em->getRepository(UserType::class)->findOneBy([
+        $user->setRoles($em->getRepository(Usertype::class)->findOneBy([
             'label' => $parameters["usertype"]
         ]));
-        $user->setStatus($em->getRepository(UserStatus::class)->findOneBy([
+        $user->setStatus($em->getRepository(Userstatus::class)->findOneBy([
             'label' => 'Actif'
         ]));
 
@@ -104,24 +106,121 @@ class UserController extends AbstractController
         $emailService->sendText(to:$parameters["email"], subject:"Demande de création de compte membreMR", text:"Votre demande de création de compte a bien été prise en compte");
 
         return new JsonResponse(['message' => 'Utilisateur crée avec succès'], Response::HTTP_OK);
-    }/*
+    }
     // Récupérer les données de l'utilisateur connecté seulement
-    #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
-    #[Route('/users', name: 'users_get', methods: ['GET'])]
-    public function getallusers(Request $request, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
+    /*
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/api/users', name: 'users_get', methods: ['GET'])]
+    public function getallusers(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
     {
-        return new JsonResponse(['message' => 'Utilisateur récupéré'], Response::HTTP_OK);
-    }
+        $users=$em->getRepository(User::class)->findAll();
+        
+        $parametersURL = $request->query->all();
 
-    #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
+        $constraints = new Assert\Collection([
+            'fields' => [
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true, false)],
+                'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Userstatus::class, 'label', true, false)],
+                'email' => [new Assert\Type('string'), new Assert\NotBlank],
+                'surname' => [new Assert\Type('string'), new Assert\NotBlank],
+                'firstname' => [new Assert\Type('string'), new Assert\NotBlank]
+            ],
+            'allowMissingFields' => true,
+        ]);
+
+        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => $users], Response::HTTP_OK);
+    }*/
+    // Récupérer les données de l'utilisateur connecté seulement
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/users/{iduser}', name: 'users_get', methods: ['GET'])]
+    public function getauser(Request $request, int $iduser, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService): Response
+    {
+        $parametersURL = $request->query->all();
+
+        $responseValidatorService->checkContraintsValidation($parametersURL, 
+            new Assert\Collection([
+                'mode' => [new Assert\Choice(["0", "1"], message:"Cette valeur doit être l'un des choix proposés : ({{ choices }})."), new Assert\NotBlank]
+            ])
+        );
+        
+        $user=$em->getRepository(User::class)->find($iduser);
+
+        if(!$user){
+            return new JsonResponse(['message' => 'Utilisateur inexistant'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'surname' => $user->getSurname(),
+            'firstname' => $user->getFirstname(),
+            'city' => $user->getCity(),
+            'postalcode' => $user->getPostalcode(),
+            'point' => $user->getPoint(),
+            'usertype' => $user->getType()->getLabel(),
+            'userstatus' => $user->getStatus()->getLabel()
+        ];
+        
+        return new JsonResponse(['message' => 'Utilisateur récupéré', 'data' => $data], Response::HTTP_OK);
+    }
+    
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/users/{iduser}', name: 'user_edit', methods: ['PUT'])]
-    public function editauser(Request $request, int $iduser, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
+    public function edituser(Request $request, int $iduser, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService): Response
     {
-        return new JsonResponse(['message' => 'Données de l\'utilisateur connecté avec succès'], Response::HTTP_OK);
-    }
+        $parameters = json_decode($request->getContent(), true);
 
+        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
+            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        }
+
+        $responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection(
+                fields: [
+                    'surname' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'city' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'city,postalcode' => [new CustomAssert\CityCP]
+            ],
+            allowMissingFields: true)
+        );
+
+        $user=$em->getRepository(User::class)->find($iduser);
+
+        if(!$user){
+            return new JsonResponse(['message' => 'Utilisateur inexistant'], Response::HTTP_NOT_FOUND);
+        }
+
+        $hasAccess = $this->isGranted('ROLE_SUPERADMIN');
+        if(!$hasAccess && $user->getType()->getLabel() != 'Modérateur' && $user->getType()->getLabel() != 'MembreMr' && $user->getType()->getLabel() != 'MembreVolontaire' && $user->getType()->getLabel() != 'Partenaire')
+        {
+            $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
+        }
+
+        $email = $user->getEmail();
+        if(array_key_exists('surname', $parameters)){
+            $user->setSurname($parameters["surname"]);
+        }
+        if(array_key_exists('firstname', $parameters)){
+            $user->setFirstname($parameters["firstname"]);
+        }
+        if(array_key_exists('city', $parameters)){
+            $user->setCity($parameters["city"]);
+        }
+        if(array_key_exists('postalcode', $parameters)){
+            $user->setPostalCode($parameters["postalcode"]);
+        }
+        $em->persist($user);
+        $em->flush();
+
+        $emailService->sendText(to:$email, subject:"Modification de vos données de compte membreMR", text:"Les données de votre compte ont été modifiées");
+
+        return new JsonResponse(['message' => 'Données de l\'utilisateur modifiée avec succès'], Response::HTTP_OK);
+    }
+    /*
     #[IsGranted(['ROLE_ADMIN', 'ROLE_SUPERADMIN'])]
-    #[Route('/users/{iduser}', name: 'user_delete', methods: ['DELETE'])]
+    #[Route('/api/users/{iduser}', name: 'user_delete', methods: ['DELETE'])]
     public function removeauser(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, EmailService $emailService, CryptService $cryptService): Response
     {
         return new JsonResponse(['message' => 'L\'utilisateur a bien été supprimé'], Response::HTTP_OK);

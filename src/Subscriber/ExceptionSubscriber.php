@@ -2,6 +2,7 @@
 
 namespace App\Subscriber;
 
+use App\Exception\ValidationContraintsException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,6 +36,15 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
         $user = $this->security->getUser();
         $exception = $event->getThrowable();
+
+
+        if($exception instanceof ValidationContraintsException){
+            $event->setResponse(
+                new JsonResponse(['message' => 'Erreur lors de la validation des données', 'data' => $exception->getData()], Response::HTTP_BAD_REQUEST)
+            );
+            return;
+        }
+
 
         // Récupération de l'erreur 404 
         if ($exception instanceof NotFoundHttpException) {
