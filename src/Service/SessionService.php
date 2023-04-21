@@ -44,7 +44,7 @@ class SessionService implements ISessionService
         if(!$this->userService->isUserExists(
             [
                 'email' => $this->cryptservice->encrypt($requestBody['email']), 
-                'status' => $this->userService->findUserStatus(['label' => 'Actif'])
+                'status' => $this->userService->findUserStatus(['label' => UserStatusLabel::ENABLE])
             ]
             )){
             $connection->setSuccess(false);
@@ -55,7 +55,7 @@ class SessionService implements ISessionService
         $user = $this->userService->findUser(
             [
                 'email' => $this->cryptservice->encrypt($requestBody['email']), 
-                'status' => $this->userService->findUserStatus(['label' => 'Actif'])
+                'status' => $this->userService->findUserStatus(['label' => UserStatusLabel::ENABLE])
             ]
             );
 
@@ -72,8 +72,13 @@ class SessionService implements ISessionService
         $this->connectionService->save($connection);
         
         $authToken = $this->JWTTokenManager->create($user);
+        $tokenParts = explode(".", $authToken); 
+        $tokenHeader = base64_decode($tokenParts[0]);
+        $tokenPayload = base64_decode($tokenParts[1]);
+        $jwtHeader = json_decode($tokenHeader);
+        $jwtPayload = json_decode($tokenPayload);
 
-        return new JsonResponse(['message' => 'Authentification réussie', 'data' => ['token' => $authToken, 'user' => $infouser]], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Authentification réussie', 'data' => ['token' => $authToken, 'header' => $tokenHeader, 'payload' => $tokenPayload, 'user' => $infouser]], Response::HTTP_OK);
     }
 
     function logout(User $connectedUser): JsonResponse

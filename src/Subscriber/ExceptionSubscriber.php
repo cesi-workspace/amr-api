@@ -56,7 +56,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         // Récupération de l'erreur d'accès aux routes via IsGranted, si l'utilisateur n'est pas authentifié, cela signifie que le jeton est absent
         if (($exception instanceof AccessDeniedException)&&($user == null)) {
             $event->setResponse(
-                new JsonResponse(['message' => 'Vous devez être authentifié pour accéder à cette route, le jeton est absent'], Response::HTTP_UNAUTHORIZED)
+                new JsonResponse(['message' => $exception->getMessage()], Response::HTTP_UNAUTHORIZED)
             );
             return;
         }
