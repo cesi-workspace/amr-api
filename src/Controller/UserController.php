@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\UserType;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
@@ -84,5 +86,12 @@ class UserController extends AbstractController
     public function remove(Request $request, User $user): Response
     {
         return $this->userService->removeUser($request, $user);
+    }
+
+    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_GOV")'))]
+    #[Route('/users/{id}/status', name: 'user_status_edit', methods: ['PUT'])]
+    public function editStatus(Request $request, User $user): Response
+    {
+        return $this->userService->editStatusUser($request, $user);
     }
 }

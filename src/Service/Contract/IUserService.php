@@ -15,5 +15,6 @@ interface IUserService
     function getUser(Request $request, User $user) : JsonResponse;
     function editUser(Request $request, User $user) : JsonResponse;
     function removeUser(Request $request, User $user) : JsonResponse;
+    function editStatusUser(Request $request, User $user) : JsonResponse;
 
 }

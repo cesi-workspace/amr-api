@@ -21,7 +21,7 @@ use App\Validator\Constraints as CustomAssert;
 enum UserStatusLabel: string
 {
     case ENABLE = 'Activé';
-    case REQUESTFOREACTIVATION = 'Demande d\'activation';
+    case REQUESTFOREACTIVATION = 'En demande';
     case DISABLED = 'Désactivé';
     case REFUSED = 'Refusé';
 }
@@ -117,7 +117,7 @@ class UserService implements IUserService
                 'postal_code' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
                 'city,postal_code' => [new Assert\Optional(
                     [new CustomAssert\CityCP]
                 )]
@@ -278,5 +278,39 @@ class UserService implements IUserService
         $this->emailService->sendText(to:$email, subject:"Compte supprimée", text:"Vos données ont bien été supprimées");
 
         return new JsonResponse(['message' => 'L\'utilisateur a bien été supprimé'], Response::HTTP_OK);
+    }
+
+    public function editStatusUser(Request $request, User $user) : JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && $this->security->getUser()->getId()!=$user->getId() && (in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_SUPERADMIN', $user->getRoles()))){
+            throw new AccessDeniedException("Edition de statut d'administrateur interdite");
+        }
+        
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection(
+                [
+                    'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true)]
+                ])
+        );
+
+        $email = $user->getEmail();
+        
+        $user->setStatus($this->findUserStatusByLabel($parameters["userstatus"]));
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        if($parameters["userstatus"]==UserStatusLabel::REFUSED){
+            $this->emailService->sendText(to:$email, subject:"Demande de compte AMR refusée", text:"Nous vous informons que la demande de création de compte membreMR a été refusée");
+        }
+        if($parameters["userstatus"]==UserStatusLabel::ENABLE){
+            $this->emailService->sendText(to:$email, subject:"Demande de compte AMR acceptée", text:"Nous vous informons que la demande de création de compte membreMR a été acceptée");
+        }
+
+        return new JsonResponse(['message' => 'Statut de l\'utilisateur mis à jour'], Response::HTTP_OK);
+
     }
 }
