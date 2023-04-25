@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ConnectionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Table(name: "connection")]
 #[ORM\Entity(repositoryClass: ConnectionRepository::class)]
@@ -30,6 +31,14 @@ class Connection
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private ?User $user;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
+    private \DateTime $createdAt;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
+    private ?\DateTime $updatedAt;
 
     public function getId(): int
     {
@@ -94,6 +103,14 @@ class Connection
         $this->user = $user;
 
         return $this;
+    }
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
     }
 
 }

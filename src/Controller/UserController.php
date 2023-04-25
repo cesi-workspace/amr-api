@@ -94,4 +94,16 @@ class UserController extends AbstractController
     {
         return $this->userService->editStatusUser($request, $user);
     }
+    /*
+    #[Route('/users/{id}/proofs', name: 'user_send_proofs', methods: ['PUT'])]
+    public function sendProofs(Request $request, User $user): Response
+    {
+        return $this->userService->sendProofsUser($request, $user);
+    }*/
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/users/{id}/favorites', name: 'user_add_favorite', methods: ['POST'])]
+    public function addFavorite(Request $request, User $user): Response
+    {
+        return $this->userService->addFavoriteUser($request, $user);
+    }
 }

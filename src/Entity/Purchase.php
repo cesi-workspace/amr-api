@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PurchaseRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 
 #[ORM\Table(name: "Purchase")]
@@ -29,6 +30,14 @@ class Purchase
 
     #[ORM\Column(name: "date", type: "datetime", nullable: false)]
     private \DateTime $date;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
+    private \DateTime $createdAt;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
+    private ?\DateTime $updatedAt;
 
     public function getHelper(): User
     {
@@ -76,5 +85,13 @@ class Purchase
         $this->date = $date;
 
         return $this;
+    }
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
     }
 }

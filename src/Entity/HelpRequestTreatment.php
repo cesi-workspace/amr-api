@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\HelpRequestTreatmentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Table(name: "help_request_treatment")]
 #[ORM\Entity(repositoryClass: HelpRequestTreatmentRepository::class)]
@@ -27,6 +28,14 @@ class HelpRequestTreatment
     #[ORM\OneToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "helper_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private User $helper;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
+    private \DateTime $createdAt;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
+    private ?\DateTime $updatedAt;
 
     public function getType(): HelpRequestTreatmentType
     {
@@ -62,5 +71,13 @@ class HelpRequestTreatment
         $this->helper = $helper;
 
         return $this;
+    }
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
     }
 }

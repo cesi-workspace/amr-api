@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GiftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Table(name: "gift")]
 #[ORM\Index(columns: ["partner_id"], name: "FK_GIFT_PARTNER")]
@@ -34,6 +35,14 @@ class Gift
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: "gift")]
     private ArrayCollection $helpers;
+
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
+    private \DateTime $createdAt;
+
+    #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
+    private ?\DateTime $updatedAt;
 
     public function getId(): int
     {
@@ -86,6 +95,14 @@ class Gift
         $this->toDate = $toDate;
 
         return $this;
+    }
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
     }
 
     /**

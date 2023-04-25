@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Favorite;
 use App\Entity\User;
 use App\Entity\UserStatus;
 use App\Entity\UserType;
@@ -34,6 +35,7 @@ enum UserTypeLabel: string
     case MODERATOR = 'Modérateur';
     case PARTNER = 'Partenaire';
     case SUPERADMIN = 'Superadministrateur';
+    case GOV = 'MembreEtat';
 }
 
 class UserService implements IUserService
@@ -90,7 +92,7 @@ class UserService implements IUserService
             throw new AccessDeniedException("Création d'utilisateur non MembreMr et non MembreVolontaire interdite");
         }
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != 'MembreMr' && $parameters['usertype'] != 'MembreVolontaire' && $parameters['usertype'] != 'Modérateur' && $parameters['usertype'] != 'Partenaire'){
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != 'MembreMr' && $parameters['usertype'] != 'MembreVolontaire' && $parameters['usertype'] != 'Modérateur' && $parameters['usertype'] != 'Partenaire' && $parameters['usertype'] != 'MembreEtat'){
             throw new AccessDeniedException("Création d'administrateur interdite");
         }
 
@@ -284,7 +286,11 @@ class UserService implements IUserService
     {
         $parameters = json_decode($request->getContent(), true);
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && $this->security->getUser()->getId()!=$user->getId() && (in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_SUPERADMIN', $user->getRoles()))){
+        if(!$this->security->isGranted('ROLE_ADMIN') && (in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_SUPERADMIN', $user->getRoles()) || in_array('ROLE_PARTNER', $user->getRoles()) || in_array('ROLE_MODERATOR', $user->getRoles()) || in_array('ROLE_GOV', $user->getRoles()))){
+            throw new AccessDeniedException("Edition de statut d'utilisateur volontaire et membremr uniquement");
+        }
+
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && (in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_SUPERADMIN', $user->getRoles()))){
             throw new AccessDeniedException("Edition de statut d'administrateur interdite");
         }
         
@@ -311,6 +317,55 @@ class UserService implements IUserService
         }
 
         return new JsonResponse(['message' => 'Statut de l\'utilisateur mis à jour'], Response::HTTP_OK);
+
+    }
+
+    public function sendProofsUser(Request $request, User $user) : JsonResponse
+    {
+        return new JsonResponse(['message' => 'Statut de l\'utilisateur mis à jour'], Response::HTTP_OK);
+
+    }
+
+    public function addFavoriteUser(Request $request, User $user) : JsonResponse
+    {
+        if($this->security->getUser()->getId()!=$user->getId()){
+            throw new AccessDeniedException("Ajout d'utilisateur en favori seulement avec utilisateur connecté");
+        }
+
+        $parameters = json_decode($request->getContent(), true);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters, 
+            new Assert\Collection([
+                'userid' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true), ]
+            ])
+        );
+
+        $helper = $this->findUser([
+            'id' => $parameters['userid'],
+            'type' => $this->findUserTypeByLabel(UserTypeLabel::HELPER)
+        ]);
+
+        if($helper == null){
+            return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['userid' => 'Il s\'agit pas d\'un utilisateur membrevolontaire']], Response::HTTP_BAD_REQUEST);
+        }
+
+        $favoritetest = $this->entityManager->getRepository(Favorite::class)->findBy([
+            'helper' => $helper,
+            'owner' => $user
+        ]);
+
+        if($favoritetest != null){
+            return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['userid' => 'Le favori existe déjà']], Response::HTTP_BAD_REQUEST);
+        }
+        
+        $favorite = new Favorite();
+        $favorite->setOwner($user);
+        $favorite->setHelper($helper);
+        
+        $this->entityManager->persist($favorite);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Utilisateur ajouté aux favoris'], Response::HTTP_OK);
 
     }
 }
