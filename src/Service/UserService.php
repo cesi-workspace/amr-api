@@ -58,6 +58,16 @@ class UserService implements IUserService
         return $this->entityManager->getRepository(User::class)->findOneBy($findQuery);
     }
 
+    function findUsers(array $findQuery): array | null
+    {
+        $usersquery = $this->entityManager->getRepository(User::class)->findBy($findQuery);
+        $users = [];
+        foreach($usersquery as $key => $value){
+            $users[$key] = $value->getInfo();
+        }
+        return $users;
+    }
+
     function findUserType(array $findQuery): UserType|null
     {
         return $this->entityManager->getRepository(UserType::class)->findOneBy($findQuery);
@@ -88,11 +98,11 @@ class UserService implements IUserService
             $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
 
-        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != 'MembreMr' && $parameters['usertype'] != 'MembreVolontaire'){
+        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != UserTypeLabel::OWNER && $parameters['usertype'] != UserTypeLabel::HELPER){
             throw new AccessDeniedException("Création d'utilisateur non MembreMr et non MembreVolontaire interdite");
         }
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != 'MembreMr' && $parameters['usertype'] != 'MembreVolontaire' && $parameters['usertype'] != 'Modérateur' && $parameters['usertype'] != 'Partenaire' && $parameters['usertype'] != 'MembreEtat'){
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('usertype', $parameters) && ($parameters['usertype'] == UserTypeLabel::ADMIN || $parameters['usertype'] == UserTypeLabel::SUPERADMIN)){
             throw new AccessDeniedException("Création d'administrateur interdite");
         }
 
@@ -177,20 +187,36 @@ class UserService implements IUserService
             ])
         );
 
-        $data = [
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'surname' => $user->getSurname(),
-            'firstname' => $user->getFirstname(),
-            'city' => $user->getCity(),
-            'postalcode' => $user->getPostalcode(),
-            'point' => $user->getPoint(),
-            'usertype' => $user->getType()->getLabel(),
-            'userstatus' => $user->getStatus()->getLabel()
-        ];
+        return new JsonResponse(['message' => 'Utilisateur récupéré', 'data' => $user->getInfo()], Response::HTTP_OK);
 
-        return new JsonResponse(['message' => 'Utilisateur récupéré', 'data' => $data], Response::HTTP_OK);
+    }
 
+    public function getUsers(Request $request) : JsonResponse
+    {
+        
+        $parametersURL = $request->query->all();
+
+        $this->responseValidatorService->checkContraintsValidation($parametersURL,
+            new Assert\Collection([
+                'fields' => [
+                    'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
+                    'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
+                ],
+                'allowMissingFields' => true,
+            ])
+        );
+
+        $paramsearch = [];
+        if(array_key_exists('usertype', $parametersURL)){
+            $paramsearch["type"] = $this->findUserTypeByLabel($parametersURL["usertype"]);
+        }
+        if(array_key_exists('userstatus', $parametersURL)){
+            $paramsearch["status"] = $this->findUserStatusByLabel($parametersURL["userstatus"]);
+        }
+        
+        $users = $this->findUsers($paramsearch);
+
+        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => [$users]], Response::HTTP_OK);
     }
 
     public function editUser(Request $request, User $user) : JsonResponse
@@ -367,5 +393,26 @@ class UserService implements IUserService
 
         return new JsonResponse(['message' => 'Utilisateur ajouté aux favoris'], Response::HTTP_OK);
 
+    }
+
+    public function removeFavoriteUser(User $owner, User $helper) : JsonResponse
+    {
+        if($this->security->getUser()->getId()!=$owner->getId()){
+            throw new AccessDeniedException("Suppression d'utilisateur en favori seulement avec utilisateur connecté");
+        }
+
+        $favorite = $this->entityManager->getRepository(Favorite::class)->findOneBy([
+            'helper' => $helper,
+            'owner' => $owner
+        ]);
+
+        if($favorite == null){
+            return new JsonResponse(['message' => 'Ressource non trouvée'], Response::HTTP_NOT_FOUND);
+        }
+
+        $this->entityManager->remove($favorite);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Utilisateur supprimée des favoris'], Response::HTTP_OK);
     }
 }

@@ -11,6 +11,7 @@ use App\Service\ResponseValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\UserType;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,7 +36,7 @@ class UserController extends AbstractController
         private readonly IUserService $userService
     ){}
     
-    //Route pour ajouter un utilisateur
+    //Ajouter un nouvel utilisateur
     #[Route('/users', name: 'users_add', methods: ['POST'])]
     public function add(Request $request): Response
     {
@@ -43,37 +44,22 @@ class UserController extends AbstractController
     }
 
     // Récupérer les données de l'utilisateur connecté seulement
-    /*
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/users', name: 'users_get', methods: ['GET'])]
-    public function getallusers(Request $request, EntityManagerInterface $em, ResponseValidatorService $responseValidatorService, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager): Response
+    #[Route('/users', name: 'users_get', methods: ['GET'])]
+    public function getAll(Request $request): Response
     {
-        $users=$em->getRepository(User::class)->findAll();
-        
-        $parametersURL = $request->query->all();
+        return $this->userService->getUsers($request);
+    }
 
-        $constraints = new Assert\Collection([
-            'fields' => [
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true, false)],
-                'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Userstatus::class, 'label', true, false)],
-                'email' => [new Assert\Type('string'), new Assert\NotBlank],
-                'surname' => [new Assert\Type('string'), new Assert\NotBlank],
-                'firstname' => [new Assert\Type('string'), new Assert\NotBlank]
-            ],
-            'allowMissingFields' => true,
-        ]);
-
-        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => $users], Response::HTTP_OK);
-    }*/
-
-    // Récupérer les données de l'utilisateur connecté seulement
+    // Récupérer les données d'un utilisateur
     #[IsGranted('ROLE_USER')]
-    #[Route('/users/{id}', name: 'users_get', methods: ['GET'])]
+    #[Route('/users/{id}', name: 'user_get', methods: ['GET'])]
     public function get(Request $request, User $user): Response
     {
         return $this->userService->getUser($request, $user);
     }
     
+    // Modifier les données standard d'un utilisateur
     #[IsGranted('ROLE_USER')]
     #[Route('/users/{id}', name: 'user_edit', methods: ['PUT'])]
     public function edit(Request $request, User $user): Response
@@ -81,6 +67,7 @@ class UserController extends AbstractController
         return $this->userService->editUser($request, $user);
     }
     
+    // Supprimer un utilisateur
     #[IsGranted('ROLE_USER')]
     #[Route('/users/{id}', name: 'user_delete', methods: ['DELETE'])]
     public function remove(Request $request, User $user): Response
@@ -88,22 +75,36 @@ class UserController extends AbstractController
         return $this->userService->removeUser($request, $user);
     }
 
+    //Modifier le statut d'un utilisateur
     #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_GOV")'))]
     #[Route('/users/{id}/status', name: 'user_status_edit', methods: ['PUT'])]
     public function editStatus(Request $request, User $user): Response
     {
         return $this->userService->editStatusUser($request, $user);
     }
+
     /*
     #[Route('/users/{id}/proofs', name: 'user_send_proofs', methods: ['PUT'])]
     public function sendProofs(Request $request, User $user): Response
     {
         return $this->userService->sendProofsUser($request, $user);
     }*/
+
+    //Ajouter un membrevolontaire en favori pour un membremr
     #[IsGranted('ROLE_OWNER')]
     #[Route('/users/{id}/favorites', name: 'user_add_favorite', methods: ['POST'])]
     public function addFavorite(Request $request, User $user): Response
     {
         return $this->userService->addFavoriteUser($request, $user);
+    }
+
+    //Supprimer un membrevolontaire des favoris pour un membremr
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/users/{id1}/favorites/{id2}', name: 'user_del_favorite', methods: ['DELETE'])]
+    #[Entity('owner', expr: 'repository.find(id1)')]
+    #[Entity('helper', expr: 'repository.find(id2)')]
+    public function removeFavorite(User $owner, User $helper): Response
+    {
+        return $this->userService->removeFavoriteUser($owner, $helper);
     }
 }
