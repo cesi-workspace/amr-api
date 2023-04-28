@@ -12,11 +12,25 @@ class APIGeo
         $this->client = $client;
     }
 
-    public function searchCity($city, $codepostal)
+    public function searchCityByCityAndCP(string $city, string $codepostal)
     {
         $response = $this->client->request(
             'GET',
             'https://geo.api.gouv.fr/communes?nom='.$city.'&codePostal='.$codepostal,
+            [
+                'verify_peer' => false,
+            ]
+        );
+        $content = $response->toArray();
+        
+        return $content;
+    }
+
+    public function searchCityByCoordinates(float $lat, float $lon)
+    {
+        $response = $this->client->request(
+            'GET',
+            'https://geo.api.gouv.fr/communes?lat='.$lat.'&lon='.$lon,
             [
                 'verify_peer' => false,
             ]

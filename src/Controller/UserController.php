@@ -37,31 +37,31 @@ class UserController extends AbstractController
     ){}
     
     //Ajouter un nouvel utilisateur
-    #[Route('/users', name: 'users_add', methods: ['POST'])]
-    public function add(Request $request): Response
+    #[Route('/users', name: 'app_user_new', methods: ['POST'])]
+    public function new(Request $request): Response
     {
         return $this->userService->createUser($request);
     }
 
     // Récupérer les données de l'utilisateur connecté seulement
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/users', name: 'users_get', methods: ['GET'])]
-    public function getAll(Request $request): Response
+    #[Route('/users', name: 'app_user_index', methods: ['GET'])]
+    public function index(Request $request): Response
     {
         return $this->userService->getUsers($request);
     }
 
     // Récupérer les données d'un utilisateur
     #[IsGranted('ROLE_USER')]
-    #[Route('/users/{id}', name: 'user_get', methods: ['GET'])]
-    public function get(Request $request, User $user): Response
+    #[Route('/users/{id}', name: 'app_user_show', methods: ['GET'])]
+    public function show(Request $request, User $user): Response
     {
         return $this->userService->getUser($request, $user);
     }
     
     // Modifier les données standard d'un utilisateur
     #[IsGranted('ROLE_USER')]
-    #[Route('/users/{id}', name: 'user_edit', methods: ['PUT'])]
+    #[Route('/users/{id}', name: 'app_user_edit', methods: ['PUT'])]
     public function edit(Request $request, User $user): Response
     {
         return $this->userService->editUser($request, $user);
@@ -69,8 +69,8 @@ class UserController extends AbstractController
     
     // Supprimer un utilisateur
     #[IsGranted('ROLE_USER')]
-    #[Route('/users/{id}', name: 'user_delete', methods: ['DELETE'])]
-    public function remove(Request $request, User $user): Response
+    #[Route('/users/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    public function delete(Request $request, User $user): Response
     {
         return $this->userService->removeUser($request, $user);
     }
@@ -92,18 +92,18 @@ class UserController extends AbstractController
 
     //Ajouter un membrevolontaire en favori pour un membremr
     #[IsGranted('ROLE_OWNER')]
-    #[Route('/users/{id}/favorites', name: 'user_add_favorite', methods: ['POST'])]
-    public function addFavorite(Request $request, User $user): Response
+    #[Route('/{id}/favorites', name: 'app_user_new_favorite', methods: ['POST'])]
+    public function newFavorite(Request $request, User $user): Response
     {
         return $this->userService->addFavoriteUser($request, $user);
     }
 
     //Supprimer un membrevolontaire des favoris pour un membremr
     #[IsGranted('ROLE_OWNER')]
-    #[Route('/users/{id1}/favorites/{id2}', name: 'user_del_favorite', methods: ['DELETE'])]
+    #[Route('/{id1}/favorites/{id2}', name: 'app_user_delete_favorite', methods: ['DELETE'])]
     #[Entity('owner', expr: 'repository.find(id1)')]
     #[Entity('helper', expr: 'repository.find(id2)')]
-    public function removeFavorite(User $owner, User $helper): Response
+    public function deleteFavorite(User $owner, User $helper): Response
     {
         return $this->userService->removeFavoriteUser($owner, $helper);
     }

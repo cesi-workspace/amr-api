@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\NeddRepository;
+use App\Repository\HelpRequestRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ["owner_id"], name: "FK_HELP_REQUEST_OWNER")]
 #[ORM\Index(columns: ["status_id"], name: "FK_HELP_REQUEST_STATUS")]
 #[ORM\Index(columns: ["helper_id"], name: "FK_HELP_REQUEST_HELPER")]
-#[ORM\Entity(repositoryClass: NeddRepository::class)]
+#[ORM\Entity(repositoryClass: HelpRequestRepository::class)]
 class HelpRequest
 {
     #[ORM\Id]
@@ -31,14 +31,11 @@ class HelpRequest
     #[ORM\Column(name: "date", type: "datetime", nullable: false)]
     private \DateTime $date;
 
-    #[ORM\Column(name: "city", type: "string", length: 300, nullable: false)]
-    private string $city;
+    #[ORM\Column(name: "latitude", type: "float", nullable: false)]
+    private float $latitude;
 
-    #[ORM\Column(name: "postal_code", type: "string", length: 300, nullable: false)]
-    private string $postalCode;
-
-    #[ORM\Column(name: "mark", type: "integer", nullable: true)]
-    private ?int $mark;
+    #[ORM\Column(name: "longitude", type: "float", nullable: false)]
+    private float $longitude;
 
     /*
      * It corresponds to the reduced mobility member, which is a user
@@ -124,26 +121,26 @@ class HelpRequest
         return $this;
     }
 
-    public function getCity(): string
+    public function getLatitude(): float
     {
-        return $this->city;
+        return $this->latitude;
     }
 
-    public function setCity(string $city): self
+    public function setLatitude(float $latitude): self
     {
-        $this->city = $city;
+        $this->latitude = $latitude;
 
         return $this;
     }
 
-    public function getPostalCode(): string
+    public function getLongitude(): float
     {
-        return $this->postalCode;
+        return $this->longitude;
     }
 
-    public function setPostalCode(string $postalCode): self
+    public function setLongitude(float $longitude): self
     {
-        $this->postalCode = $postalCode;
+        $this->longitude = $longitude;
 
         return $this;
     }

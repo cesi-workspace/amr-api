@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\HelpRequestCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\UseRepository;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Table(name:"help_request_category")]
-#[ORM\Entity(repositoryClass: NeedcategoryRepository::class)]
+#[ORM\Entity(repositoryClass: HelpRequestCategoryRepository::class)]
 class HelpRequestCategory
 {
     #[ORM\Id]

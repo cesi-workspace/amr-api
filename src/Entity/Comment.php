@@ -34,6 +34,9 @@ class Comment
     #[ORM\JoinColumn(name: "helper_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private User $helper;
 
+    #[ORM\Column(name: "mark", type: "integer", nullable: true)]
+    private ?int $mark;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
     private \DateTime $createdAt;
@@ -45,30 +48,6 @@ class Comment
     public function getId(): int
     {
         return $this->id;
-    }
-
-    public function getOwner(): User
-    {
-        return $this->owner;
-    }
-
-    public function setOwner(User $owner): self
-    {
-        $this->owner = $owner;
-
-        return $this;
-    }
-
-    public function getHelper(): User
-    {
-        return $this->helper;
-    }
-
-    public function setHelper(User $helper): self
-    {
-        $this->helper = $helper;
-
-        return $this;
     }
 
     public function getContent(): string
@@ -106,6 +85,43 @@ class Comment
 
         return $this;
     }
+
+    public function getOwner(): User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(User $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getHelper(): User
+    {
+        return $this->helper;
+    }
+
+    public function setHelper(User $helper): self
+    {
+        $this->helper = $helper;
+
+        return $this;
+    }
+
+    public function getMark(): ?int
+    {
+        return $this->mark;
+    }
+
+    public function setMark(?int $mark): self
+    {
+        $this->mark = $mark;
+
+        return $this;
+    }
+
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
