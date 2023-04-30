@@ -63,7 +63,7 @@ class UserService implements IUserService
         $usersquery = $this->entityManager->getRepository(User::class)->findBy($findQuery);
         $users = [];
         foreach($usersquery as $key => $value){
-            $users[$key] = $value->getInfo();
+            $users[$key] = $this->getInfo($value);
         }
         return $users;
     }
@@ -89,6 +89,20 @@ class UserService implements IUserService
         return $this->findUserType([
             'label' => $userTypeLabel
         ]);
+    }
+
+    public function getInfo(User $user): array
+    {
+        return [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'firstname' => $user->getFirstname(),
+            'surname' => $user->getSurname(),
+            'city' => $user->getCity(),
+            'postal_code' => $user->getPostalCode(),
+            'userstatus' => $user->getStatus()->getLabel(),
+            'usertype' => $user->getType()->getLabel(),
+        ];
     }
     function createUser(Request $request) : JsonResponse
     {
@@ -187,7 +201,7 @@ class UserService implements IUserService
             ])
         );
 
-        return new JsonResponse(['message' => 'Utilisateur récupéré', 'data' => $user->getInfo()], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Utilisateur récupéré', 'data' => $this->getInfo($user)], Response::HTTP_OK);
 
     }
 

@@ -20,7 +20,7 @@ final class Version20230421140454 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE Purchase (helper_id INT NOT NULL, gift_id INT NOT NULL, code VARCHAR(200) NOT NULL, date DATETIME NOT NULL, INDEX FK_PURCHASE_HELPER (helper_id), INDEX FK_PURCHASE_GIFT (gift_id), PRIMARY KEY(helper_id, gift_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE purchase (helper_id INT NOT NULL, gift_id INT NOT NULL, code VARCHAR(200) NOT NULL, date DATETIME NOT NULL, INDEX FK_PURCHASE_HELPER (helper_id), INDEX FK_PURCHASE_GIFT (gift_id), PRIMARY KEY(helper_id, gift_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE comment (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, date DATETIME NOT NULL, `signal` TINYINT(1) NOT NULL, INDEX FK_COMMENT_USER (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE connection (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, ip_address VARCHAR(300) NOT NULL, success TINYINT(1) NOT NULL, login_date DATETIME NOT NULL, logout_date DATETIME DEFAULT NULL, INDEX FK_CONNECTION_USER (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE favorite (helper_id INT NOT NULL, owner_id INT NOT NULL, INDEX FK_FAVORITE_HELPER (helper_id), INDEX FK_FAVORITE_OWNER (owner_id), PRIMARY KEY(helper_id, owner_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -35,8 +35,8 @@ final class Version20230421140454 extends AbstractMigration
         $this->addSql('CREATE TABLE user_status (id INT NOT NULL, label VARCHAR(300) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user_type (id INT NOT NULL, label VARCHAR(300) NOT NULL, role VARCHAR(300) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL, available_at DATETIME NOT NULL, delivered_at DATETIME DEFAULT NULL, INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE Purchase ADD CONSTRAINT FK_PURCHASE_HELPER FOREIGN KEY (helper_id) REFERENCES user (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE Purchase ADD CONSTRAINT FK_PURCHASE_GIFT FOREIGN KEY (gift_id) REFERENCES gift (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE purchase ADD CONSTRAINT FK_PURCHASE_HELPER FOREIGN KEY (helper_id) REFERENCES user (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE purchase ADD CONSTRAINT FK_PURCHASE_GIFT FOREIGN KEY (gift_id) REFERENCES gift (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_PURCHASE_COMMENT FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE connection ADD CONSTRAINT FK_CONNECTION_USER FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE favorite ADD CONSTRAINT FK_FAVORITE_HELPER FOREIGN KEY (helper_id) REFERENCES user (id) ON DELETE CASCADE');
@@ -64,8 +64,8 @@ final class Version20230421140454 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE Purchase DROP FOREIGN KEY FK_PURCHASE_USER');
-        $this->addSql('ALTER TABLE Purchase DROP FOREIGN KEY FK_PURCHASE_GIFT');
+        $this->addSql('ALTER TABLE purchase DROP FOREIGN KEY FK_PURCHASE_USER');
+        $this->addSql('ALTER TABLE purchase DROP FOREIGN KEY FK_PURCHASE_GIFT');
         $this->addSql('ALTER TABLE comment DROP FOREIGN KEY FK_PURCHASE_COMMENT');
         $this->addSql('ALTER TABLE connection DROP FOREIGN KEY FK_CONNECTION_USER');
         $this->addSql('ALTER TABLE favorite DROP FOREIGN KEY FK_FAVORITE_HELPER');
@@ -82,7 +82,7 @@ final class Version20230421140454 extends AbstractMigration
         $this->addSql('ALTER TABLE message DROP FOREIGN KEY FK_MESSAGE_USERFROM');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_USER_TYPE');
         $this->addSql('ALTER TABLE user DROP FOREIGN KEY FK_USER_STATUS');
-        $this->addSql('DROP TABLE Purchase');
+        $this->addSql('DROP TABLE purchase');
         $this->addSql('DROP TABLE comment');
         $this->addSql('DROP TABLE connection');
         $this->addSql('DROP TABLE favorite');

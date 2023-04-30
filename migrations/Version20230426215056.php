@@ -54,7 +54,7 @@ final class Version20230426215056 extends AbstractMigration
         $this->addSql('ALTER TABLE help_request_status CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         $this->addSql('ALTER TABLE help_request_treatment CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         $this->addSql('ALTER TABLE help_request_treatment_type CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
-        $this->addSql('ALTER TABLE Purchase CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
+        $this->addSql('ALTER TABLE purchase CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         $this->addSql('ALTER TABLE user_status CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
         $this->addSql('ALTER TABLE user_type CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL');
     }

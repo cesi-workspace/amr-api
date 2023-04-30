@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class HelpRequestController extends AbstractController
 {
@@ -33,15 +34,13 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->createHelprequest($request);
     }
-/*
+    #[IsGranted(new Expression('is_granted("ROLE_HELPER") or is_granted("ROLE_OWNER")'))]
     #[Route('/helprequests/{id}', name: 'app_help_request_show', methods: ['GET'])]
     public function show(HelpRequest $helpRequest): Response
     {
-        return $this->render('help_request/show.html.twig', [
-            'help_request' => $helpRequest,
-        ]);
+        return $this->helpRequestService->getHelprequest($helpRequest);
     }
-
+/*
     #[Route('/helprequests/{id}/edit', name: 'app_help_request_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, HelpRequest $helpRequest, HelpRequestRepository $helpRequestRepository): Response
     {

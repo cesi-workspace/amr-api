@@ -145,18 +145,6 @@ class HelpRequest
         return $this;
     }
 
-    public function getMark(): ?int
-    {
-        return $this->mark;
-    }
-
-    public function setMark(?int $mark): self
-    {
-        $this->mark = $mark;
-
-        return $this;
-    }
-
     public function getOwner(): User
     {
         return $this->owner;
@@ -213,5 +201,22 @@ class HelpRequest
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function getInfo(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'estimated_delay' => $this->getEstimatedDelay(),
+            'date' => $this->getDate(),
+            'latitude' => $this->getLatitude(),
+            'longitude' => $this->getLongitude(),
+            'description' => $this->getDescription(),
+            'helprequestcategory' => $this->getCategory()->getTitle(),
+            'helprequeststatus' => $this->getStatus()->getLabel(),
+            'helprequestowner' => $this->getOwner()->getInfo(),
+            'helprequesthelper' => $this->getHelper() == null ? null : $this->getHelper()->getInfo(),
+        ];
     }
 }

@@ -9,4 +9,5 @@ use Symfony\Component\HttpFoundation\Request;
 interface IHelpRequestService
 {
     function createHelprequest(Request $request): JsonResponse;
+    function getHelprequest(HelpRequest $helpRequest): JsonResponse;
 }

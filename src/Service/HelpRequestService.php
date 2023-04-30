@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
 
@@ -42,7 +43,8 @@ class HelpRequestService implements IHelpRequestService
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
-        private readonly IResponseValidatorService $responseValidatorService
+        private readonly IResponseValidatorService $responseValidatorService,
+        private readonly APIGeo $apiGeo
     ) {}
 
     function findOneBy(array $query, array $orderBy = []): HelpRequest
@@ -73,6 +75,25 @@ class HelpRequestService implements IHelpRequestService
         return $this->findHelpRequestStatus([
             'label' => $helpRequestStatusLabel
         ]);
+    }
+
+    public function getInfo(HelpRequest $helpRequest): array
+    {
+        $content = $this->apiGeo->searchCityByCoordinates($helpRequest->getLatitude(), $helpRequest->getLongitude());
+
+        return [
+            'id' => $helpRequest->getId(),
+            'title' => $helpRequest->getTitle(),
+            'estimated_delay' => $helpRequest->getEstimatedDelay()->format('H:i:s'),
+            'date' => $helpRequest->getDate()->format('Y-m-d H:i:s'),
+            'city' => $content[0]["nom"],
+            'postal_code' => $content[0]["codesPostaux"][0],
+            'description' => $helpRequest->getDescription(),
+            'helprequestcategory' => $helpRequest->getCategory()->getTitle(),
+            'helprequeststatus' => $helpRequest->getStatus()->getLabel(),
+            'helprequestowner' => $helpRequest->getOwner()->getInfo(),
+            'helprequesthelper' => $helpRequest->getHelper() == null ? null : $helpRequest->getHelper()->getInfo(),
+        ];
     }
 
     function createHelprequest(Request $request) : JsonResponse
@@ -111,6 +132,24 @@ class HelpRequestService implements IHelpRequestService
         $this->entityManager->flush();
 
         return new JsonResponse(['message' => 'Demande créée'], Response::HTTP_OK);
+    }
+
+    function getHelpRequest(HelpRequest $helpRequest) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER') && $helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value && $helpRequest->getHelper()?->getId()!=$userconnect->getId())
+        {
+            throw new AccessDeniedException("Récupération de demande d'aide non créée et non associé à l'utilisateur interdite");
+        }
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
+        {
+            throw new AccessDeniedException("Récupération de demande d'aide non associé à l'utilisateur interdite");
+        }
+
+        $data = $this->getInfo($helpRequest);
+        
+        return new JsonResponse($data);
     }
 
 }
