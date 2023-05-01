@@ -13,4 +13,6 @@ interface IHelpRequestService
     function getHelprequest(HelpRequest $helpRequest): JsonResponse;
     function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse;
     function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest, User $user) : JsonResponse;
+    function finishHelpRequest(Request $request, HelpRequest $helpRequest) : JsonResponse;
+    function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse;
 }

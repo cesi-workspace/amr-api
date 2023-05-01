@@ -100,8 +100,8 @@ class UserService implements IUserService
             'surname' => $user->getSurname(),
             'city' => $user->getCity(),
             'postal_code' => $user->getPostalCode(),
-            'user_status' => $user->getStatus()->getLabel(),
-            'user_type' => $user->getType()->getLabel(),
+            'status' => $user->getStatus()->getLabel(),
+            'type' => $user->getType()->getLabel(),
         ];
     }
     function createUser(Request $request) : JsonResponse
@@ -127,7 +127,7 @@ class UserService implements IUserService
             'password' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
             'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
-            'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+            'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
             'city,postal_code' => [new CustomAssert\CityCP]
         ]);
 
@@ -143,7 +143,7 @@ class UserService implements IUserService
                 'postal_code' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
-                'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
+                'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
                 'city,postal_code' => [new Assert\Optional(
                     [new CustomAssert\CityCP]
                 )]
@@ -173,7 +173,7 @@ class UserService implements IUserService
             $user->setStatus($this->findUserStatusByLabel(UserStatusLabel::ENABLE));
         }
 
-        if($parameters["user_type"] == UserTypeLabel::HELPER){
+        if($parameters["type"] == UserTypeLabel::HELPER){
             $user->setPoint(0);
         }
 
@@ -213,22 +213,14 @@ class UserService implements IUserService
         $this->responseValidatorService->checkContraintsValidation($parametersURL,
             new Assert\Collection([
                 'fields' => [
-                    'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
-                    'user_status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
+                    'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
+                    'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
                 ],
                 'allowMissingFields' => true,
             ])
         );
-
-        $paramsearch = [];
-        if(array_key_exists('user_type', $parametersURL)){
-            $paramsearch["type"] = $this->findUserTypeByLabel($parametersURL["usertype"]);
-        }
-        if(array_key_exists('user_status', $parametersURL)){
-            $paramsearch["status"] = $this->findUserStatusByLabel($parametersURL["userstatus"]);
-        }
         
-        $users = $this->findUsers($paramsearch);
+        $users = $this->findUsers($parametersURL);
 
         return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => [$users]], Response::HTTP_OK);
     }
@@ -338,21 +330,21 @@ class UserService implements IUserService
         $this->responseValidatorService->checkContraintsValidation($parameters,
             new Assert\Collection(
                 [
-                    'user_status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true)]
+                    'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true)]
                 ])
         );
 
         $email = $user->getEmail();
         
-        $user->setStatus($this->findUserStatusByLabel($parameters["user_status"]));
+        $user->setStatus($this->findUserStatusByLabel($parameters["status"]));
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        if($parameters["user_status"]==UserStatusLabel::REFUSED){
+        if($parameters["status"]==UserStatusLabel::REFUSED){
             $this->emailService->sendText(to:$email, subject:"Demande de compte AMR refusée", text:"Nous vous informons que la demande de création de compte membreMR a été refusée");
         }
-        if($parameters["user_status"]==UserStatusLabel::ENABLE){
+        if($parameters["status"]==UserStatusLabel::ENABLE){
             $this->emailService->sendText(to:$email, subject:"Demande de compte AMR acceptée", text:"Nous vous informons que la demande de création de compte membreMR a été acceptée");
         }
 
@@ -376,12 +368,12 @@ class UserService implements IUserService
 
         $this->responseValidatorService->checkContraintsValidation($parameters, 
             new Assert\Collection([
-                'user_id' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true), ]
+                'id' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true), ]
             ])
         );
 
         $helper = $this->findUser([
-            'id' => $parameters['user_id'],
+            'id' => $parameters['id'],
             'type' => $this->findUserTypeByLabel(UserTypeLabel::HELPER)
         ]);
 
@@ -395,7 +387,7 @@ class UserService implements IUserService
         ]);
 
         if($favoritetest != null){
-            return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['userid' => 'Le favori existe déjà']], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['id' => 'Le favori existe déjà']], Response::HTTP_BAD_REQUEST);
         }
         
         $favorite = new Favorite();

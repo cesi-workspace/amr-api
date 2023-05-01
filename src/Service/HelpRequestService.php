@@ -121,10 +121,10 @@ class HelpRequestService implements IHelpRequestService
             'city' => $content[0]["nom"],
             'postal_code' => $content[0]["codesPostaux"][0],
             'description' => $helpRequest->getDescription(),
-            'help_request_category' => $helpRequest->getCategory()->getTitle(),
-            'help_request_status' => $helpRequest->getStatus()->getLabel(),
-            'help_request_owner' => $this->userService->getInfo($helpRequest->getOwner()),
-            'help_request_helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
+            'category' => $helpRequest->getCategory()->getTitle(),
+            'status' => $helpRequest->getStatus()->getLabel(),
+            'owner' => $this->userService->getInfo($helpRequest->getOwner()),
+            'helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
         ];
     }
 
@@ -144,7 +144,7 @@ class HelpRequestService implements IHelpRequestService
             'latitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'longitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'description' => [new Assert\Type('string'), new Assert\NotBlank],
-            'help_request_category' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)],
+            'category' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)],
             'latitude,longitude' => [new CustomAssert\CoordinatesFr]
         ]);
 
@@ -157,7 +157,7 @@ class HelpRequestService implements IHelpRequestService
         $helpRequest->setLatitude($parameters['latitude']);
         $helpRequest->setLongitude($parameters['longitude']);
         $helpRequest->setDescription($parameters['description']);
-        $helpRequest->setCategory($this->findHelpRequestCategoryByTitle($parameters['helprequestcategory']));
+        $helpRequest->setCategory($this->findHelpRequestCategoryByTitle($parameters['category']));
         $helpRequest->setOwner($this->security->getUser());
         $helpRequest->setStatus($this->findHelpRequestStatusByLabel(HelpRequestStatusLabel::CREATED));
         $this->entityManager->persist($helpRequest);
@@ -196,7 +196,7 @@ class HelpRequestService implements IHelpRequestService
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
             new Assert\Collection([
-                'help_request_treatment_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestTreatmentType::class, 'label', true)],
+                'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestTreatmentType::class, 'label', true)],
             ])
         );
 
@@ -212,13 +212,13 @@ class HelpRequestService implements IHelpRequestService
         }
 
         $helprequesttreatment->setType(
-            $this->findHelpRequestTreatmentTypeByLabel($parameters['help_request_treatment_type'])
+            $this->findHelpRequestTreatmentTypeByLabel($parameters['type'])
         );
 
         $this->entityManager->persist($helprequesttreatment);
         $this->entityManager->flush();
         
-        return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['help_request_treatment_type']], Response::HTTP_OK);
+        return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['type']], Response::HTTP_OK);
     }
 
     function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest, User $user) : JsonResponse
@@ -287,6 +287,60 @@ class HelpRequestService implements IHelpRequestService
 
             return new JsonResponse(["message" => "Traitement de la demande d'aide bien accepté"], Response::HTTP_OK);
         }
+
+    }
+
+    function finishHelpRequest(Request $request, HelpRequest $helpRequest) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
+        {
+            throw new AccessDeniedException("Traitement d'une demande d'aide non associé à l'utilisateur connecté interdite");
+        }
+        $parameters = json_decode($request->getContent(), true);
+
+        if($helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::ACCEPTED->value)
+        {
+            return new JsonResponse(["message" => "La demande d'aide n'est pas acceptée ou est déjà terminé"], Response::HTTP_BAD_REQUEST);
+        }
+        
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+                'real_delay' => [new Assert\Time, new Assert\NotBlank],
+            ])
+        );
+
+        $helpRequest->setRealDelay(new DateTime($parameters['real_delay']));
+        $helpRequest->setStatus($this->findHelpRequestStatusByLabel(HelpRequestStatusLabel::FINISHED));
+        $this->entityManager->persist($helpRequest);
+        $this->entityManager->flush();
+
+        $helper = $helpRequest->getHelper();
+        $helper->setPoint($helper->getPoint() + 10);
+        $this->entityManager->persist($helper);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => 'Demande d\'aide enregistrée comme terminée'], Response::HTTP_OK);
+
+    }
+
+    function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
+        {
+            throw new AccessDeniedException("Suppression d'une demande d'aide non associé à l'utilisateur connecté interdite");
+        }
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
+        {
+            throw new AccessDeniedException("Suppression d'une demande d'aide dont le statut n'est pas Créée est interdit");
+        }
+
+        $this->entityManager->remove($helpRequest);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['message' => "Demande d'aide supprimée avec succès"], Response::HTTP_OK);
 
     }
 

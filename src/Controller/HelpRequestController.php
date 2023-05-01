@@ -60,33 +60,17 @@ class HelpRequestController extends AbstractController
         return $this->helpRequestService->acceptHelpRequestTreatment($request, $helpRequest, $owner);
     }
 
-/*
-    #[Route('/helprequests/{id}/edit', name: 'app_help_request_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, HelpRequest $helpRequest, HelpRequestRepository $helpRequestRepository): Response
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/helprequests/{id}/finish', name: 'app_help_request_edit_finish', methods: ['PUT'])]
+    public function editFinish(Request $request, HelpRequest $helpRequest)
     {
-        $form = $this->createForm(HelpRequestType::class, $helpRequest);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $helpRequestRepository->save($helpRequest, true);
-
-            return $this->redirectToRoute('app_help_request_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('help_request/edit.html.twig', [
-            'help_request' => $helpRequest,
-            'form' => $form,
-        ]);
+        return $this->helpRequestService->finishHelpRequest($request, $helpRequest);
     }
 
-    #[Route('/helprequests/{id}', name: 'app_help_request_delete', methods: ['POST'])]
-    public function delete(Request $request, HelpRequest $helpRequest, HelpRequestRepository $helpRequestRepository): Response
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/helprequests/{id}', name: 'app_help_request_delete', methods: ['DELETE'])]
+    public function delete(HelpRequest $helpRequest): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$helpRequest->getId(), $request->request->get('_token'))) {
-            $helpRequestRepository->remove($helpRequest, true);
-        }
-
-        return $this->redirectToRoute('app_help_request_index', [], Response::HTTP_SEE_OTHER);
+        return $this->helpRequestService->deleteHelpRequest($helpRequest);
     }
-    */
 }
