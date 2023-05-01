@@ -61,12 +61,12 @@ class HelpRequestTreatment
         return $this;
     }
 
-    public function getvolunteermember(): User
+    public function getHelper(): User
     {
         return $this->helper;
     }
 
-    public function setvolunteermember(User $helper): self
+    public function setHelper(User $helper): self
     {
         $this->helper = $helper;
 

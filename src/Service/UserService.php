@@ -100,8 +100,8 @@ class UserService implements IUserService
             'surname' => $user->getSurname(),
             'city' => $user->getCity(),
             'postal_code' => $user->getPostalCode(),
-            'userstatus' => $user->getStatus()->getLabel(),
-            'usertype' => $user->getType()->getLabel(),
+            'user_status' => $user->getStatus()->getLabel(),
+            'user_type' => $user->getType()->getLabel(),
         ];
     }
     function createUser(Request $request) : JsonResponse
@@ -127,7 +127,7 @@ class UserService implements IUserService
             'password' => [new Assert\Type('string'), new Assert\NotBlank],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
             'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
-            'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
+            'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
             'city,postal_code' => [new CustomAssert\CityCP]
         ]);
 
@@ -143,7 +143,7 @@ class UserService implements IUserService
                 'postal_code' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
-                'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
+                'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true)],
                 'city,postal_code' => [new Assert\Optional(
                     [new CustomAssert\CityCP]
                 )]
@@ -161,11 +161,11 @@ class UserService implements IUserService
             $user->setCity($parameters["city"]);
         }
 
-        if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalcode($parameters["postalcode"]);
+        if(array_key_exists('postal_code', $parameters)){
+            $user->setPostalcode($parameters["postal_code"]);
         }
 
-        $user->setRoles($this->findUserTypeByLabel($parameters["usertype"]));
+        $user->setRoles($this->findUserTypeByLabel($parameters["user_type"]));
         
         if(!$this->security->isGranted('ROLE_ADMIN')){
             $user->setStatus($this->findUserStatusByLabel(UserStatusLabel::REQUESTFOREACTIVATION));
@@ -173,7 +173,7 @@ class UserService implements IUserService
             $user->setStatus($this->findUserStatusByLabel(UserStatusLabel::ENABLE));
         }
 
-        if($parameters["usertype"] == UserTypeLabel::HELPER){
+        if($parameters["user_type"] == UserTypeLabel::HELPER){
             $user->setPoint(0);
         }
 
@@ -213,18 +213,18 @@ class UserService implements IUserService
         $this->responseValidatorService->checkContraintsValidation($parametersURL,
             new Assert\Collection([
                 'fields' => [
-                    'usertype' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
-                    'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
+                    'user_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
+                    'user_status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
                 ],
                 'allowMissingFields' => true,
             ])
         );
 
         $paramsearch = [];
-        if(array_key_exists('usertype', $parametersURL)){
+        if(array_key_exists('user_type', $parametersURL)){
             $paramsearch["type"] = $this->findUserTypeByLabel($parametersURL["usertype"]);
         }
-        if(array_key_exists('userstatus', $parametersURL)){
+        if(array_key_exists('user_status', $parametersURL)){
             $paramsearch["status"] = $this->findUserStatusByLabel($parametersURL["userstatus"]);
         }
         
@@ -245,8 +245,8 @@ class UserService implements IUserService
         
         $parameters = json_decode($request->getContent(), true);
 
-        if(array_key_exists('city', $parameters) && array_key_exists('postalcode', $parameters)){
-            $parameters['city,postalcode'] = [$parameters['city'], $parameters['postalcode']];
+        if(array_key_exists('city', $parameters) && array_key_exists('postal_code', $parameters)){
+            $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
@@ -255,8 +255,8 @@ class UserService implements IUserService
                     'surname' => [new Assert\Type('string'), new Assert\NotBlank],
                     'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
                     'city' => [new Assert\Type('string'), new Assert\NotBlank],
-                    'postalcode' => [new Assert\Type('string'), new Assert\NotBlank],
-                    'city,postalcode' => [new CustomAssert\CityCP]
+                    'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'city,postal_code' => [new CustomAssert\CityCP]
             ],
             allowMissingFields: true)
         );
@@ -272,8 +272,8 @@ class UserService implements IUserService
         if(array_key_exists('city', $parameters)){
             $user->setCity($parameters["city"]);
         }
-        if(array_key_exists('postalcode', $parameters)){
-            $user->setPostalCode($parameters["postalcode"]);
+        if(array_key_exists('postal_code', $parameters)){
+            $user->setPostalCode($parameters["postal_code"]);
         }
 
         $this->entityManager->persist($user);
@@ -338,21 +338,21 @@ class UserService implements IUserService
         $this->responseValidatorService->checkContraintsValidation($parameters,
             new Assert\Collection(
                 [
-                    'userstatus' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true)]
+                    'user_status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true)]
                 ])
         );
 
         $email = $user->getEmail();
         
-        $user->setStatus($this->findUserStatusByLabel($parameters["userstatus"]));
+        $user->setStatus($this->findUserStatusByLabel($parameters["user_status"]));
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        if($parameters["userstatus"]==UserStatusLabel::REFUSED){
+        if($parameters["user_status"]==UserStatusLabel::REFUSED){
             $this->emailService->sendText(to:$email, subject:"Demande de compte AMR refusée", text:"Nous vous informons que la demande de création de compte membreMR a été refusée");
         }
-        if($parameters["userstatus"]==UserStatusLabel::ENABLE){
+        if($parameters["user_status"]==UserStatusLabel::ENABLE){
             $this->emailService->sendText(to:$email, subject:"Demande de compte AMR acceptée", text:"Nous vous informons que la demande de création de compte membreMR a été acceptée");
         }
 
@@ -376,12 +376,12 @@ class UserService implements IUserService
 
         $this->responseValidatorService->checkContraintsValidation($parameters, 
             new Assert\Collection([
-                'userid' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true), ]
+                'user_id' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true), ]
             ])
         );
 
         $helper = $this->findUser([
-            'id' => $parameters['userid'],
+            'id' => $parameters['user_id'],
             'type' => $this->findUserTypeByLabel(UserTypeLabel::HELPER)
         ]);
 

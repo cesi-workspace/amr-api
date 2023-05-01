@@ -34,12 +34,21 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->createHelprequest($request);
     }
+    
     #[IsGranted(new Expression('is_granted("ROLE_HELPER") or is_granted("ROLE_OWNER")'))]
     #[Route('/helprequests/{id}', name: 'app_help_request_show', methods: ['GET'])]
     public function show(HelpRequest $helpRequest): Response
     {
         return $this->helpRequestService->getHelprequest($helpRequest);
     }
+
+    #[IsGranted('ROLE_HELPER')]
+    #[Route('/helprequests/{id}/treatment', name: 'app_help_request_edit_treatment', methods: ['PUT'])]
+    public function editTreatment(Request $request, HelpRequest $helpRequest): Response
+    {
+        return $this->helpRequestService->postHelpRequestTreatment($request, $helpRequest);
+    }
+
 /*
     #[Route('/helprequests/{id}/edit', name: 'app_help_request_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, HelpRequest $helpRequest, HelpRequestRepository $helpRequestRepository): Response

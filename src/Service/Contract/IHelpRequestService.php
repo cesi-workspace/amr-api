@@ -10,4 +10,5 @@ interface IHelpRequestService
 {
     function createHelprequest(Request $request): JsonResponse;
     function getHelprequest(HelpRequest $helpRequest): JsonResponse;
+    function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse;
 }

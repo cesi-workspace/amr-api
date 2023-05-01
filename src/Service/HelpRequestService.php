@@ -5,9 +5,12 @@ namespace App\Service;
 use App\Entity\HelpRequest;
 use App\Entity\HelpRequestCategory;
 use App\Entity\HelpRequestStatus;
+use App\Entity\HelpRequestTreatment;
+use App\Entity\HelpRequestTreatmentType;
 use App\Service\Contract\IHelpRequestService;
 use App\Service\Contract\IDateService;
 use App\Service\Contract\IResponseValidatorService;
+use App\Service\Contract\IUserService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
@@ -37,6 +40,12 @@ enum HelpRequestCategoryLabel: string
     case DIY = 'Bricolage';
     case FOOD = 'Alimentation';
 }
+enum HelpRequestTreatmentTypeLabel: string
+{
+    case FAVORITED = 'Favorisée';
+    case ACCEPTED = 'Acceptée';
+    case REFUSED = 'Refusée';
+}
 class HelpRequestService implements IHelpRequestService
 {
 
@@ -44,7 +53,8 @@ class HelpRequestService implements IHelpRequestService
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly IResponseValidatorService $responseValidatorService,
-        private readonly APIGeo $apiGeo
+        private readonly APIGeo $apiGeo,
+        private readonly IUserService $userService
     ) {}
 
     function findOneBy(array $query, array $orderBy = []): HelpRequest
@@ -52,6 +62,10 @@ class HelpRequestService implements IHelpRequestService
         return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
     }
     
+    function findHelpRequestTreatment(array $query): HelpRequestTreatment|null
+    {
+        return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query);
+    }
 
     function findHelpRequestCategory(array $findQuery): HelpRequestCategory|null
     {
@@ -61,6 +75,11 @@ class HelpRequestService implements IHelpRequestService
     function findHelpRequestStatus(array $findQuery): HelpRequestStatus|null
     {
         return $this->entityManager->getRepository(HelpRequestStatus::class)->findOneBy($findQuery);
+    }
+
+    function findHelpRequestTreatmentType(array $findQuery): HelpRequestTreatmentType|null
+    {
+        return $this->entityManager->getRepository(HelpRequestTreatmentType::class)->findOneBy($findQuery);
     }
 
     function findHelpRequestCategoryByTitle(HelpRequestCategory|string $helpRequestCategory): HelpRequestCategory|null
@@ -77,6 +96,13 @@ class HelpRequestService implements IHelpRequestService
         ]);
     }
 
+    function findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel|string $helpRequestTreatmentTypeLabel): HelpRequestTreatmentType|null
+    {
+        return $this->findHelpRequestTreatmentType([
+            'label' => $helpRequestTreatmentTypeLabel
+        ]);
+    }
+
     public function getInfo(HelpRequest $helpRequest): array
     {
         $content = $this->apiGeo->searchCityByCoordinates($helpRequest->getLatitude(), $helpRequest->getLongitude());
@@ -89,10 +115,10 @@ class HelpRequestService implements IHelpRequestService
             'city' => $content[0]["nom"],
             'postal_code' => $content[0]["codesPostaux"][0],
             'description' => $helpRequest->getDescription(),
-            'helprequestcategory' => $helpRequest->getCategory()->getTitle(),
-            'helprequeststatus' => $helpRequest->getStatus()->getLabel(),
-            'helprequestowner' => $helpRequest->getOwner()->getInfo(),
-            'helprequesthelper' => $helpRequest->getHelper() == null ? null : $helpRequest->getHelper()->getInfo(),
+            'help_request_category' => $helpRequest->getCategory()->getTitle(),
+            'help_request_status' => $helpRequest->getStatus()->getLabel(),
+            'help_request_owner' => $this->userService->getInfo($helpRequest->getOwner()),
+            'help_request_helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
         ];
     }
 
@@ -112,7 +138,7 @@ class HelpRequestService implements IHelpRequestService
             'latitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'longitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'description' => [new Assert\Type('string'), new Assert\NotBlank],
-            'helprequestcategory' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)],
+            'help_request_category' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)],
             'latitude,longitude' => [new CustomAssert\CoordinatesFr]
         ]);
 
@@ -149,7 +175,44 @@ class HelpRequestService implements IHelpRequestService
 
         $data = $this->getInfo($helpRequest);
         
-        return new JsonResponse($data);
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        $parameters = json_decode($request->getContent(), true);
+        
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER') && $helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
+        {
+            throw new AccessDeniedException("Traitement sur une demande d'aide non créée interdite");
+        }
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+                'help_request_treatment_type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestTreatmentType::class, 'label', true)],
+            ])
+        );
+
+        $helprequesttreatment = $this->findHelpRequestTreatment([
+            'helper' => $userconnect,
+            'helpRequest' => $helpRequest
+        ]);
+
+        if($helprequesttreatment == null){
+            $helprequesttreatment = new HelpRequestTreatment();
+            $helprequesttreatment->setHelper($userconnect);
+            $helprequesttreatment->setHelpRequest($helpRequest);
+        }
+
+        $helprequesttreatment->setType(
+            $this->findHelpRequestTreatmentTypeByLabel($parameters['help_request_treatment_type'])
+        );
+
+        $this->entityManager->persist($helprequesttreatment);
+        $this->entityManager->flush();
+        
+        return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['help_request_treatment_type']], Response::HTTP_OK);
     }
 
 }

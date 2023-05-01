@@ -63,7 +63,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         // Récupération de l'erreur d'accès aux routes via IsGranted, si l'utilisateur est authentifié, cela signifie que l'utilisateur n'a pas les droits
         if ($exception instanceof AccessDeniedException) {
             $event->setResponse(
-                new JsonResponse(['message' => 'Accès interdit, votre habilitation ne vous permet d\'accéder à cette route'], Response::HTTP_FORBIDDEN)
+                new JsonResponse(['message' => 'Accès interdit, votre habilitation ne vous permet d\'accéder à cette route ou à cette ressource'], Response::HTTP_FORBIDDEN)
             );
             return;
         }

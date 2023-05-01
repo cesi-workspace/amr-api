@@ -11,6 +11,7 @@ interface IUserService
 
     function isUserExists(array $findQuery): bool;
     function findUser(array $findQuery): User | null;
+    function getInfo(User $user) : array;
     function createUser(Request $request) : JsonResponse;
     function getUser(Request $request, User $user) : JsonResponse;
     function getUsers(Request $request) : JsonResponse;
