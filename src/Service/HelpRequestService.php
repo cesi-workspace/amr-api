@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use App\Entity\HelpRequest;
 use App\Entity\HelpRequestCategory;
 use App\Entity\HelpRequestStatus;
@@ -26,8 +27,8 @@ use App\Validator\Constraints as CustomAssert;
 enum HelpRequestStatusLabel: string
 {
     case CREATED = 'Créée';
-    case ACCEPTED = 'Accepté';
-    case FINISHED = 'Terminé';
+    case ACCEPTED = 'Acceptée';
+    case FINISHED = 'Terminée';
 }
 
 enum HelpRequestCategoryLabel: string
@@ -54,7 +55,8 @@ class HelpRequestService implements IHelpRequestService
         private readonly Security $security,
         private readonly IResponseValidatorService $responseValidatorService,
         private readonly APIGeo $apiGeo,
-        private readonly IUserService $userService
+        private readonly IUserService $userService,
+        private readonly EmailService $emailService
     ) {}
 
     function findOneBy(array $query, array $orderBy = []): HelpRequest
@@ -62,9 +64,13 @@ class HelpRequestService implements IHelpRequestService
         return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
     }
     
-    function findHelpRequestTreatment(array $query): HelpRequestTreatment|null
+    function findHelpRequestTreatment(array $query, bool $single = true): HelpRequestTreatment|null|array
     {
-        return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query);
+        if($single){
+            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query);
+        }else{
+            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findBy($query);
+        }
     }
 
     function findHelpRequestCategory(array $findQuery): HelpRequestCategory|null
@@ -183,9 +189,9 @@ class HelpRequestService implements IHelpRequestService
         $userconnect = $this->security->getUser();
         $parameters = json_decode($request->getContent(), true);
         
-        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER') && $helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
+        if($helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
         {
-            throw new AccessDeniedException("Traitement sur une demande d'aide non créée interdite");
+            return new JsonResponse("La demande d'aide est déjà acceptée ou terminée", Response::HTTP_BAD_REQUEST);
         }
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
@@ -213,6 +219,75 @@ class HelpRequestService implements IHelpRequestService
         $this->entityManager->flush();
         
         return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['help_request_treatment_type']], Response::HTTP_OK);
+    }
+
+    function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest, User $user) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
+        {
+            throw new AccessDeniedException("Traitement d'une demande d'aide non associé à l'utilisateur connecté interdite");
+        }
+        $parameters = json_decode($request->getContent(), true);
+
+        // On récupère le traitement Acceptée de la demande d'aide associé au membre volontaire, ce traitement doit exister sinon erreur 403
+        $helprequesttreatment = $this->findHelpRequestTreatment([
+            'helper' => $user,
+            'helpRequest' => $helpRequest,
+            'type' => $this->findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel::ACCEPTED)
+        ]);
+        
+        if($helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
+        {
+            return new JsonResponse(["message" => "La demande d'aide est déjà accepté ou terminé"], Response::HTTP_BAD_REQUEST);
+        }
+        if($helprequesttreatment == null)
+        {
+            return new JsonResponse(["message" => "Le traitement accepté sur la demande d'aide décrite n'existe pas"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+                'accepted' => [new Assert\Type('int'), new Assert\NotBlank, new Assert\Choice([0, 1])],
+            ])
+        );
+
+
+        if($parameters['accepted'] == "0"){
+            $textEmail = "Le traitement de la demande d'aide que vous aviez acceptée a été refusé par l'utilisateur. Il s'agissait de la demande d'aide suivante : \n- Titre : ".$helpRequest->getTitle()."\n- Description : ".$helpRequest->getDescription()."\n- Catégorie : ".$helpRequest->getCategory()->getTitle()."\n- Auteur demande d'aide : ".$userconnect->getFirstname().' '.$userconnect->getSurname();
+            $this->emailService->sendText(to:$user->getEmail(), subject:"Refus du traitement d'une demande d'aide", text:$textEmail);
+
+            $this->entityManager->remove($helprequesttreatment);
+            $this->entityManager->flush();
+
+            return new JsonResponse(["message" => "Traitement de la demande d'aide bien refusé"], Response::HTTP_OK);
+        }else{
+
+            $helpRequestTreatments = $this->findHelpRequestTreatment([
+                'helpRequest' => $helpRequest
+            ], false);
+
+            foreach($helpRequestTreatments as $value){
+                if($value != $helprequesttreatment && $value->getType()->getLabel() != HelpRequestTreatmentTypeLabel::ACCEPTED){
+                    $textEmail = "Le traitement de la demande d'aide que vous aviez acceptée a été refusé par l'utilisateur. Il s'agissait de la demande d'aide suivante : \n- Titre : ".$helpRequest->getTitle()."\n- Description : ".$helpRequest->getDescription()."\n- Catégorie : ".$helpRequest->getCategory()->getTitle()."\n- Auteur demande d'aide : ".$helpRequest->getOwner()->getFirstname().' '.$helpRequest->getOwner()->getSurname();
+                    $this->emailService->sendText(to:$value->getHelper()->getEmail(), subject:"Refus du traitement d'une demande d'aide", text:$textEmail);
+                }
+                $this->entityManager->remove($value);
+            }
+
+            $helpRequest->setHelper($user);
+            $helpRequest->setStatus($this->findHelpRequestStatusByLabel(HelpRequestStatusLabel::ACCEPTED));
+
+            $textEmail = "Le traitement de la demande d'aide que vous aviez acceptée a été accepté par l'utilisateur. Il s'agit de la demande d'aide suivante : \n- Titre : ".$helpRequest->getTitle()."\n- Description : ".$helpRequest->getDescription()."\n- Catégorie : ".$helpRequest->getCategory()->getTitle()."\n- Auteur demande d'aide : ".$helpRequest->getOwner()->getFirstname().' '.$helpRequest->getOwner()->getSurname();
+            $this->emailService->sendText(to:$user->getEmail(), subject:"Acceptation du traitement d'une demande d'aide", text:$textEmail);
+
+            $this->entityManager->persist($helpRequest);
+            $this->entityManager->flush();
+
+            return new JsonResponse(["message" => "Traitement de la demande d'aide bien accepté"], Response::HTTP_OK);
+        }
+
     }
 
 }

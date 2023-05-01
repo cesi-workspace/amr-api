@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\HelpRequest;
 use App\Form\HelpRequestType;
 use App\Repository\HelpRequestRepository;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 
 class HelpRequestController extends AbstractController
 {
@@ -47,6 +49,15 @@ class HelpRequestController extends AbstractController
     public function editTreatment(Request $request, HelpRequest $helpRequest): Response
     {
         return $this->helpRequestService->postHelpRequestTreatment($request, $helpRequest);
+    }
+
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/helprequests/{helprequest_id}/accept/{owner_id}', name: 'app_help_request_edit_accept', methods: ['PUT'])]
+    #[Entity('helpRequest', expr: 'repository.find(helprequest_id)')]
+    #[Entity('owner', expr: 'repository.find(owner_id)')]
+    public function editAcceptTreatment(Request $request, HelpRequest $helpRequest, User $owner) : Response
+    {
+        return $this->helpRequestService->acceptHelpRequestTreatment($request, $helpRequest, $owner);
     }
 
 /*

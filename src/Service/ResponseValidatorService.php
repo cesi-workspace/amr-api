@@ -6,6 +6,7 @@ use App\Service\Contract\IResponseValidatorService;
 use Exception;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ResponseValidatorService implements IResponseValidatorService
 {
@@ -31,6 +32,10 @@ class ResponseValidatorService implements IResponseValidatorService
     }
 
     public function checkContraintsValidation($parameters, $constraints){
+        
+        if($parameters == null){
+            $parameters = [];
+        }
         $errorMessages = $this->getErrorMessagesValidation($parameters, $constraints);
 
         if (count($errorMessages) != 0){

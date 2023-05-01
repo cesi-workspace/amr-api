@@ -59,6 +59,9 @@ class HelpRequest
     #[ORM\JoinColumn(name: "status_id", referencedColumnName: "id", nullable: false)]
     private HelpRequestStatus $status;
 
+    #[ORM\Column(name: "real_delay", type: "time", nullable: true)]
+    private \DateTime $realDelay;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name: "created_at", type: "datetime", nullable: false)]
     private \DateTime $createdAt;
@@ -189,6 +192,18 @@ class HelpRequest
     public function setStatus(HelpRequestStatus $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getRealDelay(): \DateTime
+    {
+        return $this->realDelay;
+    }
+
+    public function setRealDelay(\DateTime $realDelay): self
+    {
+        $this->realDelay = $realDelay;
 
         return $this;
     }
