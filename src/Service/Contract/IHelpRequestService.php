@@ -4,11 +4,29 @@ namespace App\Service\Contract;
 
 use App\Entity\HelpRequest;
 use App\Entity\User;
+use App\Entity\UserType;
+use App\Entity\UserStatus;
+use App\Entity\HelpRequestCategory;
+use App\Entity\HelpRequestTreatment;
+use App\Entity\HelpRequestStatus;
+use App\Entity\HelpRequestTreatmentType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\HelpRequestCategoryTitle;
+use App\Service\HelpRequestStatusLabel;
+use App\Service\HelpRequestTreatmentTypeLabel;
 
 interface IHelpRequestService
 {
+    function findOneBy(array $query, array $orderBy = []): HelpRequest|null;
+    function findHelpRequestTreatment(array $query, bool $single = true): HelpRequestTreatment|null|array;
+    function findHelpRequestCategory(array $findQuery): HelpRequestCategory|null;
+    function findHelpRequestStatus(array $findQuery): HelpRequestStatus|null;
+    function findHelpRequestTreatmentType(array $findQuery): HelpRequestTreatmentType|null;
+    function findHelpRequestCategoryByTitle(HelpRequestCategoryTitle|string $helpRequestCategory): HelpRequestCategory|null;
+    function findHelpRequestStatusByLabel(HelpRequestStatusLabel|string $helpRequestStatusLabel): HelpRequestStatus|null;
+    function findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel|string $helpRequestTreatmentTypeLabel): HelpRequestTreatmentType|null;
+    public function getInfo(HelpRequest $helpRequest): array;
     function createHelprequest(Request $request): JsonResponse;
     function getHelprequest(HelpRequest $helpRequest): JsonResponse;
     function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse;

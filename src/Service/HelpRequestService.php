@@ -31,7 +31,7 @@ enum HelpRequestStatusLabel: string
     case FINISHED = 'Terminée';
 }
 
-enum HelpRequestCategoryLabel: string
+enum HelpRequestCategoryTitle: string
 {
     case HOUSEWORKS = 'Tâches ménagères';
     case GREENSPACES = 'Espaces verts';
@@ -59,7 +59,7 @@ class HelpRequestService implements IHelpRequestService
         private readonly EmailService $emailService
     ) {}
 
-    function findOneBy(array $query, array $orderBy = []): HelpRequest
+    function findOneBy(array $query, array $orderBy = []): HelpRequest |null
     {
         return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
     }
@@ -88,7 +88,7 @@ class HelpRequestService implements IHelpRequestService
         return $this->entityManager->getRepository(HelpRequestTreatmentType::class)->findOneBy($findQuery);
     }
 
-    function findHelpRequestCategoryByTitle(HelpRequestCategory|string $helpRequestCategory): HelpRequestCategory|null
+    function findHelpRequestCategoryByTitle(HelpRequestCategoryTitle|string $helpRequestCategory): HelpRequestCategory|null
     {
         return $this->findHelpRequestCategory([
             'title' => $helpRequestCategory

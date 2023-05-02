@@ -23,9 +23,6 @@ class Comment
     #[ORM\Column(name: "content", type: "string", length: 3000, nullable: false)]
     private string $content;
 
-    #[ORM\Column(name: "signal", type: "boolean", nullable: false)]
-    private bool $signal;
-
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "owner_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private User $owner;
@@ -70,18 +67,6 @@ class Comment
     public function setDate(\DateTime $date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getSignal(): bool
-    {
-        return $this->signal;
-    }
-
-    public function setSignal(bool $signal): self
-    {
-        $this->signal = $signal;
 
         return $this;
     }
