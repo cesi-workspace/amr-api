@@ -32,4 +32,5 @@ interface IHelpRequestService
     function finishHelpRequest(Request $request, HelpRequest $helpRequest) : JsonResponse;
     function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse;
     function getHelpRequestCategories() : JsonResponse;
+    function getHelpRequests(Request $request) : JsonResponse;
 }

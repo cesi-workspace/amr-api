@@ -127,6 +127,15 @@ class HelpRequestService implements IHelpRequestService
             'helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
         ];
     }
+    
+    public function getInfos(array $helprequests): array
+    {
+        $arrayhelprequests = [];
+        foreach($helprequests as $key => $value){
+            $arrayhelprequests[$key] = $this->getInfo($value);
+        }
+        return $arrayhelprequests;
+    }
 
     function createHelprequest(Request $request) : JsonResponse
     {
@@ -354,6 +363,37 @@ class HelpRequestService implements IHelpRequestService
         }
 
         return new JsonResponse(["message" => "Catégories des demandes d'aides récupérées", "data" => $arrayHelpRequestCategories], Response::HTTP_OK);
+    }
+
+    function getHelpRequests(Request $request) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        $parameters = $request->query->all();
+        /*
+        if(!$this->security->isGranted('ROLE_USER')){
+
+        }*/
+
+        $constraints = new Assert\Collection([
+            'latitude' => [new Assert\NotBlank],
+            'longitude' => [new Assert\NotBlank],
+            'range' => [new Assert\Optional(
+                [new Assert\NotBlank, new Assert\GreaterThanOrEqual(0)]
+            )],
+            'category' => [new Assert\Optional(
+                [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)]
+            )],
+        ]);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
+
+        if(!array_key_exists('range', $parameters)){
+            $parameters['range'] = 100;
+        }
+
+        $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
+
+        return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
     }
 
 }

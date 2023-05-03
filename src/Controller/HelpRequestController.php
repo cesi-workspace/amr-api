@@ -22,14 +22,12 @@ class HelpRequestController extends AbstractController
         private readonly IHelpRequestService $helpRequestService
     ){}
 
-    /*
+    
     #[Route('/helprequests', name: 'app_help_request_index', methods: ['GET'])]
-    public function index(HelpRequestRepository $helpRequestRepository): Response
+    public function index(Request $request): Response
     {
-        return $this->render('help_request/index.html.twig', [
-            'help_requests' => $helpRequestRepository->findAll(),
-        ]);
-    }*/
+        return $this->helpRequestService->getHelpRequests($request);
+    }
     #[IsGranted('ROLE_OWNER')]
     #[Route('/helprequests', name: 'app_help_request_new', methods: ['POST'])]
     public function new(Request $request): Response
@@ -73,4 +71,5 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->deleteHelpRequest($helpRequest);
     }
+
 }

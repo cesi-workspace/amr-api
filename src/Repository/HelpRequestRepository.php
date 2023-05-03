@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\HelpRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -63,4 +64,26 @@ class HelpRequestRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findHelpRequestsByCriteria($parameters)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT hr.id FROM help_request hr INNER JOIN help_request_category hrc ON hr.category_id=hrc.id WHERE get_distance_kms(latitude, longitude, :latitude, :longitude) <= :range';
+        
+        if(array_key_exists('category', $parameters)){
+            $sql = $sql.' AND hrc.title = :category';
+        }
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery($parameters);
+        // returns an array of arrays (i.e. a raw data set)
+        $helpRequestIds = $resultSet->fetchFirstColumn();
+
+        $result = $this->findBy([
+            'id' => $helpRequestIds
+        ]);
+        
+        return $result;
+    }
 }

@@ -23,7 +23,7 @@ class HelpRequest
     private string $title;
 
     #[ORM\Column(name: "description", type: "string", length: 5000, nullable: true)]
-    private string $description;
+    private ?string $description;
 
     #[ORM\Column(name: "estimated_delay", type: "time", nullable: false)]
     private \DateTime $estimatedDelay;
@@ -88,12 +88,12 @@ class HelpRequest
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 

@@ -74,9 +74,9 @@ class ExceptionSubscriber implements EventSubscriberInterface
             return;
         }
         // Récupération des autres erreurs générales
-        /*$event->setResponse(
+        $event->setResponse(
             new JsonResponse(['message' => 'Erreur Serveur', 'data' => $exception->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR)
-        );*/
+        );
 
     }
 }
