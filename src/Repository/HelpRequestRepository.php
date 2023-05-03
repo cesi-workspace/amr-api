@@ -67,22 +67,42 @@ class HelpRequestRepository extends ServiceEntityRepository
 
     public function findHelpRequestsByCriteria($parameters)
     {
+        $maxnbresult = $parameters['max_nb_results'];
+        unset($parameters['max_nb_results']);
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = 'SELECT hr.id FROM help_request hr INNER JOIN help_request_category hrc ON hr.category_id=hrc.id WHERE get_distance_kms(latitude, longitude, :latitude, :longitude) <= :range';
+        $sql = 'SELECT hr.id FROM help_request hr
+        INNER JOIN help_request_category hrc ON hr.category_id=hrc.id
+        INNER JOIN help_request_status hrs ON hr.status_id=hrs.id
+        WHERE 1=1';
         
+        if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters) && array_key_exists('range', $parameters)){
+            $sql = $sql.' AND get_distance_kms(latitude, longitude, :latitude, :longitude) <= :range';
+        }
         if(array_key_exists('category', $parameters)){
             $sql = $sql.' AND hrc.title = :category';
+        }
+        if(array_key_exists('status', $parameters)){
+            $sql = $sql.' AND hrs.label = :status';
+        }
+        if(array_key_exists('owner_id', $parameters)){
+            $sql = $sql.' AND hr.owner_id = :owner_id';
+        }
+        if(array_key_exists('helper_id', $parameters)){
+            $sql = $sql.' AND hr.helper_id = :helper_id';
+        }
+        if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters)){
+            $sql = $sql. ' ORDER BY get_distance_kms(latitude, longitude, :latitude, :longitude)';
         }
         
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery($parameters);
-        // returns an array of arrays (i.e. a raw data set)
+        
         $helpRequestIds = $resultSet->fetchFirstColumn();
 
         $result = $this->findBy([
             'id' => $helpRequestIds
-        ]);
+        ], [], (int)$maxnbresult);
         
         return $result;
     }

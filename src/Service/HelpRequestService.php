@@ -117,7 +117,7 @@ class HelpRequestService implements IHelpRequestService
             'id' => $helpRequest->getId(),
             'title' => $helpRequest->getTitle(),
             'estimated_delay' => $helpRequest->getEstimatedDelay()->format('H:i:s'),
-            'date' => $helpRequest->getDate()->format('Y-m-d H:i:s'),
+            'finished_date' => $helpRequest->getFinishedDate()?->format('Y-m-d H:i:s'),
             'city' => $content[0]["nom"],
             'postal_code' => $content[0]["codesPostaux"][0],
             'description' => $helpRequest->getDescription(),
@@ -149,7 +149,6 @@ class HelpRequestService implements IHelpRequestService
         $constraints = new Assert\Collection([
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
             'estimated_delay' => [new Assert\Time, new Assert\NotBlank],
-            'date' => [new Assert\Date, new Assert\NotBlank],
             'latitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'longitude' => [new Assert\Type('float'), new Assert\NotBlank],
             'description' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -161,7 +160,6 @@ class HelpRequestService implements IHelpRequestService
         
         $helpRequest=new HelpRequest();
         $helpRequest->setTitle($parameters['title']);
-        $helpRequest->setDate(new DateTime($parameters['date']));
         $helpRequest->setEstimatedDelay(new DateTime($parameters['estimated_delay']));
         $helpRequest->setLatitude($parameters['latitude']);
         $helpRequest->setLongitude($parameters['longitude']);
@@ -321,6 +319,7 @@ class HelpRequestService implements IHelpRequestService
         );
 
         $helpRequest->setRealDelay(new DateTime($parameters['real_delay']));
+        $helpRequest->setFinishedDate(new DateTime());
         $helpRequest->setStatus($this->findHelpRequestStatusByLabel(HelpRequestStatusLabel::FINISHED));
         $this->entityManager->persist($helpRequest);
         $this->entityManager->flush();
@@ -369,31 +368,77 @@ class HelpRequestService implements IHelpRequestService
     {
         $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
-        /*
-        if(!$this->security->isGranted('ROLE_USER')){
+        
+        if(!$this->security->isGranted('ROLE_ADMIN')){
 
-        }*/
+            $constraints = new Assert\Collection([
+                'latitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
+                'longitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
+                'range' => [new Assert\Optional(
+                    [new Assert\NotBlank, new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0)]
+                )],
+                'category' => [new Assert\Optional(
+                    [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)]
+                )],
+                'max_nb_results' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0), new Assert\DivisibleBy(1, message: "Cette valeur doit être entière")]
+                )],
+            ]);
+    
+            $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
+    
+            if(!array_key_exists('range', $parameters)){
+                $parameters['range'] = 100;
+            }
+            if(!array_key_exists('max_nb_results', $parameters)){
+                $parameters['max_nb_results'] = 25;
+            }
+    
+            $parameters['status'] = HelpRequestStatusLabel::CREATED->value;
+    
+            $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
+    
+            return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
+        }else{
+            
+            $constraints = new Assert\Collection([
+                'latitude' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank]
+                )],
+                'longitude' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank]
+                )],
+                'range' => [new Assert\Optional(
+                    [new Assert\NotBlank, new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0)]
+                )],
+                'category' => [new Assert\Optional(
+                    [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)]
+                )],
+                'status' => [new Assert\Optional(
+                    [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestStatus::class, 'label', true)]
+                )],
+                'owner_id' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true)]
+                )],
+                'helper_id' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true)]
+                )],
+                'max_nb_results' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0), new Assert\DivisibleBy(1, message: "Cette valeur doit être entière")]
+                )],
+            ]);
 
-        $constraints = new Assert\Collection([
-            'latitude' => [new Assert\NotBlank],
-            'longitude' => [new Assert\NotBlank],
-            'range' => [new Assert\Optional(
-                [new Assert\NotBlank, new Assert\GreaterThanOrEqual(0)]
-            )],
-            'category' => [new Assert\Optional(
-                [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)]
-            )],
-        ]);
+            $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
 
-        $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
+            if(!array_key_exists('max_nb_results', $parameters)){
+                $parameters['max_nb_results'] = 25;
+            }
 
-        if(!array_key_exists('range', $parameters)){
-            $parameters['range'] = 100;
+            $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
+
+            return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
         }
 
-        $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
-
-        return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
     }
 
 }

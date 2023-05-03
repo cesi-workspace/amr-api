@@ -28,8 +28,8 @@ class HelpRequest
     #[ORM\Column(name: "estimated_delay", type: "time", nullable: false)]
     private \DateTime $estimatedDelay;
 
-    #[ORM\Column(name: "date", type: "datetime", nullable: false)]
-    private \DateTime $date;
+    #[ORM\Column(name: "finished_date", type: "datetime", nullable: true)]
+    private ?\DateTime $finishedDate;
 
     #[ORM\Column(name: "latitude", type: "float", nullable: false)]
     private float $latitude;
@@ -112,14 +112,14 @@ class HelpRequest
         return $this;
     }
 
-    public function getDate(): \DateTime
+    public function getFinishedDate(): ?\DateTime
     {
-        return $this->date;
+        return $this->finishedDate;
     }
 
-    public function setDate(\DateTime $date): self
+    public function setFinishedDate(?\DateTime $finishedDate): self
     {
-        $this->date = $date;
+        $this->finishedDate = $finishedDate;
 
         return $this;
     }
