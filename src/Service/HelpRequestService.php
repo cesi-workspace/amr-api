@@ -344,4 +344,16 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
+    function getHelpRequestCategories() : JsonResponse
+    {
+        $helpRequestCategories = $this->entityManager->getRepository(HelpRequestCategory::class)->findAll();
+
+        $arrayHelpRequestCategories = [];
+        foreach($helpRequestCategories as $key => $value){
+            $arrayHelpRequestCategories[$key] = $value->getTitle();
+        }
+
+        return new JsonResponse(["message" => "Catégories des demandes d'aides récupérées", "data" => $arrayHelpRequestCategories], Response::HTTP_OK);
+    }
+
 }

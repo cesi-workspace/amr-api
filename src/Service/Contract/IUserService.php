@@ -30,5 +30,7 @@ interface IUserService
     function sendProofsUser(Request $request, User $user) : JsonResponse;
     function addFavoriteUser(Request $request, User $user) : JsonResponse;
     function removeFavoriteUser(User $owner, User $helper) : JsonResponse;
+    function getUserTypes() : JsonResponse;
+    function getUserStatus() : JsonResponse;
 
 }

@@ -442,4 +442,28 @@ class UserService implements IUserService
 
         return new JsonResponse(['message' => 'Utilisateur supprimée des favoris'], Response::HTTP_OK);
     }
+
+    function getUserTypes() : JsonResponse
+    {
+        $userTypes = $this->entityManager->getRepository(UserType::class)->findAll();
+
+        $arrayUserTypes = [];
+        foreach($userTypes as $key => $value){
+            $arrayUserTypes[$key] = $value->getLabel();
+        }
+
+        return new JsonResponse(["message" => "Types d'utilisateurs récupérées", "data" => $arrayUserTypes], Response::HTTP_OK);
+    }
+
+    function getUserStatus() : JsonResponse
+    {
+        $userStatus = $this->entityManager->getRepository(UserStatus::class)->findAll();
+
+        $arrayUserStatus = [];
+        foreach($userStatus as $key => $value){
+            $arrayUserStatus[$key] = $value->getLabel();
+        }
+
+        return new JsonResponse(["message" => "Statuts d'utilisateurs récupérées", "data" => $arrayUserStatus], Response::HTTP_OK);
+    }
 }
