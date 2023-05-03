@@ -60,12 +60,7 @@ class UserService implements IUserService
 
     function findUsers(array $findQuery): array | null
     {
-        $usersquery = $this->entityManager->getRepository(User::class)->findBy($findQuery);
-        $users = [];
-        foreach($usersquery as $key => $value){
-            $users[$key] = $this->getInfo($value);
-        }
-        return $users;
+        return $this->entityManager->getRepository(User::class)->findBy($findQuery);
     }
 
     function findUserType(array $findQuery): UserType|null
@@ -90,6 +85,15 @@ class UserService implements IUserService
             'label' => $userTypeLabel
         ]);
     }
+    
+    public function getInfos(array $users): array
+    {
+        $arrayusers = [];
+        foreach($users as $key => $value){
+            $arrayusers[$key] = $this->getInfo($value);
+        }
+        return $arrayusers;
+    }
 
     public function getInfo(User $user): array
     {
@@ -112,11 +116,11 @@ class UserService implements IUserService
             $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
 
-        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('usertype', $parameters) && $parameters['usertype'] != UserTypeLabel::OWNER && $parameters['usertype'] != UserTypeLabel::HELPER){
+        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('type', $parameters) && $parameters['type'] != UserTypeLabel::OWNER && $parameters['type'] != UserTypeLabel::HELPER){
             throw new AccessDeniedException("Création d'utilisateur non MembreMr et non MembreVolontaire interdite");
         }
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('usertype', $parameters) && ($parameters['usertype'] == UserTypeLabel::ADMIN || $parameters['usertype'] == UserTypeLabel::SUPERADMIN)){
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('type', $parameters) && ($parameters['type'] == UserTypeLabel::ADMIN || $parameters['type'] == UserTypeLabel::SUPERADMIN)){
             throw new AccessDeniedException("Création d'administrateur interdite");
         }
 
@@ -210,19 +214,36 @@ class UserService implements IUserService
         
         $parametersURL = $request->query->all();
 
-        $this->responseValidatorService->checkContraintsValidation($parametersURL,
-            new Assert\Collection([
-                'fields' => [
-                    'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
-                    'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
-                ],
-                'allowMissingFields' => true,
-            ])
-        );
-        
-        $users = $this->findUsers($parametersURL);
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_MODERATOR')){
+            $this->responseValidatorService->checkContraintsValidation($parametersURL,
+                new Assert\Collection([
+                    'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false), new Assert\Choice([UserTypeLabel::HELPER->value, UserTypeLabel::OWNER->value])],
+                ])
+            );
+            $parametersURL['status'] = UserStatusLabel::ENABLE;
+        }else{
+            $this->responseValidatorService->checkContraintsValidation($parametersURL,
+                new Assert\Collection([
+                    'fields' => [
+                        'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false)],
+                        'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserStatus::class, 'label', true, false)],
+                    ],
+                    'allowMissingFields' => true,
+                ])
+            );
+        }
 
-        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => [$users]], Response::HTTP_OK);
+        $paramsearch = [];
+        if(array_key_exists('type', $parametersURL)){
+            $paramsearch['type'] = $this->findUserTypeByLabel($parametersURL['type']);
+        }
+        if(array_key_exists('status', $parametersURL)){
+            $paramsearch['status'] = $this->findUserStatusByLabel($parametersURL['status']);
+        }
+        
+        $users = $this->findUsers($paramsearch);
+
+        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => $this->getInfos($users)], Response::HTTP_OK);
     }
 
     public function editUser(Request $request, User $user) : JsonResponse

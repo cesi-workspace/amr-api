@@ -4,8 +4,6 @@ namespace App\Service\Contract;
 
 use App\Entity\HelpRequest;
 use App\Entity\User;
-use App\Entity\UserType;
-use App\Entity\UserStatus;
 use App\Entity\HelpRequestCategory;
 use App\Entity\HelpRequestTreatment;
 use App\Entity\HelpRequestStatus;

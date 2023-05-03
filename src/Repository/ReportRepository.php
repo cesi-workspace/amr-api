@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Report;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Comment;
 
 /**
  * @extends ServiceEntityRepository<Report>
@@ -63,4 +64,26 @@ class ReportRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function groupByComments() : array
+    {
+        $qb = $this->createQueryBuilder('r')
+        ->select("count(*) as number_report, r.comment_id as comment_id")
+        ->groupBy('r.comment_id');
+
+        return $qb->getQuery()->getResult();
+    }
+    
+    public function countReportByComment(Comment $comment) : int
+    {
+
+        $result = $this->createQueryBuilder('r')
+            ->andWhere('r.comment = :comment')
+            ->setParameter('comment', $comment)
+            ->select('COUNT(r.user) as number_report')
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return (int) $result['number_report'];
+    }
 }

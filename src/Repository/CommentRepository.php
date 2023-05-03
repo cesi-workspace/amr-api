@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<Comment>
@@ -63,4 +64,42 @@ class CommentRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function findCommentsByCriteria($parameters)
+    {
+        $owner = array_key_exists('owner_id', $parameters) ? $parameters['owner_id'] : null;
+        $helper = array_key_exists('helper_id', $parameters) ? $parameters['helper_id'] : null;
+        $startDate = array_key_exists('start_date', $parameters) ? new \DateTime($parameters['start_date']) : null;
+        $endDate = array_key_exists('end_date', $parameters) ? new \DateTime($parameters['end_date']) : null;
+
+        $query = $this->createQueryBuilder('c');
+
+        if($owner != null){
+            $query
+            ->andWhere('identity(c.owner) = :val1')
+            ->setParameter('val1', $owner);
+        }
+            
+        if($helper != null){
+            $query
+            ->andWhere('identity(c.helper) = :val2')
+            ->setParameter('val2', $helper);
+        }
+        if($startDate != null){
+            $query
+            ->andWhere('c.date >= :val3')
+            ->setParameter('val3', $startDate);
+        }
+        if($endDate != null){
+            $query
+            ->andWhere('c.date <= :val4')
+            ->setParameter('val4', $endDate);
+        }
+        
+        $result = $query
+        ->orderBy('c.date', 'DESC')
+        ->getQuery()
+        ->getResult();
+
+        return $result;
+    }
 }

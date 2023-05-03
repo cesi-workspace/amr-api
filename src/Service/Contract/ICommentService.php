@@ -10,4 +10,5 @@ use Symfony\Component\HttpFoundation\Request;
 interface ICommentService
 {
     function createComment(Request $request): JsonResponse;
+    function getComments(Request $request) : JsonResponse;
 }

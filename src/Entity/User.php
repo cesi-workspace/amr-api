@@ -235,18 +235,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         //$this->achatCadeau = new ArrayCollection();
         //$this->favoriMembrevolontaire = new ArrayCollection();
     }
-
-    public function getInfo(): array
-    {
-        return [
-            'id' => $this->getId(),
-            'email' => $this->getEmail(),
-            'firstname' => $this->getFirstname(),
-            'surname' => $this->getSurname(),
-            'city' => $this->getCity(),
-            'postal_code' => $this->getPostalCode(),
-            'userstatus' => $this->getStatus()->getLabel(),
-            'usertype' => $this->getType()->getLabel(),
-        ];
-    }
 }

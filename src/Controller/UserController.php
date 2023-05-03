@@ -44,7 +44,7 @@ class UserController extends AbstractController
     }
 
     // Récupérer les données de l'utilisateur connecté seulement
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")'))]
     #[Route('/users', name: 'app_user_index', methods: ['GET'])]
     public function index(Request $request): Response
     {

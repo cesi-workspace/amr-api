@@ -65,7 +65,7 @@ class SessionService implements ISessionService
             return new JsonResponse(['message' => 'Authentification échouée, vérifiez le login et le mot de passe'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $infouser = $user->getInfo();
+        $infouser = $this->userService->getInfo($user);
 
         $connection->setUser($user);
         $connection->setSuccess(true);

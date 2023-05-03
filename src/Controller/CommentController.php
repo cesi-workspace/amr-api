@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CommentController extends AbstractController
 {
@@ -25,16 +26,15 @@ class CommentController extends AbstractController
     {
         return $this->commentService->createComment($request);
     }
-    /*
+    
+    #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_OWNER") or is_granted("ROLE_HELPER")'))]
     #[Route('/comments', name: 'app_comment_index', methods: ['GET'])]
-    public function index(CommentRepository $commentRepository): Response
+    public function index(Request $request): Response
     {
-        return $this->render('comment/index.html.twig', [
-            'comments' => $commentRepository->findAll(),
-        ]);
+        return $this->commentService->getComments($request);
     }
 
-
+    /*
     #[Route('/comments/{id}', name: 'app_comment_show', methods: ['GET'])]
     public function show(Comment $comment): Response
     {
