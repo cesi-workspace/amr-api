@@ -116,11 +116,11 @@ class UserService implements IUserService
             $parameters['city,postal_code'] = [$parameters['city'], $parameters['postal_code']];
         }
 
-        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('type', $parameters) && $parameters['type'] != UserTypeLabel::OWNER && $parameters['type'] != UserTypeLabel::HELPER){
+        if(!$this->security->isGranted('ROLE_ADMIN') && array_key_exists('type', $parameters) && $parameters['type'] != UserTypeLabel::OWNER->value && $parameters['type'] != UserTypeLabel::HELPER->value){
             throw new AccessDeniedException("Création d'utilisateur non MembreMr et non MembreVolontaire interdite");
         }
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('type', $parameters) && ($parameters['type'] == UserTypeLabel::ADMIN || $parameters['type'] == UserTypeLabel::SUPERADMIN)){
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('type', $parameters) && ($parameters['type'] == UserTypeLabel::ADMIN->value || $parameters['type'] == UserTypeLabel::SUPERADMIN->value)){
             throw new AccessDeniedException("Création d'administrateur interdite");
         }
 
@@ -128,7 +128,7 @@ class UserService implements IUserService
             'surname' => [new Assert\Type('string'), new Assert\NotBlank],
             'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'password' => [new Assert\Type('string'), new Assert\NotBlank],
+            'password' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Regex("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
             'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
             'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
@@ -140,7 +140,7 @@ class UserService implements IUserService
                 'surname' => [new Assert\Type('string'), new Assert\NotBlank],
                 'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
                 'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-                'password' => [new Assert\Type('string'), new Assert\NotBlank],
+                'password' => [new Assert\Type('string'), new Assert\NotBlank,  new Assert\Regex("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
                 'city' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
@@ -169,7 +169,7 @@ class UserService implements IUserService
             $user->setPostalcode($parameters["postal_code"]);
         }
 
-        $user->setRoles($this->findUserTypeByLabel($parameters["user_type"]));
+        $user->setRoles($this->findUserTypeByLabel($parameters["type"]));
         
         if(!$this->security->isGranted('ROLE_ADMIN')){
             $user->setStatus($this->findUserStatusByLabel(UserStatusLabel::REQUESTFOREACTIVATION));

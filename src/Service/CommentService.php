@@ -174,4 +174,19 @@ class CommentService implements ICommentService
         return new JsonResponse(["message" => "Commentaire signalée"], Response::HTTP_OK);
     }
 
+    function deleteComment(Comment $comment) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        
+        if(!$this->security->isGranted('ROLE_MODERATOR') && $this->security->isGranted('ROLE_OWNER') && $userconnect->getId() != $comment->getOwner()->getId()){
+            throw new AccessDeniedException("La suppression de commentaires que vous n'avez pas écris est interdite");
+        }
+
+        $this->entityManager->remove($comment);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Commentaire supprimé"], Response::HTTP_OK);
+
+    }
+
 }

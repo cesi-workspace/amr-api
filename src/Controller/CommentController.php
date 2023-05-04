@@ -67,15 +67,12 @@ class CommentController extends AbstractController
             'form' => $form,
         ]);
     }
-
+*/
+    #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_OWNER")'))]
     #[Route('/comments/{id}', name: 'app_comment_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Comment $comment, CommentRepository $commentRepository): Response
+    public function delete(Comment $comment): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$comment->getId(), $request->request->get('_token'))) {
-            $commentRepository->remove($comment, true);
-        }
-
-        return $this->redirectToRoute('app_comment_index', [], Response::HTTP_SEE_OTHER);
+        return $this->commentService->deleteComment($comment);
     }
-    */
+    
 }
