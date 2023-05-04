@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\HelpRequest;
 use App\Entity\HelpRequestTreatment;
+use App\Service\HelpRequestTreatmentTypeLabel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

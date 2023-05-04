@@ -34,8 +34,14 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->createHelprequest($request);
     }
+
+    #[Route('/helprequests/categories', name: 'app_help_request_category_index', methods: ['GET'])]
+    public function indexCategories(): Response
+    {
+        return $this->helpRequestService->getHelpRequestCategories();
+    }
     
-    #[IsGranted(new Expression('is_granted("ROLE_HELPER") or is_granted("ROLE_OWNER")'))]
+    #[IsGranted('ROLE_OWNER')]
     #[Route('/helprequests/{id}', name: 'app_help_request_show', methods: ['GET'])]
     public function show(HelpRequest $helpRequest): Response
     {

@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\HelpRequest;
 use App\Entity\Statututilisateur;
 use App\Entity\User;
 use App\Entity\UserStatus;
+use App\Service\HelpRequestTreatmentTypeLabel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -95,5 +97,52 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function findHelperAcceptHelpRequest(HelpRequest $helpRequest)
+    {
 
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT u.id id FROM help_request hr
+        INNER JOIN help_request_treatment hrt ON hr.id=hrt.help_request_id
+        INNER JOIN user u ON u.id=hrt.helper_id
+        INNER JOIN help_request_treatment_type hrtt ON hrt.type_id=hrtt.id
+        WHERE help_request_id= :help_request_id
+        AND hrtt.label = :label';
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery([
+            'help_request_id' => $helpRequest->getId(),
+            'label' => HelpRequestTreatmentTypeLabel::ACCEPTED->value
+        ]);
+        
+        $helpRequestIds = $resultSet->fetchFirstColumn();
+
+        $result = $this->findBy([
+            'id' => $helpRequestIds
+        ]);
+        
+        return $result;
+    }
+    public function findNbHelperAcceptHelpRequest(HelpRequest $helpRequest):int
+    {
+
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT COUNT(*) nb FROM help_request hr
+        INNER JOIN help_request_treatment hrt ON hr.id=hrt.help_request_id
+        INNER JOIN user u ON u.id=hrt.helper_id
+        INNER JOIN help_request_treatment_type hrtt ON hrt.type_id=hrtt.id
+        WHERE help_request_id= :help_request_id
+        AND hrtt.label = :label';
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery([
+            'help_request_id' => $helpRequest->getId(),
+            'label' => HelpRequestTreatmentTypeLabel::ACCEPTED->value
+        ]);
+        
+        $result = $resultSet->fetchFirstColumn();
+
+        return (int)$result[0];
+    }
 }

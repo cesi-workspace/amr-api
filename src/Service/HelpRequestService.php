@@ -109,11 +109,11 @@ class HelpRequestService implements IHelpRequestService
         ]);
     }
 
-    public function getInfo(HelpRequest $helpRequest): array
+    public function getInfo(HelpRequest $helpRequest, bool $details): array
     {
         $content = $this->apiGeo->searchCityByCoordinates($helpRequest->getLatitude(), $helpRequest->getLongitude());
 
-        return [
+        $data = [
             'id' => $helpRequest->getId(),
             'title' => $helpRequest->getTitle(),
             'estimated_delay' => $helpRequest->getEstimatedDelay()->format('H:i:s'),
@@ -126,13 +126,22 @@ class HelpRequestService implements IHelpRequestService
             'owner' => $this->userService->getInfo($helpRequest->getOwner()),
             'helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
         ];
+
+        if($details){
+            $helperAccepted = $this->entityManager->getRepository(User::class)->findHelperAcceptHelpRequest($helpRequest);
+            $data['helpers_accept'] = $this->userService->getInfos($helperAccepted);
+        }else{
+            $data['nb_helpers_accept'] = $this->entityManager->getRepository(User::class)->findNbHelperAcceptHelpRequest($helpRequest);
+        }
+
+        return $data;
     }
     
     public function getInfos(array $helprequests): array
     {
         $arrayhelprequests = [];
         foreach($helprequests as $key => $value){
-            $arrayhelprequests[$key] = $this->getInfo($value);
+            $arrayhelprequests[$key] = $this->getInfo($value, false);
         }
         return $arrayhelprequests;
     }
@@ -177,16 +186,12 @@ class HelpRequestService implements IHelpRequestService
     {
         $userconnect = $this->security->getUser();
         
-        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER') && $helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value && $helpRequest->getHelper()?->getId()!=$userconnect->getId())
-        {
-            throw new AccessDeniedException("Récupération de demande d'aide non créée et non associé à l'utilisateur interdite");
-        }
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
         {
             throw new AccessDeniedException("Récupération de demande d'aide non associé à l'utilisateur interdite");
         }
 
-        $data = $this->getInfo($helpRequest);
+        $data = $this->getInfo($helpRequest, true);
         
         return new JsonResponse($data, Response::HTTP_OK);
     }

@@ -153,4 +153,25 @@ class CommentService implements ICommentService
         }
     }
 
+    function postReportOnComment(Comment $comment) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+
+        if($this->entityManager->getRepository(Report::class)->findBy([
+            'user' => $userconnect,
+            'comment' => $comment
+        ]) != null){
+            return new JsonResponse(["message" => "Commentaire déjà signalée"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $report = new Report();
+        $report->setComment($comment);
+        $report->setUser($this->security->getUser());
+        $report->setDate(new DateTime());
+        $this->entityManager->persist($report);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Commentaire signalée"], Response::HTTP_OK);
+    }
+
 }

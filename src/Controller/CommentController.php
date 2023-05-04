@@ -34,6 +34,13 @@ class CommentController extends AbstractController
         return $this->commentService->getComments($request);
     }
 
+    #[IsGranted('ROLE_USER')]
+    #[Route('/comments/{id}/report', name: 'app_comment_report_new', methods: ['POST'])]
+    public function newReport(Comment $comment): Response
+    {
+        return $this->commentService->postReportOnComment($comment);
+    }
+
     /*
     #[Route('/comments/{id}', name: 'app_comment_show', methods: ['GET'])]
     public function show(Comment $comment): Response

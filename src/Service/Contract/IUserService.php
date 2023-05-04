@@ -20,6 +20,7 @@ interface IUserService
     function findUserStatus(array $findQuery): UserStatus|null;
     function findUserStatusByLabel(UserStatusLabel|string $userStatusLabel): UserStatus|null;
     function findUserTypeByLabel(UserTypeLabel|string $userTypeLabel): UserType|null;
+    public function getInfos(array $users): array;
     function getInfo(User $user) : array;
     function createUser(Request $request) : JsonResponse;
     function getUser(Request $request, User $user) : JsonResponse;

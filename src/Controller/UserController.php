@@ -51,6 +51,20 @@ class UserController extends AbstractController
         return $this->userService->getUsers($request);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/users/status', name: 'app_user_status_index', methods: ['GET'])]
+    public function indexStatus(): Response
+    {
+        return $this->userService->getUserStatus();
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/users/types', name: 'app_user_type_index', methods: ['GET'])]
+    public function indexTypes(): Response
+    {
+        return $this->userService->getUserTypes();
+    }
+
     // Récupérer les données d'un utilisateur
     #[IsGranted('ROLE_USER')]
     #[Route('/users/{id}', name: 'app_user_show', methods: ['GET'])]
@@ -92,7 +106,7 @@ class UserController extends AbstractController
 
     //Ajouter un membrevolontaire en favori pour un membremr
     #[IsGranted('ROLE_OWNER')]
-    #[Route('/{id}/favorites', name: 'app_user_new_favorite', methods: ['POST'])]
+    #[Route('/users/{id}/favorites', name: 'app_user_new_favorite', methods: ['POST'])]
     public function newFavorite(Request $request, User $user): Response
     {
         return $this->userService->addFavoriteUser($request, $user);
@@ -100,7 +114,7 @@ class UserController extends AbstractController
 
     //Supprimer un membrevolontaire des favoris pour un membremr
     #[IsGranted('ROLE_OWNER')]
-    #[Route('/{id1}/favorites/{id2}', name: 'app_user_delete_favorite', methods: ['DELETE'])]
+    #[Route('/users/{id1}/favorites/{id2}', name: 'app_user_delete_favorite', methods: ['DELETE'])]
     #[Entity('owner', expr: 'repository.find(id1)')]
     #[Entity('helper', expr: 'repository.find(id2)')]
     public function deleteFavorite(User $owner, User $helper): Response

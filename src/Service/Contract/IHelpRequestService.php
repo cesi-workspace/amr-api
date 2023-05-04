@@ -24,7 +24,7 @@ interface IHelpRequestService
     function findHelpRequestCategoryByTitle(HelpRequestCategoryTitle|string $helpRequestCategory): HelpRequestCategory|null;
     function findHelpRequestStatusByLabel(HelpRequestStatusLabel|string $helpRequestStatusLabel): HelpRequestStatus|null;
     function findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel|string $helpRequestTreatmentTypeLabel): HelpRequestTreatmentType|null;
-    public function getInfo(HelpRequest $helpRequest): array;
+    public function getInfo(HelpRequest $helpRequest, bool $details): array;
     function createHelprequest(Request $request): JsonResponse;
     function getHelprequest(HelpRequest $helpRequest): JsonResponse;
     function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse;
