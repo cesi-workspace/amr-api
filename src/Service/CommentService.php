@@ -127,7 +127,7 @@ class CommentService implements ICommentService
         $this->entityManager->persist($comment);
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Commentaire ajouté'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Commentaire ajouté'], Response::HTTP_CREATED);
     }
 
     function getComments(Request $request) : JsonResponse
@@ -171,7 +171,7 @@ class CommentService implements ICommentService
                 }, ARRAY_FILTER_USE_BOTH);
             }
 
-            return new JsonResponse(['message' => "Demandes d'aide récupérées", 'data' => $result]);
+            return new JsonResponse(['message' => "Demandes d'aide récupérées", 'data' => $result], $result ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
         }
     }
 
@@ -193,7 +193,7 @@ class CommentService implements ICommentService
         $this->entityManager->persist($report);
         $this->entityManager->flush();
 
-        return new JsonResponse(["message" => "Commentaire signalée"], Response::HTTP_OK);
+        return new JsonResponse(["message" => "Commentaire signalée"], Response::HTTP_CREATED);
     }
 
     function deleteComment(Comment $comment) : JsonResponse

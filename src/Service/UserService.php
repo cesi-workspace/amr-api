@@ -188,7 +188,7 @@ class UserService implements IUserService
 
         $this->emailService->sendText(to:$parameters["email"], subject:"Demande de création de compte", text:"Votre demande de création de compte a bien été prise en compte");
 
-        return new JsonResponse(['message' => 'Utilisateur crée avec succès'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Utilisateur crée avec succès'], Response::HTTP_CREATED);
     }
 
     public function getUser(Request $request, User $user) : JsonResponse
@@ -244,7 +244,7 @@ class UserService implements IUserService
         
         $users = $this->findUsers($paramsearch);
 
-        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => $this->getInfos($users)], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Utilisateurs récupérés', 'data' => $this->getInfos($users)], $users ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
     }
 
     public function editUser(Request $request, User $user) : JsonResponse

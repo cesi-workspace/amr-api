@@ -31,7 +31,8 @@ class ConversationService implements IConversationService
         private readonly Security $security,
         private readonly IResponseValidatorService $responseValidatorService,
         private readonly IUserService $userService,
-        private readonly IMessageService $messageService
+        private readonly IMessageService $messageService,
+        private readonly RequestAmrService $requestAmrService
     ) {}
 
     function createMessage(Request $request, User $userto) : JsonResponse
@@ -71,17 +72,41 @@ class ConversationService implements IConversationService
         $userconnect = $this->security->getUser();
         
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $user->getType()->getLabel() != userTypeLabel::HELPER->value){
-            return new JsonResponse(['message' => 'Les données ne sont pas valides : Il s\'agit pas d\'un utilisateur membrevolontaire'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['message' => 'Erreur de validation de données : La conversation est possible seulement avec un membre volontaire'], Response::HTTP_BAD_REQUEST);
         }
         
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER') && $user->getType()->getLabel() != userTypeLabel::OWNER->value){
-            return new JsonResponse(['message' => 'Les données ne sont pas valides : Il s\'agit pas d\'un utilisateur membre mr'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['message' => 'Erreur de validation de données : La conversation est possible seulement avec un membre mr'], Response::HTTP_BAD_REQUEST);
         }
         $messages = $this->entityManager->getRepository(Message::class)->getConversationsMessage($userconnect, $user);
-        if(count($messages) == 0){
-            throw new NotFoundHttpException();
+        return new JsonResponse(["message" => "Message récupérés", "data" => $this->messageService->getInfos($messages)], $messages ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+    }
+    public function getInfos(array $conversations): array
+    {
+        $arrayconversations = [];
+        foreach($conversations as $key => $value){
+            $arrayconversations[$key] = $this->getInfo($value);
         }
-        return new JsonResponse(["message" => "Message récupérés", "data" => $this->messageService->getInfos($messages)], Response::HTTP_OK);
+        return $arrayconversations;
+    }
+    function getInfo(array $conversation) : array
+    {
+        $lastmessage = $this->entityManager->getRepository(Message::class)->find((int)$conversation['last_message_id']);
+        $user = $this->userService->findUser([
+            'id' => (int)$conversation['user_id']
+        ]);
+
+        return [
+            'user' => $this->userService->getInfo($user),
+            'last_message' => $this->messageService->getInfo($lastmessage)
+        ];
+    }
+
+    function getConversations() : JsonResponse
+    {
+        $userconnect=$this->security->getUser();
+        $conversations = $this->entityManager->getRepository(User::class)->getLastMessageByUsers($userconnect);
+        return new JsonResponse(["message" => "Conversations récupérées", "data" => $this->getInfos($conversations)], $conversations ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
     }
 
 }

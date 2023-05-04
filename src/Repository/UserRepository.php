@@ -145,4 +145,25 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return (int)$result[0];
     }
+    public function getLastMessageByUsers(User $userconnect)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'SELECT m.user_id, MAX(m.id) AS last_message_id FROM
+                    (SELECT from_user_id as user_id, id
+                    FROM message WHERE to_user_id=:user_id
+                    UNION
+                    SELECT to_user_id as user_id, id
+                    FROM message WHERE from_user_id=:user_id) m
+                GROUP BY m.user_id ORDER BY MAX(m.id) DESC;';
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery([
+            'user_id' => $userconnect->getId()
+        ]);
+        
+        $lastmessagebyuser = $resultSet->fetchAllAssociative();
+        
+        return $lastmessagebyuser;
+    }
 }

@@ -180,7 +180,7 @@ class HelpRequestService implements IHelpRequestService
         $this->entityManager->persist($helpRequest);
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Demande créée'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Demande créée'], Response::HTTP_CREATED);
     }
 
     function getHelpRequest(HelpRequest $helpRequest) : JsonResponse

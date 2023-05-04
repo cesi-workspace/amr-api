@@ -41,6 +41,12 @@ class ConversationController extends AbstractController
     {
         return $this->conversationService->getConversationMessages($user);
     }
+    #[IsGranted(new Expression('is_granted("ROLE_OWNER") or is_granted("ROLE_HELPER")'))]
+    #[Route('/conversations', name: 'app_conversation_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        return $this->conversationService->getConversations();
+    }
     
 /*
     #[Route('/messages/{date}', name: 'app_message_show', methods: ['GET'])]
