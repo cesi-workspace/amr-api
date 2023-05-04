@@ -49,7 +49,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
         // Récupération de l'erreur 404 
         if ($exception instanceof NotFoundHttpException) {
             $event->setResponse(
-                new JsonResponse(['message' => 'Route non trouvée'], Response::HTTP_NOT_FOUND)
+                new JsonResponse(['message' => 'Ressource ou route non trouvée'], Response::HTTP_NOT_FOUND)
             );
             return;
         }

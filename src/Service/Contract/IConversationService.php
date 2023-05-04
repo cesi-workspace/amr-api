@@ -7,8 +7,8 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-interface IMessageService
+interface IConversationService
 {
-    function getInfo(Message $message) : array;
-    public function getInfos(array $helpmessages): array;
+    function createMessage(Request $request, User $userto) : JsonResponse;
+    function getConversationMessages(User $user) : JsonResponse;
 }

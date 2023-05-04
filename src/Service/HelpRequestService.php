@@ -8,6 +8,7 @@ use App\Entity\HelpRequestCategory;
 use App\Entity\HelpRequestStatus;
 use App\Entity\HelpRequestTreatment;
 use App\Entity\HelpRequestTreatmentType;
+use App\Service\Contract\IConversationService;
 use App\Service\Contract\IHelpRequestService;
 use App\Service\Contract\IDateService;
 use App\Service\Contract\IResponseValidatorService;

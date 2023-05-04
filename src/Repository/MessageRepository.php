@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Message;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,4 +64,15 @@ class MessageRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function getConversationsMessage(User $user1, User $user2)
+    {
+        $query = $this->createQueryBuilder('m');
+        $query->andWhere('(m.toUser= :user1 AND m.fromUser= :user2) OR (m.toUser= :user2 AND m.fromUser= :user1)')
+        ->setParameter('user1', $user1)
+        ->setParameter('user2', $user2)
+        ->orderBy('m.date', 'DESC');
+        
+        return $query->getQuery()->getResult();
+    }
 }
