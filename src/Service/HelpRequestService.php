@@ -401,10 +401,6 @@ class HelpRequestService implements IHelpRequestService
             }
     
             $parameters['status'] = HelpRequestStatusLabel::CREATED->value;
-    
-            $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
-    
-            return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
         }else{
             
             $constraints = new Assert\Collection([
@@ -440,10 +436,14 @@ class HelpRequestService implements IHelpRequestService
                 $parameters['max_nb_results'] = 25;
             }
 
-            $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
-
-            return new JsonResponse($this->getInfos($helpRequests), Response::HTTP_BAD_REQUEST);
         }
+        $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
+
+        if(count($helpRequests) == 0){
+            return new JsonResponse([], Response::HTTP_NO_CONTENT);
+        }
+
+        return new JsonResponse(["message" => "Demandes d'aides récupérées", 'data' =>$this->getInfos($helpRequests)], Response::HTTP_OK);
 
     }
 
