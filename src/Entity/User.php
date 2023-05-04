@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Index(columns: ["type_id"], name: "FK_USER_USERTYPE")]
@@ -225,14 +226,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: "id", referencedColumnName: "id")]
     #[ORM\InverseJoinColumn(name: "id", referencedColumnName: "user")]
     private $favoriMembrevolontaire = array();
-    */
+*/
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'myFavorites')]
+    private Collection $favoritedBy;
+
+    #[ORM\JoinTable(name: 'favorite')]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'helper_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'favoritedBy')]
+    private Collection $myFavorites;
+
+    public function getMyFavorites() : Collection
+    {
+        return $this->myFavorites;
+    }
+    public function setMyFavorites(Collection $myFavorites) : self
+    {
+        $this->myFavorites = $myFavorites;
+
+        return $this;
+    }
+    public function getFavoritedBy() : Collection
+    {
+        return $this->favoritedBy;
+    }
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        //$this->achatCadeau = new ArrayCollection();
-        //$this->favoriMembrevolontaire = new ArrayCollection();
+        $this->favoritedBy = new ArrayCollection();
+        $this->myFavorites = new ArrayCollection();
     }
 }

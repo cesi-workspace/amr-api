@@ -86,4 +86,14 @@ class ReportRepository extends ServiceEntityRepository
 
         return (int) $result['number_report'];
     }
+
+    public function findReportByComment(Comment $comment)
+    {
+        $qb = $this->createQueryBuilder('r')
+        ->andWhere('r.comment = :comment')
+        ->setParameter('comment', $comment)
+        ->getQuery();
+
+        return $qb->getResult();
+    }
 }

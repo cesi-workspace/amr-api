@@ -121,4 +121,11 @@ class UserController extends AbstractController
     {
         return $this->userService->removeFavoriteUser($owner, $helper);
     }
+
+    #[IsGranted('ROLE_OWNER')]
+    #[Route('/users/{id}/favorites', name: 'app_user_index_favorite', methods: ['GET'])]
+    public function indexFavorites(User $user): Response
+    {
+        return $this->userService->getFavoriteUser($user);
+    }
 }

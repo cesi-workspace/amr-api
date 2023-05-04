@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Doctrine\Common\Collections\Collection;
 
 enum UserStatusLabel: string
 {
@@ -86,7 +87,7 @@ class UserService implements IUserService
         ]);
     }
     
-    public function getInfos(array $users): array
+    public function getInfos(array|Collection $users): array
     {
         $arrayusers = [];
         foreach($users as $key => $value){
@@ -402,20 +403,16 @@ class UserService implements IUserService
             return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['userid' => 'Il s\'agit pas d\'un utilisateur membrevolontaire']], Response::HTTP_BAD_REQUEST);
         }
 
-        $favoritetest = $this->entityManager->getRepository(Favorite::class)->findBy([
-            'helper' => $helper,
-            'owner' => $user
-        ]);
+        $favorites = $user->getMyFavorites();
 
-        if($favoritetest != null){
+        if($favorites->contains($helper)){
             return new JsonResponse(['message' => 'Les données ne sont pas valides', 'data' => ['id' => 'Le favori existe déjà']], Response::HTTP_BAD_REQUEST);
         }
-        
-        $favorite = new Favorite();
-        $favorite->setOwner($user);
-        $favorite->setHelper($helper);
-        
-        $this->entityManager->persist($favorite);
+
+        $favorites->add($helper);
+        $user->setMyFavorites($favorites);
+
+        $this->entityManager->persist($user);
         $this->entityManager->flush();
 
         return new JsonResponse(['message' => 'Utilisateur ajouté aux favoris'], Response::HTTP_OK);
@@ -427,20 +424,31 @@ class UserService implements IUserService
         if($this->security->getUser()->getId()!=$owner->getId()){
             throw new AccessDeniedException("Suppression d'utilisateur en favori seulement avec utilisateur connecté");
         }
+        
+        $favorites = $owner->getMyFavorites();
 
-        $favorite = $this->entityManager->getRepository(Favorite::class)->findOneBy([
-            'helper' => $helper,
-            'owner' => $owner
-        ]);
-
-        if($favorite == null){
+        if(!$favorites->contains($helper)){
             return new JsonResponse(['message' => 'Ressource non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        $this->entityManager->remove($favorite);
+        $favorites->removeElement($helper);
+        $owner->setMyFavorites($favorites);
+
+        $this->entityManager->persist($owner);
         $this->entityManager->flush();
 
         return new JsonResponse(['message' => 'Utilisateur supprimée des favoris'], Response::HTTP_OK);
+    }
+
+    public function getFavoriteUser(User $owner) : JsonResponse
+    {
+        if($this->security->getUser()->getId()!=$owner->getId()){
+            throw new AccessDeniedException("Récupération des utilisateurs en favori seulement avec utilisateur connecté");
+        }
+        
+        $favorites = $owner->getMyFavorites();
+
+        return new JsonResponse(['message' => 'Utilisateurs favoris récupérés', 'data' => $this->getInfos($favorites)], Response::HTTP_OK);
     }
 
     function getUserTypes() : JsonResponse

@@ -41,33 +41,13 @@ class CommentController extends AbstractController
         return $this->commentService->postReportOnComment($comment);
     }
 
-    /*
+    #[IsGranted('ROLE_MODERATOR')]
     #[Route('/comments/{id}', name: 'app_comment_show', methods: ['GET'])]
     public function show(Comment $comment): Response
     {
-        return $this->render('comment/show.html.twig', [
-            'comment' => $comment,
-        ]);
+        return $this->commentService->getComment($comment);
     }
 
-    #[Route('/comments/{id}', name: 'app_comment_edit', methods: ['PUT'])]
-    public function edit(Request $request, Comment $comment, CommentRepository $commentRepository): Response
-    {
-        $form = $this->createForm(CommentType::class, $comment);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $commentRepository->save($comment, true);
-
-            return $this->redirectToRoute('app_comment_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('comment/edit.html.twig', [
-            'comment' => $comment,
-            'form' => $form,
-        ]);
-    }
-*/
     #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_OWNER")'))]
     #[Route('/comments/{id}', name: 'app_comment_delete', methods: ['DELETE'])]
     public function delete(Comment $comment): Response

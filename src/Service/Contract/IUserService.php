@@ -33,5 +33,5 @@ interface IUserService
     function removeFavoriteUser(User $owner, User $helper) : JsonResponse;
     function getUserTypes() : JsonResponse;
     function getUserStatus() : JsonResponse;
-
+    public function getFavoriteUser(User $owner) : JsonResponse;
 }

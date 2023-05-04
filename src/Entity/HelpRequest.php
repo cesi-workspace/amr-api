@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\HelpRequestRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Table(name: "help_request")]
 #[ORM\Index(columns: ["category_id"], name: "FK_HELP_REQUEST_CATEGORY")]
@@ -70,6 +72,8 @@ class HelpRequest
     #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
     private ?\DateTime $updatedAt;
 
+    #[ORM\OneToMany(targetEntity: HelpRequestTreatment::class, mappedBy: 'helpRequest')]
+    private Collection $helpRequestTreatments;
 
     public function getId(): int
     {
@@ -216,5 +220,14 @@ class HelpRequest
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function getHelpRequestsTreatments() : Collection
+    {
+        return $this->helpRequestTreatments;
+    }
+
+    public function __construct() {
+        $this->helpRequestTreatments = new ArrayCollection();
     }
 }

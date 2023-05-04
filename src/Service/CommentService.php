@@ -42,26 +42,48 @@ class CommentService implements ICommentService
     {
         return $this->entityManager->getRepository(Comment::class)->findBy($query, $orderBy);
     }
+
+    function getListReports(Comment $comment) : array
+    {
+        $reports = $this->entityManager->getRepository(Report::class)->findReportByComment($comment);
+        $arrayreports = [];
+        foreach($reports as $key => $value){
+
+            $onereport=[];
+            $onereport["user"] = $this->userService->getInfo($value->getUser());
+            $onereport["date"] = $value->getDate()->format('Y-m-d H:i:s');
+
+            $arrayreports[$key] = $onereport;
+        }
+
+        return $arrayreports;
+    }
     
     public function getInfos(array $comments): array
     {
         $arraycomments = [];
         foreach($comments as $key => $value){
-            $arraycomments[$key] = $this->getInfo($value);
+            $arraycomments[$key] = $this->getInfo($value, false);
         }
         return $arraycomments;
     }
-    public function getInfo(Comment $comment): array
+    public function getInfo(Comment $comment, bool $details): array
     {   
-        return [
+        $data = [
             'id' => $comment->getId(),
             'content' => $comment->getContent(),
             'mark' => $comment->getMark(),
             'date' => $comment->getDate()->format('Y-m-d H:i:s'),
             'owner' => $this->userService->getInfo($comment->getOwner()),
-            'helper' => $this->userService->getInfo($comment->getHelper()),
-            'number_report' => $this->entityManager->getRepository(Report::class)->countReportByComment($comment)
+            'helper' => $this->userService->getInfo($comment->getHelper())
         ];
+
+        if($details){
+            $data['reports'] = $this->getListReports($comment);
+        }else{
+            $data['number_report'] = $this->entityManager->getRepository(Report::class)->countReportByComment($comment);
+        }
+        return $data;
     }
 
     function createComment(Request $request) : JsonResponse
@@ -187,6 +209,11 @@ class CommentService implements ICommentService
 
         return new JsonResponse(["message" => "Commentaire supprimé"], Response::HTTP_OK);
 
+    }
+
+    function getComment(Comment $comment) : JsonResponse
+    {
+        return new JsonResponse(["message" => "Détails du commentaire récupérés", "data" => $this->getInfo($comment, true)]);
     }
 
 }

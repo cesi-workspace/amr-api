@@ -13,4 +13,5 @@ interface ICommentService
     function getComments(Request $request) : JsonResponse;
     function postReportOnComment(Comment $comment) : JsonResponse;
     function deleteComment(Comment $comment) : JsonResponse;
+    function getComment(Comment $comment) : JsonResponse;
 }

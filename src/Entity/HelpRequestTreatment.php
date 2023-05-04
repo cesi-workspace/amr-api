@@ -37,6 +37,8 @@ class HelpRequestTreatment
     #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
     private ?\DateTime $updatedAt;
 
+    
+
     public function getType(): HelpRequestTreatmentType
     {
         return $this->type;
