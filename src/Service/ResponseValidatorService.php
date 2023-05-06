@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Service;
-use App\Exception\ValidationContraintsException;
+use App\Exception\ValidationConstraintsException;
 use App\Service\Contract\IResponseValidatorService;
 use Exception;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -39,7 +39,7 @@ class ResponseValidatorService implements IResponseValidatorService
         $errorMessages = $this->getErrorMessagesValidation($parameters, $constraints);
 
         if (count($errorMessages) != 0){
-            throw new ValidationContraintsException($errorMessages);
+            throw new ValidationConstraintsException($errorMessages);
         }
     }
 

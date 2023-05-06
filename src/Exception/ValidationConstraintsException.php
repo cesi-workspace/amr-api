@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Exception;
+use Exception;
 
-class ValidationContraintsException extends \Exception
+class ValidationConstraintsException extends Exception
 {
 
     private $data;

@@ -3,6 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\HelpRequest;
+use App\Entity\User;
+use App\Service\HelpRequestStatusLabel;
+use App\Service\HelpRequestTreatmentTypeLabel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
@@ -104,6 +107,29 @@ class HelpRequestRepository extends ServiceEntityRepository
             'id' => $helpRequestIds
         ], [], (int)$maxnbresult);
         
+        return $result;
+    }
+
+    public function findHelpRequestByTreatmentTypeUser(string $helpRequestTreatmentType, User $user)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT hr.id FROM help_request hr
+        INNER JOIN help_request_status hrs ON hrs.id=hr.status_id
+        INNER JOIN help_request_treatment hrt ON hrt.help_request_id=hr.id
+        INNER JOIN help_request_treatment_type hrtt ON hrt.type_id=hrtt.id
+        WHERE hrt.helper_id=:helper_id AND hrtt.label=:label AND hrs.label=:label2
+        ORDER BY hrt.created_at DESC';
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['helper_id' => $user->getId(), 'label' => $helpRequestTreatmentType, 'label2' => HelpRequestStatusLabel::CREATED->value]);
+
+        
+        $helpRequestIds = $resultSet->fetchFirstColumn();
+
+        $result = $this->findBy([
+            'id' => $helpRequestIds
+        ]);
+
         return $result;
     }
 }

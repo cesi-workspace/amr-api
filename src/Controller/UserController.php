@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\UserStatus;
 use App\Entity\User;
+use App\Service\Contract\IHelpRequestService;
 use App\Service\Contract\IUserService;
 use App\Service\CryptService;
 use App\Service\EmailService;
@@ -33,7 +34,8 @@ class UserController extends AbstractController
 {
 
     public function __construct(
-        private readonly IUserService $userService
+        private readonly IUserService $userService,
+        private readonly IHelpRequestService $helpRequestService
     ){}
     
     //Ajouter un nouvel utilisateur
@@ -127,5 +129,11 @@ class UserController extends AbstractController
     public function indexFavorites(User $user): Response
     {
         return $this->userService->getFavoriteUser($user);
+    }
+    #[IsGranted(new Expression('is_granted("ROLE_OWNER") or is_granted("ROLE_HELPER")'))]
+    #[Route('/users/{id}/helprequests', name: 'app_user_help_request_index', methods: ['GET'])]
+    public function indexHelpRequests(Request $request, User $user)
+    {
+        return $this->helpRequestService->getOwnHelpRequests($user, $request);
     }
 }

@@ -64,13 +64,21 @@ class HelpRequestService implements IHelpRequestService
     {
         return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
     }
-    
-    function findHelpRequestTreatment(array $query, bool $single = true): HelpRequestTreatment|null|array
+    function findHelpRequest(array $query, bool $single = true, array $orderBy = []): HelpRequest |null|array
     {
         if($single){
-            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query);
+            return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
         }else{
-            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findBy($query);
+            return $this->entityManager->getRepository(HelpRequest::class)->findBy($query, $orderBy);
+        }
+    }
+    
+    function findHelpRequestTreatment(array $query, bool $single = true, array $orderBy = []): HelpRequestTreatment|null|array
+    {
+        if($single){
+            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query, $orderBy);
+        }else{
+            return $this->entityManager->getRepository(HelpRequestTreatment::class)->findBy($query, $orderBy);
         }
     }
 
@@ -445,6 +453,72 @@ class HelpRequestService implements IHelpRequestService
 
         return new JsonResponse(["message" => "Demandes d'aides récupérées", 'data' =>$this->getInfos($helpRequests)], Response::HTTP_OK);
 
+    }
+
+    function getOwnHelpRequests(User $user, Request $request) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        $parameters = $request->query->all();
+
+        if($user != $userconnect)
+        {
+            throw new AccessDeniedException("Récupération des demandes d'aides non associé à l'utilisateur connecté interdite");
+        }
+
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER'))
+        {
+            $this->responseValidatorService->checkContraintsValidation($parameters,
+                new Assert\Collection([
+                    'treatment_type' => [new Assert\Optional(
+                        [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestTreatmentType::class, 'label', true)]
+                    )],
+                    'status' => [new Assert\Optional(
+                        [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestStatus::class, 'label', true)]
+                    )],
+                    ])
+            );
+            
+            if(count($parameters) != 1)
+            {
+                return new JsonResponse(["message" => "Les données ne sont pas valides", "data" => ["treatment_type" => "Ce champ est requis sauf si et seulement si l'autre champ n'est pas renseigné", "status" => "Ce champ est requis sauf si et seulement si l'autre champ n'est pas renseigné"]], Response::HTTP_BAD_REQUEST);
+            }
+
+            $helpRequests = [];
+            if(array_key_exists('treatment_type', $parameters))
+            {
+                $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestByTreatmentTypeUser($parameters['treatment_type'], $user);
+            }
+            if(array_key_exists('status', $parameters))
+            {
+                $helpRequests = $this->findHelpRequest([
+                    'status' => $this->findHelpRequestStatusByLabel($parameters['status']),
+                    'helper' => $user
+                ], false,[
+                    'createdAt' => 'DESC'
+                ]
+            );
+            }
+
+            return new JsonResponse(["message" => "Demandes récupérées", "data" => $this->getInfos($helpRequests)], count($helpRequests) != 0 ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+        }
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER'))
+        {
+            $this->responseValidatorService->getErrorMessagesValidation($parameters,
+                new Assert\Collection([
+                'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestStatus::class, 'label', true)],
+                ])
+            );
+
+            $helpRequests = $this->findHelpRequest([
+                'status' => $this->findHelpRequestStatusByLabel($parameters['status']),
+                'owner' => $user
+            ], false,[
+                'createdAt' => 'DESC'
+            ]);
+
+            return new JsonResponse(["message" => "Demandes récupérées", "data" => $this->getInfos($helpRequests)], count($helpRequests) != 0 ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+        }
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
 }
