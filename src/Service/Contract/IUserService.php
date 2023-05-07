@@ -34,4 +34,5 @@ interface IUserService
     function getUserTypes() : JsonResponse;
     function getUserStatus() : JsonResponse;
     public function getFavoriteUser(User $owner) : JsonResponse;
+    function sendProofIdentity(Request $request, User $user) : JsonResponse;
 }

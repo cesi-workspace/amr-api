@@ -17,12 +17,16 @@ class EmailService
 
     }
 
-    public function sendText(string $from = "", string $to = "", string $subject = "", string $text = "")
+    public function sendText(string $from = "", string $to = "", string $subject = "", string $text = "" , array $files = [])
     {
         $email = (new Email())->from($from == "" ? $this->from : $from)
         ->to($to == "" ? $this->to : $to)
         ->subject($subject)
         ->text($text);
+
+        foreach ($files as $key => $value){
+            $email->attach($value['file'], $value['name']);
+        }
      
         $this->mailerInterface->send($email);
     }

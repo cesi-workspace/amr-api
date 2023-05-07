@@ -136,4 +136,9 @@ class UserController extends AbstractController
     {
         return $this->helpRequestService->getOwnHelpRequests($user, $request);
     }
+    #[Route('/users/{id}/proofidentity', name: 'app_user_send_proofidentity', methods: ['POST'])]
+    public function sendProofIdentity(Request $request, User $user)
+    {
+        return $this->userService->sendProofIdentity($request, $user);
+    }
 }

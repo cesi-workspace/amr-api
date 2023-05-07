@@ -474,4 +474,42 @@ class UserService implements IUserService
 
         return new JsonResponse(["message" => "Statuts d'utilisateurs récupérées", "data" => $arrayUserStatus], Response::HTTP_OK);
     }
+
+    function sendProofIdentity(Request $request, User $user) : JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+
+        if(array_key_exists('email', $parameters) && ($parameters['email'] != $user->getEmail() || $user->getStatus()->getLabel() != UserStatusLabel::REQUESTFOREACTIVATION->value)){
+            throw new AccessDeniedException("Envoi des justificatifs interdit");
+        }
+        if($user->getType()->getLabel() == UserTypeLabel::OWNER->value)
+        {
+            $this->responseValidatorService->checkContraintsValidation($parameters, 
+                new Assert\Collection([
+                    'email' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', true, true)],
+                    'identity_card' => [new Assert\Type('string'), new Assert\NotBlank],
+                    'mr_proof' => [new Assert\Type('string'), new Assert\NotBlank],
+                ])
+            );
+
+            $this->emailService->sendText(subject:"Envoi de justificatifs d'identité", text:"Voici ci-joint les justificatifs d'identité de la personne suivante : \n"."- Nom : ".$user->getFirstname()."\n- Prénom : ".$user->getSurname(),
+            files:[["file" => base64_decode($parameters['identity_card']), 'name' => "Carte d'identité ".$user->getFirstname()." ".$user->getSurname().".pdf"], 
+            ["file" => base64_decode($parameters['mr_proof']), 'name' => "Justificatif MR ".$user->getFirstname()." ".$user->getSurname().".pdf"]]);
+
+            return new JsonResponse(["message" => "Justificatifs d'identité envoyées"], Response::HTTP_OK);
+        }else{
+            
+            $this->responseValidatorService->checkContraintsValidation($parameters, 
+                new Assert\Collection([
+                    'email' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', true, true)],
+                    'identity_card' => [new Assert\Type('string'), new Assert\NotBlank],
+                ])
+            );
+
+            $this->emailService->sendText(subject:"Envoi de justificatifs d'identité", text:"Voici ci-joint les justificatifs d'identité de la personne suivante : \n"."- Nom : ".$user->getFirstname()."\n- Prénom : ".$user->getSurname(),
+            files:[["file" => base64_decode($parameters['identity_card']), 'name' => "Carte d'identité ".$user->getFirstname()." ".$user->getSurname().".pdf"]]);
+
+            return new JsonResponse(["message" => "Justificatifs d’identité envoyées"], Response::HTTP_OK);
+        }
+    }
 }
