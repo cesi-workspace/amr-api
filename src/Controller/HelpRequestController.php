@@ -56,12 +56,11 @@ class HelpRequestController extends AbstractController
     }
 
     #[IsGranted('ROLE_OWNER')]
-    #[Route('/helprequests/{helprequest_id}/accept/{owner_id}', name: 'app_help_request_edit_accept', methods: ['PUT'])]
+    #[Route('/helprequests/{helprequest_id}/accept', name: 'app_help_request_edit_accept', methods: ['PUT'])]
     #[Entity('helpRequest', expr: 'repository.find(helprequest_id)')]
-    #[Entity('owner', expr: 'repository.find(owner_id)')]
-    public function editAcceptTreatment(Request $request, HelpRequest $helpRequest, User $owner) : Response
+    public function editAcceptTreatment(Request $request, HelpRequest $helpRequest) : Response
     {
-        return $this->helpRequestService->acceptHelpRequestTreatment($request, $helpRequest, $owner);
+        return $this->helpRequestService->acceptHelpRequestTreatment($request, $helpRequest);
     }
 
     #[IsGranted('ROLE_OWNER')]

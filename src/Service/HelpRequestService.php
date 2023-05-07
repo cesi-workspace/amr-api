@@ -134,6 +134,7 @@ class HelpRequestService implements IHelpRequestService
             'status' => $helpRequest->getStatus()->getLabel(),
             'owner' => $this->userService->getInfo($helpRequest->getOwner()),
             'helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
+            'created_at' => $helpRequest->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
 
         if($details){
@@ -242,7 +243,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['type']], Response::HTTP_OK);
     }
 
-    function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest, User $user) : JsonResponse
+    function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -251,7 +252,7 @@ class HelpRequestService implements IHelpRequestService
             throw new AccessDeniedException("Traitement d'une demande d'aide non associé à l'utilisateur connecté interdite");
         }
         $parameters = json_decode($request->getContent(), true);
-
+        $user = array_key_exists('helper_id', $parameters) ? $this->userService->findUser(['id' => $parameters["helper_id"]]) : null;
         // On récupère le traitement Acceptée de la demande d'aide associé au membre volontaire, ce traitement doit exister sinon erreur 403
         $helprequesttreatment = $this->findHelpRequestTreatment([
             'helper' => $user,
@@ -270,6 +271,7 @@ class HelpRequestService implements IHelpRequestService
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
             new Assert\Collection([
+                'helper_id' => [new Assert\Type('int'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true)],
                 'accepted' => [new Assert\Type('int'), new Assert\NotBlank, new Assert\Choice([0, 1])],
             ])
         );
@@ -386,8 +388,12 @@ class HelpRequestService implements IHelpRequestService
         if(!$this->security->isGranted('ROLE_ADMIN')){
 
             $constraints = new Assert\Collection([
-                'latitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
-                'longitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
+                'latitude' => [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank]
+                )],
+                'longitude' =>  [new Assert\Optional(
+                    [new Assert\Type('numeric'), new Assert\NotBlank]
+                )],
                 'range' => [new Assert\Optional(
                     [new Assert\NotBlank, new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0)]
                 )],
@@ -401,7 +407,7 @@ class HelpRequestService implements IHelpRequestService
     
             $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
     
-            if(!array_key_exists('range', $parameters)){
+            if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters) && !array_key_exists('range', $parameters)){
                 $parameters['range'] = 100;
             }
             if(!array_key_exists('max_nb_results', $parameters)){

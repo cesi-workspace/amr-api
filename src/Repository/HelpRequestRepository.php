@@ -96,17 +96,33 @@ class HelpRequestRepository extends ServiceEntityRepository
         }
         if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters)){
             $sql = $sql. ' ORDER BY get_distance_kms(latitude, longitude, :latitude, :longitude)';
+        }else{
+            $sql = $sql. ' ORDER BY hr.created_at DESC';
         }
         
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery($parameters);
         
         $helpRequestIds = $resultSet->fetchFirstColumn();
-
+        
         $result = $this->findBy([
             'id' => $helpRequestIds
         ], [], (int)$maxnbresult);
         
+        // Obligation de retrier manuellement sur la liste d'objets obtenues car par défaut findBy va trier par l'id en croissant
+        // On trie selon l'ordre des ids récupérés dans la liste
+        usort($result, function($val1, $val2) use($helpRequestIds) {
+            if (array_search($val1->getId(), $helpRequestIds) > array_search($val2->getId(), $helpRequestIds)){
+                return 1;
+            }else{
+                if (array_search($val1->getId(), $helpRequestIds) < array_search($val2->getId(), $helpRequestIds)){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }
+            
+        });
         return $result;
     }
 
