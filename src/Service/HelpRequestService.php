@@ -382,8 +382,17 @@ class HelpRequestService implements IHelpRequestService
 
     function getHelpRequests(Request $request) : JsonResponse
     {
-        $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
+
+        if (empty($parameters)) {
+            $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findAll();
+
+            if(count($helpRequests) == 0){
+                return new JsonResponse([], Response::HTTP_NO_CONTENT);
+            }
+
+            return new JsonResponse(["message" => "Demandes d'aides récupérées", 'data' =>$this->getInfos($helpRequests)], Response::HTTP_OK);
+        }
         
         if(!$this->security->isGranted('ROLE_ADMIN')){
 
