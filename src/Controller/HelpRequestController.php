@@ -70,7 +70,7 @@ class HelpRequestController extends AbstractController
         return $this->helpRequestService->finishHelpRequest($request, $helpRequest);
     }
 
-    #[IsGranted('ROLE_OWNER')]
+    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_OWNER")'))]
     #[Route('/helprequests/{id}', name: 'app_help_request_delete', methods: ['DELETE'])]
     public function delete(HelpRequest $helpRequest): Response
     {
