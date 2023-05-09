@@ -574,4 +574,45 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Catégorie de demandes d'aide modifiée"], Response::HTTP_OK);
     }
 
+    
+
+    function getHelpRequestStats(Request $request) : JsonResponse
+    {
+        $userconnect = $this->security->getUser();
+        $parameters = $request->query->all();
+
+        $constraints = new Assert\Collection(
+            fields: [
+                'latitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
+                'longitude' => [new Assert\Type('numeric'), new Assert\NotBlank],
+                'range' => [new Assert\NotBlank, new Assert\Type('numeric'), new Assert\GreaterThanOrEqual(0)],
+                'start_date' => [new Assert\Date, new Assert\NotBlank],
+                'end_date' => [new Assert\Date, new Assert\NotBlank],
+                'category' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', true)],
+        ],allowMissingFields:true);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters, $constraints);
+        
+        // Si la récupération de statistiques est faite par un membre mr, il n'aura qu'accès qu'aux donnée le concernant
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER'))
+        {
+            $parameters['owner_id'] = $userconnect->getId();
+        }
+
+        // Si la récupération de statistiques est faite par un volontaire, il n'aura qu'accès qu'aux donnée le concernant
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER'))
+        {
+            $parameters['helper_id'] = $userconnect->getId();
+        }
+
+        $helpRequestsStats = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsStatsByCriteria($parameters);
+
+        if(count($helpRequestsStats) == 0){
+            return new JsonResponse([], Response::HTTP_NO_CONTENT);
+        }
+
+        return new JsonResponse(["message" => "Statistiques des demandes d'aides récupérées", 'data' =>$helpRequestsStats], Response::HTTP_OK);
+
+    }
+
 }

@@ -148,4 +148,42 @@ class HelpRequestRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    
+    public function findHelpRequestsStatsByCriteria($parameters)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "SELECT COUNT(*) AS nb_help_request_total,
+        SUM(IF(status_id=3, 1, 0)) AS nb_help_request_finish,
+        DATE_FORMAT(hr.created_at,'%Y-%m') AS month FROM help_request hr
+        INNER JOIN help_request_category hrc ON hrc.id=hr.category_id
+        WHERE 1=1";
+        
+        if(array_key_exists('category', $parameters)){
+            $sql = $sql.' AND hrc.title = :category';
+        }
+        if(array_key_exists('owner_id', $parameters)){
+            $sql = $sql.' AND hr.owner_id = :owner_id';
+        }
+        if(array_key_exists('helper_id', $parameters)){
+            $sql = $sql.' AND hr.helper_id = :helper_id';
+        }
+        if(array_key_exists('start_date', $parameters)){
+            $sql = $sql.' AND hr.created_at >= :start_date';
+        }
+        if(array_key_exists('end_date', $parameters)){
+            $sql = $sql.' AND hr.created_at <= :end_date';
+        }
+        if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters) && array_key_exists('range', $parameters)){
+            $sql = $sql.' AND get_distance_kms(latitude, longitude, :latitude, :longitude) <= :range';
+        }
+        $sql = $sql. " GROUP BY DATE_FORMAT(hr.created_at,'%Y-%m') ORDER BY DATE_FORMAT(hr.created_at,'%Y-%m')";
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery($parameters);
+        $result=$resultSet->fetchAllAssociative();
+
+        return $result;
+    }
 }
