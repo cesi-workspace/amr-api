@@ -509,7 +509,7 @@ class HelpRequestService implements IHelpRequestService
         }
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER'))
         {
-            $this->responseValidatorService->getErrorMessagesValidation($parameters,
+            $this->responseValidatorService->checkContraintsValidation($parameters,
                 new Assert\Collection([
                 'status' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestStatus::class, 'label', true)],
                 ])
@@ -525,6 +525,53 @@ class HelpRequestService implements IHelpRequestService
             return new JsonResponse(["message" => "Demandes récupérées", "data" => $this->getInfos($helpRequests)], count($helpRequests) != 0 ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
         }
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    function addHelpRequestCategory(Request $request) : JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+            'title' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', false)],
+            ])
+        );
+
+        $helpRequestCategory = new HelpRequestCategory();
+        $helpRequestCategory->setTitle($parameters['title']);
+        $this->entityManager->persist($helpRequestCategory);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Catégorie de demandes d'aide ajoutée"], Response::HTTP_CREATED);
+        
+    }
+    function removeHelpRequestCategory(HelpRequestCategory $helpRequestCategory) : JsonResponse
+    {
+        if($this->findHelpRequest(['category' => $helpRequestCategory])){
+            return new JsonResponse(["message" => "Suppression impossible car cette catégorie est associée au moins une demande d'aide"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $this->entityManager->remove($helpRequestCategory);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Catégorie de demandes d'aide supprimée"], Response::HTTP_OK);
+    }
+
+    function editHelpRequestCategory(Request $request, HelpRequestCategory $helpRequestCategory) : JsonResponse
+    {
+
+        $parameters = json_decode($request->getContent(), true);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+            new Assert\Collection([
+            'title' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(HelpRequestCategory::class, 'title', false)],
+            ])
+        );
+        $helpRequestCategory->setTitle($parameters['title']);
+        $this->entityManager->persist($helpRequestCategory);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Catégorie de demandes d'aide modifiée"], Response::HTTP_OK);
     }
 
 }

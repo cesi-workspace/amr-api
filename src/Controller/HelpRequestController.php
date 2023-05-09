@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\HelpRequest;
-use App\Form\HelpRequestType;
+use App\Entity\HelpRequestCategory;
 use App\Repository\HelpRequestRepository;
 use App\Service\Contract\IHelpRequestService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,6 +75,27 @@ class HelpRequestController extends AbstractController
     public function delete(HelpRequest $helpRequest): Response
     {
         return $this->helpRequestService->deleteHelpRequest($helpRequest);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/helprequests/categories', name: 'app_help_request_category_new', methods: ['POST'])]
+    public function newCategory(Request $request) : Response
+    {
+        return $this->helpRequestService->addHelpRequestCategory($request);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/helprequests/categories/{id}', name: 'app_help_request_category_delete', methods: ['DELETE'])]
+    public function removeCategory(HelpRequestCategory $helpRequestCategory) : Response
+    {
+        return $this->helpRequestService->removeHelpRequestCategory($helpRequestCategory);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/helprequests/categories/{id}', name: 'app_help_request_category_edit', methods: ['PUT'])]
+    public function editCategory(Request $request, HelpRequestCategory $helpRequestCategory) : Response
+    {
+        return $this->helpRequestService->editHelpRequestCategory($request, $helpRequestCategory);
     }
 
 }
