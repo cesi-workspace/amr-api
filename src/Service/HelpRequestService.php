@@ -203,7 +203,7 @@ class HelpRequestService implements IHelpRequestService
 
         $data = $this->getInfo($helpRequest, true);
         
-        return new JsonResponse($data, Response::HTTP_OK);
+        return new JsonResponse(['message' => '', 'data' => $data], Response::HTTP_OK);
     }
 
     function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
