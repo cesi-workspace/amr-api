@@ -34,6 +34,9 @@ class Comment
     #[ORM\Column(name: "mark", type: "integer", nullable: true)]
     private ?int $mark;
 
+    #[ORM\Column(name: "answer", type: "string", length: 3000, nullable: true)]
+    private ?string $answer;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
     private \DateTime $createdAt;
@@ -103,6 +106,18 @@ class Comment
     public function setMark(?int $mark): self
     {
         $this->mark = $mark;
+
+        return $this;
+    }
+
+    public function getAnswer(): ?string
+    {
+        return $this->answer;
+    }
+
+    public function setAnswer(?string $answer): self
+    {
+        $this->answer = $answer;
 
         return $this;
     }

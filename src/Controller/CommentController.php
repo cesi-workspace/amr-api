@@ -54,5 +54,18 @@ class CommentController extends AbstractController
     {
         return $this->commentService->deleteComment($comment);
     }
+    #[IsGranted("ROLE_MODERATOR")]
+    #[Route('/comments/{id}/answer', name: 'app_comment_answer_new', methods: ['POST'])]
+    public function newAnswer(Request $request, Comment $comment) : Response
+    {
+        return $this->commentService->postAnswerToComment($request, $comment);
+    }
+    #[IsGranted("ROLE_MODERATOR")]
+    #[Route('/comments/{id}/answer', name: 'app_comment_answer_delete', methods: ['DELETE'])]
+    public function deleteAnswer(Comment $comment) : Response
+    {
+        return $this->commentService->deleteAnswerToComment($comment);
+    }
+    
     
 }

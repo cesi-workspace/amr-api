@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
@@ -75,7 +76,8 @@ class CommentService implements ICommentService
             'mark' => $comment->getMark(),
             'date' => $comment->getDate()->format('Y-m-d H:i:s'),
             'owner' => $this->userService->getInfo($comment->getOwner()),
-            'helper' => $this->userService->getInfo($comment->getHelper())
+            'helper' => $this->userService->getInfo($comment->getHelper()),
+            'answer' => $comment->getAnswer()
         ];
 
         if($details){
@@ -214,6 +216,38 @@ class CommentService implements ICommentService
     function getComment(Comment $comment) : JsonResponse
     {
         return new JsonResponse(["message" => "Détails du commentaire récupérés", "data" => $this->getInfo($comment, true)]);
+    }
+
+    function postAnswerToComment(Request $request, Comment $comment) : JsonResponse
+    {
+        $parameters = json_decode($request->getContent(), true);
+
+        $this->responseValidatorService->checkContraintsValidation($parameters,
+                new Assert\Collection([
+                    'content' => [new Assert\Type('string'), new Assert\NotBlank]
+                ])
+            );
+        if($comment->getAnswer() != null){
+            return new JsonResponse(["message" => "Il existe déjà une réponse a ce commentaire"], Response::HTTP_BAD_REQUEST);
+        }
+
+        $comment->setAnswer($parameters['content']);
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Réponse au commentaire ajoutée"], Response::HTTP_OK);
+    }
+
+    function deleteAnswerToComment(Comment $comment) : JsonResponse
+    {
+        if($comment->getAnswer() == null){
+            throw new NotFoundHttpException();
+        }
+        $comment->setAnswer(null);
+        $this->entityManager->persist($comment);
+        $this->entityManager->flush();
+
+        return new JsonResponse(["message" => "Réponse au commentaire supprimée"], Response::HTTP_OK);
     }
 
 }
