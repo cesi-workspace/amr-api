@@ -28,7 +28,8 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->getHelpRequests($request);
     }
-    #[IsGranted('ROLE_OWNER')]
+    
+    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_OWNER")'))]
     #[Route('/helprequests', name: 'app_help_request_new', methods: ['POST'])]
     public function new(Request $request): Response
     {
