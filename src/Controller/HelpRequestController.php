@@ -48,7 +48,7 @@ class HelpRequestController extends AbstractController
         return $this->helpRequestService->getHelpRequestStats($request);
     }
     
-    #[IsGranted('ROLE_OWNER')]
+    //#[IsGranted('ROLE_OWNER')]
     #[Route('/helprequests/{id}', name: 'app_help_request_show', methods: ['GET'])]
     public function show(HelpRequest $helpRequest): Response
     {
