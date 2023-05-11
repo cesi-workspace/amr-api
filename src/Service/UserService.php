@@ -192,12 +192,7 @@ class UserService implements IUserService
     }
 
     public function getUser(Request $request, User $user) : JsonResponse
-    {
-
-        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->getUser()->getId()!=$user->getId()){
-            throw new AccessDeniedException("Récupération de données d'utilisateur différent du sein interdite");
-        }
-        
+    {        
         $parametersURL = $request->query->all();
 
         $this->responseValidatorService->checkContraintsValidation($parametersURL, 
