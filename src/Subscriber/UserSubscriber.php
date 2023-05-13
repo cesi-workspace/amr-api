@@ -9,7 +9,7 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Doctrine\Common\EventSubscriber;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-class UtilisateurSubscriber implements EventSubscriber
+class UserSubscriber implements EventSubscriber
 {
     private CryptService $cryptService;
 

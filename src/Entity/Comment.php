@@ -35,7 +35,7 @@ class Comment
     private ?int $mark;
 
     #[ORM\Column(name: "answer", type: "string", length: 3000, nullable: true)]
-    private ?string $answer;
+    private ?string $answer = null;
 
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]

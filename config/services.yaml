@@ -20,7 +20,13 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-    App\Subscriber\UtilisateurSubscriber:
+    App\Subscriber\UserSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }
+    App\Subscriber\ConnectionSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber }
+    App\Subscriber\MessageSubscriber:
         tags:
             - { name: doctrine.event_subscriber }
     App\Subscriber\ExceptionSubscriber:
