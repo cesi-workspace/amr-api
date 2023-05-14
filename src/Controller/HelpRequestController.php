@@ -29,7 +29,7 @@ class HelpRequestController extends AbstractController
         return $this->helpRequestService->getHelpRequests($request);
     }
 
-    #[Route('/helprequests/history', name: 'app_help_request_index', methods: ['GET'])]
+    #[Route('/helprequests/history', name: 'app_help_request_history', methods: ['GET'])]
     public function history(Request $request): Response
     {
         return $this->helpRequestService->getHelpRequestsHistory($request);
