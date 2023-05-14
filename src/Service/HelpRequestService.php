@@ -617,9 +617,11 @@ class HelpRequestService implements IHelpRequestService
 
     function getHelpRequestsHistory(): JsonResponse
     {
-        $user = $this->userService->findUser(['email' => $this->security->getUser()->getUserIdentifier()]);
+        $user = $this->security->getUser();
 
-        $parameter = [];
+        $parameter = [
+            'max_nb_results' => 100
+        ];
         if ($this->security->isGranted('ROLE_OWNER')) $parameter['owner_id'] = $user->getId();
         else $parameter['helper_id'] = $user->getId();
 
