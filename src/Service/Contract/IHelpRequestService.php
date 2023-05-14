@@ -33,6 +33,7 @@ interface IHelpRequestService
     function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse;
     function getHelpRequestCategories() : JsonResponse;
     function getHelpRequests(Request $request) : JsonResponse;
+    function getHelpRequestsHistory() : JsonResponse;
     function getOwnHelpRequests(User $user, Request $request) : JsonResponse;
     function addHelpRequestCategory(Request $request) : JsonResponse;
     function removeHelpRequestCategory(HelpRequestCategory $helpRequestCategory) : JsonResponse;
