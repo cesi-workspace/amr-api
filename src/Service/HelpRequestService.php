@@ -414,7 +414,7 @@ class HelpRequestService implements IHelpRequestService
                 $parameters['max_nb_results'] = 25;
             }
     
-            if (!isset($parameters['status'])) $parameters['status'] = HelpRequestStatusLabel::CREATED->value;
+            $parameters['status'] = HelpRequestStatusLabel::CREATED->value;
         }else{
             
             $constraints = new Assert\Collection([
@@ -452,16 +452,6 @@ class HelpRequestService implements IHelpRequestService
 
         }
         $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
-
-        if ($parameters['status'] !== HelpRequestStatusLabel::CREATED) {
-            $helpRequests = array_filter($helpRequests, function($helpRequest) {
-                if ($this->security->isGranted('ROLE_OWNER')) {
-                    return $helpRequest['owner']['id'] === $userconnect['id'];
-                } else {
-                    return $helpRequest['helper']['id'] === $userconnect['id'];
-                }
-            })
-        }
 
         if(count($helpRequests) == 0){
             return new JsonResponse([], Response::HTTP_NO_CONTENT);
