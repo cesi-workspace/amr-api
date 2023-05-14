@@ -139,7 +139,7 @@ class CommentService implements ICommentService
         if(!$this->security->isGranted('ROLE_ADMIN') && ($this->security->isGranted('ROLE_OWNER') || $this->security->isGranted('ROLE_HELPER'))){
             $this->responseValidatorService->checkContraintsValidation($parameters,
                 new Assert\Collection([
-                    'helper_id' => [new Assert\Type('int'), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true)]
+                    'helper_id' => [new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'id', true)]
                 ])
             );
 
