@@ -615,20 +615,4 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function getHelpRequestsHistory(): JsonResponse
-    {
-        $user = $this->userService->findUser(['email' => $this->security->getUser()->getUserIdentifier()]);
-
-        $parameter = [];
-        if ($this->security->isGranted('ROLE_OWNER')) $parameter['owner_id'] = $user->getId();
-        else $parameter['helper_id'] = $user->getId();
-
-        $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameter);
-
-        if(count($helpRequests) == 0){
-            return new JsonResponse([], Response::HTTP_NO_CONTENT);
-        }
-
-        return new JsonResponse(["message" => "Demandes d'aides récupérées", 'data' =>$this->getInfos($helpRequests)], Response::HTTP_OK);
-    }
 }

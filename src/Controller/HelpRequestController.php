@@ -28,12 +28,6 @@ class HelpRequestController extends AbstractController
     {
         return $this->helpRequestService->getHelpRequests($request);
     }
-
-    #[Route('/helprequests/history', name: 'app_help_request_index', methods: ['GET'])]
-    public function history(Request $request): Response
-    {
-        return $this->helpRequestService->getHelpRequestsHistory($request);
-    }
     
     #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_OWNER")'))]
     #[Route('/helprequests', name: 'app_help_request_new', methods: ['POST'])]
