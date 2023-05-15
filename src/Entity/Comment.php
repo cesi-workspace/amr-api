@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Table(name: "comment")]
 #[ORM\Index(columns: ["owner_id"], name: "FK_COMMENT_OWNER")]
@@ -34,9 +36,6 @@ class Comment
     #[ORM\Column(name: "mark", type: "integer", nullable: true)]
     private ?int $mark;
 
-    #[ORM\Column(name: "answer", type: "string", length: 3000, nullable: true)]
-    private ?string $answer = null;
-
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name:"created_at", type:"datetime", nullable:false)]
     private \DateTime $createdAt;
@@ -44,6 +43,9 @@ class Comment
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(name:"updated_at", type:"datetime", nullable:true)]
     private ?\DateTime $updatedAt;
+
+    #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'comment')]
+    private Collection $answers;
 
     public function getId(): int
     {
@@ -110,18 +112,6 @@ class Comment
         return $this;
     }
 
-    public function getAnswer(): ?string
-    {
-        return $this->answer;
-    }
-
-    public function setAnswer(?string $answer): self
-    {
-        $this->answer = $answer;
-
-        return $this;
-    }
-
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
@@ -129,6 +119,22 @@ class Comment
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
+    }
+
+    public function getAnswers() : Collection
+    {
+        return $this->answers;
+    }
+
+    public function setAnswers(Collection $answers): self
+    {
+        $this->answers = $answers;
+
+        return $this;
+    }
+
+    public function __construct() {
+        $this->answers = new ArrayCollection();
     }
 
 }

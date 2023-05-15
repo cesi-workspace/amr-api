@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\User;
 use App\Entity\Comment;
 use App\Entity\Report;
+use App\Entity\Answer;
 use App\Service\Contract\ICommentService;
 use App\Service\Contract\IHelpRequestService;
 use App\Service\Contract\IDateService;
@@ -70,6 +71,17 @@ class CommentService implements ICommentService
     }
     public function getInfo(Comment $comment, bool $details): array
     {   
+        
+        $arrayanswers = [];
+        foreach($comment->getAnswers() as $key => $value){
+            $arrayanswers[$key] = [
+                'id' => $value->getId(),
+                'content' => $value->getContent(),
+                'user_name' => $value->getUser()->getFirstname(). ' '.$value->getUser()->getSurname()
+            ];
+        }
+
+
         $data = [
             'id' => $comment->getId(),
             'content' => $comment->getContent(),
@@ -77,7 +89,7 @@ class CommentService implements ICommentService
             'date' => $comment->getDate()->format('Y-m-d H:i:s'),
             'owner' => $this->userService->getInfo($comment->getOwner()),
             'helper' => $this->userService->getInfo($comment->getHelper()),
-            'answer' => $comment->getAnswer()
+            'answers' => $arrayanswers
         ];
 
         if($details){
@@ -220,6 +232,12 @@ class CommentService implements ICommentService
 
     function postAnswerToComment(Request $request, Comment $comment) : JsonResponse
     {
+        $userconnect = $this->security->getUser();
+
+        if(!$this->security->isGranted('ROLE_MODERATOR') && $this->security->isGranted('ROLE_HELPER') && $userconnect->getId() != $comment->getHelper()->getId()){
+            throw new AccessDeniedException("Ajout d'une réponse à un commentaire qui ne vous est pas destiné interdit");
+        }
+
         $parameters = json_decode($request->getContent(), true);
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
@@ -227,24 +245,28 @@ class CommentService implements ICommentService
                     'content' => [new Assert\Type('string'), new Assert\NotBlank]
                 ])
             );
-        if($comment->getAnswer() != null){
-            return new JsonResponse(["message" => "Il existe déjà une réponse a ce commentaire"], Response::HTTP_BAD_REQUEST);
-        }
+        
 
-        $comment->setAnswer($parameters['content']);
-        $this->entityManager->persist($comment);
+        $answer = new Answer();
+        $answer->setComment($comment);
+        $answer->setContent($parameters['content']);
+        $answer->setUser($userconnect);
+        $answer->setDate(new DateTime());
+        $this->entityManager->persist($answer);
         $this->entityManager->flush();
 
         return new JsonResponse(["message" => "Réponse au commentaire ajoutée"], Response::HTTP_OK);
     }
 
-    function deleteAnswerToComment(Comment $comment) : JsonResponse
+    function deleteAnswerToComment(Answer $answer) : JsonResponse
     {
-        if($comment->getAnswer() == null){
-            throw new NotFoundHttpException();
+        $userconnect = $this->security->getUser();
+
+        if(!$this->security->isGranted('ROLE_MODERATOR') && $this->security->isGranted('ROLE_HELPER') && $userconnect->getId() != $answer->getUser()->getId()){
+            throw new AccessDeniedException("Suppression d'une réponse que vous n'avez pas écrite interdite");
         }
-        $comment->setAnswer(null);
-        $this->entityManager->persist($comment);
+
+        $this->entityManager->remove($answer);
         $this->entityManager->flush();
 
         return new JsonResponse(["message" => "Réponse au commentaire supprimée"], Response::HTTP_OK);

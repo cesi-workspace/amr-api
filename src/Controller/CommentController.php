@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Answer;
 use App\Form\CommentType;
 use App\Repository\CommentRepository;
 use App\Service\Contract\ICommentService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 
 class CommentController extends AbstractController
 {
@@ -19,6 +22,7 @@ class CommentController extends AbstractController
     public function __construct(
         private readonly ICommentService $commentService
     ){}
+
 
     #[IsGranted('ROLE_OWNER')]
     #[Route('/comments', name: 'app_comment_new', methods: ['POST'])]
@@ -54,17 +58,11 @@ class CommentController extends AbstractController
     {
         return $this->commentService->deleteComment($comment);
     }
-    #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_OWNER")'))]
-    #[Route('/comments/{id}/answer', name: 'app_comment_answer_new', methods: ['POST'])]
+    #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_HELPER")'))]
+    #[Route('/comments/{id}/answers', name: 'app_comment_answer_new', methods: ['POST'])]
     public function newAnswer(Request $request, Comment $comment) : Response
     {
         return $this->commentService->postAnswerToComment($request, $comment);
-    }
-    #[IsGranted("ROLE_MODERATOR")]
-    #[Route('/comments/{id}/answer', name: 'app_comment_answer_delete', methods: ['DELETE'])]
-    public function deleteAnswer(Comment $comment) : Response
-    {
-        return $this->commentService->deleteAnswerToComment($comment);
     }
     
     
