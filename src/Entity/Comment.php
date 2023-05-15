@@ -126,13 +126,6 @@ class Comment
         return $this->answers;
     }
 
-    public function setAnswers(Collection $answers): self
-    {
-        $this->answers = $answers;
-
-        return $this;
-    }
-
     public function __construct() {
         $this->answers = new ArrayCollection();
     }

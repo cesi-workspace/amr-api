@@ -258,9 +258,13 @@ class CommentService implements ICommentService
         return new JsonResponse(["message" => "Réponse au commentaire ajoutée"], Response::HTTP_OK);
     }
 
-    function deleteAnswerToComment(Answer $answer) : JsonResponse
+    function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse
     {
         $userconnect = $this->security->getUser();
+
+        if($answer->getComment() != $comment){
+            throw new NotFoundHttpException();
+        }
 
         if(!$this->security->isGranted('ROLE_MODERATOR') && $this->security->isGranted('ROLE_HELPER') && $userconnect->getId() != $answer->getUser()->getId()){
             throw new AccessDeniedException("Suppression d'une réponse que vous n'avez pas écrite interdite");

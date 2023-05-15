@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\AnswerRepository;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -9,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Table(name: "answer")]
 #[ORM\Index(columns: ["user_id"], name: "FK_ANSWER_USER")]
 #[ORM\Index(columns: ["comment_id"], name: "FK_ANSWER_COMMENT")]
-#[ORM\Entity(repositoryClass: CommentRepository::class)]
+#[ORM\Entity(repositoryClass: AnswerRepository::class)]
 class Answer
 {
     #[ORM\Id]

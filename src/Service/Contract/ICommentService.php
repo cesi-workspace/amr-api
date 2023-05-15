@@ -16,5 +16,5 @@ interface ICommentService
     function deleteComment(Comment $comment) : JsonResponse;
     function getComment(Comment $comment) : JsonResponse;
     function postAnswerToComment(Request $request, Comment $comment) : JsonResponse;
-    function deleteAnswerToComment(Answer $answer) : JsonResponse;
+    function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse;
 }

@@ -7,6 +7,7 @@ use App\Entity\Answer;
 use App\Form\CommentType;
 use App\Repository\CommentRepository;
 use App\Service\Contract\ICommentService;
+use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,6 +64,14 @@ class CommentController extends AbstractController
     public function newAnswer(Request $request, Comment $comment) : Response
     {
         return $this->commentService->postAnswerToComment($request, $comment);
+    }
+    #[IsGranted(new Expression('is_granted("ROLE_MODERATOR") or is_granted("ROLE_HELPER")'))]
+    #[Route('/comments/{id1}/answers/{id2}', name: 'app_comment_answer_delete', methods: ['DELETE'])]
+    #[Entity('comment', expr: 'repository.find(id1)')]
+    #[Entity('answer', expr: 'repository.find(id2)')]
+    public function deleteAnswer(Comment $comment, Answer $answer) : Response
+    {
+        return $this->commentService->deleteAnswerToComment($comment, $answer);
     }
     
     

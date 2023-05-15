@@ -618,7 +618,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function getHelpRequestsHistory(): JsonResponse
+    function getHelpRequestsHistory(Request $request): JsonResponse
     {
         $user = $this->security->getUser();
 
