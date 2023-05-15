@@ -121,7 +121,7 @@ class UserService implements IUserService
             throw new AccessDeniedException("Création d'utilisateur non MembreMr et non MembreVolontaire interdite");
         }
 
-        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('type', $parameters) && ($parameters['type'] == UserTypeLabel::ADMIN->value || $parameters['type'] == UserTypeLabel::SUPERADMIN->value)){
+        if(!$this->security->isGranted('ROLE_SUPERADMIN') && array_key_exists('type', $parameters) && ($parameters['type'] == UserTypeLabel::GOV->value || $parameters['type'] == UserTypeLabel::MODERATOR->value ||$parameters['type'] == UserTypeLabel::ADMIN->value || $parameters['type'] == UserTypeLabel::SUPERADMIN->value)){
             throw new AccessDeniedException("Création d'administrateur interdite");
         }
 

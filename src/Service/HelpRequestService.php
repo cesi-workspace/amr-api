@@ -374,7 +374,10 @@ class HelpRequestService implements IHelpRequestService
 
         $arrayHelpRequestCategories = [];
         foreach($helpRequestCategories as $key => $value){
-            $arrayHelpRequestCategories[$key] = $value->getTitle();
+            $arrayHelpRequestCategories[$key] = [
+                'id' => $value->getId(),
+                'title' => $value->getTitle()
+            ];
         }
 
         return new JsonResponse(["message" => "Catégories des demandes d'aides récupérées", "data" => $arrayHelpRequestCategories], Response::HTTP_OK);
