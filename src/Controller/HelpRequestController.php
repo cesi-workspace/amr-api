@@ -68,6 +68,13 @@ class HelpRequestController extends AbstractController
         return $this->helpRequestService->postHelpRequestTreatment($request, $helpRequest);
     }
 
+    #[IsGranted('ROLE_HELPER')]
+    #[Route('/helprequests/{id}/treatment', name: 'app_help_request_delete_treatment', methods: ['DELETE'])]
+    public function deleteTreatment(HelpRequest $helpRequest): Response
+    {
+        return $this->helpRequestService->deleteHelpRequestTreatment($helpRequest);
+    }
+
     #[IsGranted('ROLE_OWNER')]
     #[Route('/helprequests/{helprequest_id}/accept', name: 'app_help_request_edit_accept', methods: ['PUT'])]
     #[Entity('helpRequest', expr: 'repository.find(helprequest_id)')]

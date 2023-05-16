@@ -243,6 +243,23 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['type']], Response::HTTP_OK);
     }
 
+    function deleteHelpRequestTreatment(HelpRequest $helpRequest) : JsonResponse
+    {
+        $helpRequestTreatment = $this->findHelpRequestTreatment([
+            'helpRequest' => $helpRequest,
+            'helper' => $this->security->getUser()
+        ]);
+
+        if($helpRequestTreatment){
+            $this->entityManager->remove($helpRequestTreatment);
+            $this->entityManager->flush();
+
+            return new JsonResponse(['message' => 'Traitement de demande d\'aides supprimé'], Response::HTTP_OK);
+        }else{
+            return new JsonResponse(['message' => 'Ce traitement de demande d\'aides n\'existe pas'], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
     function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
