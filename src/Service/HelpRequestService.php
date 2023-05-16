@@ -213,7 +213,7 @@ class HelpRequestService implements IHelpRequestService
         
         if($helpRequest->getStatus()->getLabel() != HelpRequestStatusLabel::CREATED->value)
         {
-            return new JsonResponse("La demande d'aide est déjà acceptée ou terminée", Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(["message" =>"La demande d'aide est déjà acceptée ou terminée"], Response::HTTP_BAD_REQUEST);
         }
 
         $this->responseValidatorService->checkContraintsValidation($parameters,
@@ -387,7 +387,6 @@ class HelpRequestService implements IHelpRequestService
     {
         $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
-        
         if(!$this->security->isGranted('ROLE_ADMIN')){
 
             $constraints = new Assert\Collection([
@@ -454,6 +453,15 @@ class HelpRequestService implements IHelpRequestService
             }
 
         }
+
+        
+        if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_HELPER')){
+            $parameters['helper'] = $userconnect;
+        }else{
+            $parameters['helper'] = null;
+        }
+        
+
         $helpRequests = $this->entityManager->getRepository(HelpRequest::class)->findHelpRequestsByCriteria($parameters);
 
         if(count($helpRequests) == 0){

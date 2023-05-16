@@ -71,13 +71,20 @@ class HelpRequestRepository extends ServiceEntityRepository
     public function findHelpRequestsByCriteria($parameters)
     {
         $maxnbresult = $parameters['max_nb_results'];
+        $helper = $parameters['helper'];
+        unset($parameters['helper']);
         unset($parameters['max_nb_results']);
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = 'SELECT hr.id FROM help_request hr
         INNER JOIN help_request_category hrc ON hr.category_id=hrc.id
-        INNER JOIN help_request_status hrs ON hr.status_id=hrs.id
-        WHERE 1=1';
+        INNER JOIN help_request_status hrs ON hr.status_id=hrs.id';
+
+        if($helper){
+            $sql = $sql.' LEFT JOIN help_request_treatment hrt ON hrt.help_request_id=hr.id AND hrt.helper_id='.$helper->getId();
+        }
+
+        $sql = $sql.' WHERE 1=1';
         
         if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters) && array_key_exists('range', $parameters)){
             $sql = $sql.' AND get_distance_kms(latitude, longitude, :latitude, :longitude) <= :range';
@@ -93,6 +100,9 @@ class HelpRequestRepository extends ServiceEntityRepository
         }
         if(array_key_exists('helper_id', $parameters)){
             $sql = $sql.' AND hr.helper_id = :helper_id';
+        }
+        if($helper){
+            $sql = $sql.' AND (hrt.type_id IS NULL OR hrt.type_id !=3)';
         }
         if(array_key_exists('latitude', $parameters) && array_key_exists('longitude', $parameters)){
             $sql = $sql. ' ORDER BY get_distance_kms(latitude, longitude, :latitude, :longitude)';
