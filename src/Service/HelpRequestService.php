@@ -134,6 +134,7 @@ class HelpRequestService implements IHelpRequestService
             'status' => $helpRequest->getStatus()->getLabel(),
             'owner' => $this->userService->getInfo($helpRequest->getOwner()),
             'helper' => $helpRequest->getHelper() == null ? null : $this->userService->getInfo($helpRequest->getHelper()),
+            'do' => $helpRequest->getDo(),
             'created_at' => $helpRequest->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
 
@@ -348,19 +349,23 @@ class HelpRequestService implements IHelpRequestService
         $this->responseValidatorService->checkContraintsValidation($parameters,
             new Assert\Collection([
                 'real_delay' => [new Assert\Time, new Assert\NotBlank],
+                'do' => [new Assert\Type('bool')],
             ])
         );
 
         $helpRequest->setRealDelay(new DateTime($parameters['real_delay']));
         $helpRequest->setFinishedDate(new DateTime());
+        $helpRequest->setDo($parameters['do']);
         $helpRequest->setStatus($this->findHelpRequestStatusByLabel(HelpRequestStatusLabel::FINISHED));
         $this->entityManager->persist($helpRequest);
         $this->entityManager->flush();
-
-        $helper = $helpRequest->getHelper();
-        $helper->setPoint($helper->getPoint() + 10);
-        $this->entityManager->persist($helper);
-        $this->entityManager->flush();
+        
+        if($parameters['do']){
+            $helper = $helpRequest->getHelper();
+            $helper->setPoint($helper->getPoint() + 10);
+            $this->entityManager->persist($helper);
+            $this->entityManager->flush();
+        }
 
         return new JsonResponse(['message' => 'Demande d\'aide enregistrée comme terminée'], Response::HTTP_OK);
 

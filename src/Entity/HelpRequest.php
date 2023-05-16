@@ -64,6 +64,9 @@ class HelpRequest
     #[ORM\Column(name: "real_delay", type: "time", nullable: true)]
     private \DateTime $realDelay;
 
+    #[ORM\Column(name: "do", type: "boolean", nullable: true)]
+    private ?bool $do;
+
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name: "created_at", type: "datetime", nullable: false)]
     private \DateTime $createdAt;
@@ -208,6 +211,18 @@ class HelpRequest
     public function setRealDelay(\DateTime $realDelay): self
     {
         $this->realDelay = $realDelay;
+
+        return $this;
+    }
+
+    public function getDo(): ?bool
+    {
+        return $this->do;
+    }
+
+    public function setDo(?bool $do): self
+    {
+        $this->do = $do;
 
         return $this;
     }
