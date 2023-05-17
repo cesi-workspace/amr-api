@@ -211,11 +211,6 @@ class UserService implements IUserService
         $parametersURL = $request->query->all();
 
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_MODERATOR')){
-            $this->responseValidatorService->checkContraintsValidation($parametersURL,
-                new Assert\Collection([
-                    'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(UserType::class, 'label', true, false), new Assert\Choice([UserTypeLabel::HELPER->value, UserTypeLabel::OWNER->value])],
-                ])
-            );
             $parametersURL['status'] = UserStatusLabel::ENABLE;
         }else{
             $this->responseValidatorService->checkContraintsValidation($parametersURL,
