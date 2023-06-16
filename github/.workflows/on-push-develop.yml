@@ -1,5 +1,5 @@
 name: PHP push
-run-name: Deploy version ${{ github.ref_name }}
+run-name: test thomas
 
 on:
   push:
