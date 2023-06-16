@@ -1,0 +1,13 @@
+name: Setup project
+description: Group of actions used to setup php, composer and project dependencies
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-project@v2
+      with:
+        php-version: '8.2'
+    - name: Setup composer and dependencies
+      run: |
+        wget https://getcomposer.org/composer.phar
+        php composer.phar install
