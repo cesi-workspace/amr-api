@@ -3,7 +3,7 @@ run-name: Deploy version ${{ github.ref_name }}
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 
 jobs:
