@@ -1,0 +1,15 @@
+name: Setup project
+description: Group of actions used to setup php, composer and project dependencies
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: composer:v2
+    - name: Download project dependencies
+      shell: bash
+      run: |
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
