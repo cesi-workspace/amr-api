@@ -7,8 +7,6 @@ runs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-    - name: Setup composer and dependencies
+    - name: Download project dependencies
       shell: bash
-      run: |
-        wget https://getcomposer.org/composer.phar
-        php composer.phar install
+      run: composer install
