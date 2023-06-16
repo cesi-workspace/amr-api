@@ -1,4 +1,6 @@
 {
+    "name": "AMR-API",
+    "description": "AMR-API used for a school project",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
