@@ -5,6 +5,12 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
     branches: [ main ] # for test purposes only
+
+# cancel workflow when there is already one launched
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
