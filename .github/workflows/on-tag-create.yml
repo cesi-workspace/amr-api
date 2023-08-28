@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
-    branches: [ main ] # for test purposes only
+#    branches: [ recipe ]
 
 # cancel workflow when there is already one launched
 concurrency:
