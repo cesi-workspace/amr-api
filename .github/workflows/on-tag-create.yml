@@ -32,7 +32,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          password: ${{secrets.GCRH_TOKEN}}
       - name: Docker build
         run: |
           docker build . --tag ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
