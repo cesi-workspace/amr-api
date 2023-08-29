@@ -31,7 +31,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{github.actor}}
+          username: ${{secrets.GCRH_USER}}
           password: ${{secrets.GCRH_TOKEN}}
       - name: Docker build
         run: |
@@ -51,7 +51,7 @@ jobs:
             cd /home/amr-api
             docker-compose down
             docker image rm ghcr.io/cesi-workspace/amr-api
-            echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
+            echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{secrets.GCRH_USER}} --password-stdin
             docker pull ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
             docker-compose down
             docker-compose up -d
