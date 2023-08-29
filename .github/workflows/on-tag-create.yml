@@ -35,7 +35,6 @@ jobs:
           password: ${{secrets.GCRH_TOKEN}}
       - name: Docker build
         run: |
-          cd amr-api
           docker build . --tag ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
           docker push ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
   deploy:
