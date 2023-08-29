@@ -44,9 +44,9 @@ jobs:
       - name: Login to ghcr, pull and start api
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SSH_HOST_SRV_RECIPE }}
-          username: ${{ secrets.SSH_USER_SRV_RECIPE }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_SRV_RECIPE }}
+          host: ${{ secrets.SSH_HOST_SRV_PROD }}
+          username: ${{ secrets.SSH_USER_SRV_PROD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_SRV_PROD }}
           script: |
             cd /home/amr-api
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
