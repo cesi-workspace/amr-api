@@ -49,6 +49,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_SRV_RECIPE }}
           script: |
             cd /home/amr-api
+            old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
+            new_line="image: ghcr.io/cesi-workspace/amr-api:${{github.ref_name}}"
+            sed -i "s|$old_line|$new_line|g" docker-compose.yaml
+            
             docker-compose down
             docker image rm ghcr.io/cesi-workspace/amr-api
             echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{secrets.GCRH_USER}} --password-stdin
