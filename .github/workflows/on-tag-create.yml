@@ -37,3 +37,16 @@ jobs:
         run: |
           docker build . --tag ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
           docker push ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Login to ghcr, pull and start api
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST_SRV_RECIPE }}
+          username: ${{ secrets.SSH_USER_SRV_RECIPE }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_SRV_RECIPE }}
+          script: |
+            echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
+            docker pull ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
