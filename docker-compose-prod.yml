@@ -1,0 +1,19 @@
+services:
+  amr-api:
+    image: ghcr.io/cesi-workspace/amr-api
+    ports:
+      - "80:8000"  # Port 80 du conteneur vers le port 80 de l'hôte
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: mysecretpassword
+      MYSQL_DATABASE: amr
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:
