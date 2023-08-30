@@ -11,6 +11,7 @@ runs:
   using: composite
   steps:
     - name: Run tests
+      shell: bash
       run: |
         old_line="DATABASE_URL="
         new_line='DATABASE_URL="${{inputs.database_url_test}}"'
