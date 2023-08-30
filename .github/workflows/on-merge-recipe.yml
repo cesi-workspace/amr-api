@@ -21,7 +21,6 @@ jobs:
           username: ${{ secrets.SSH_USER_SRV_PROD }}
           key: ${{ secrets.SSH_KEY_SRV_PROD }}
           script: |
-            docker compose -f docker-compose-recipe.yml down
             cd /home
             if [ -d amr-api ]; then
               cd amr-api
@@ -31,5 +30,6 @@ jobs:
               git clone https://github.com/cesi-workspace/amr-api.git
               cd amr-api
             fi
+            docker compose -f docker-compose-recipe.yml down
             docker image rm $(docker images --filter=reference="*amr-api*" -q)
             docker compose -f docker-compose-recipe.yml up -d
