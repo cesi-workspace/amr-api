@@ -1,0 +1,23 @@
+name: Test
+description: Group of actions used to test entire project
+inputs:
+  sonarqube_host:
+    description: SonarQube hostname
+  sonarqube_token:
+    default: SonarQube project analysis token
+runs:
+  using: composite
+  steps:
+    - name: SonarQube Scan
+      uses: kitabisa/sonarqube-action@v1.2.0
+      with:
+        host: ${{ inputs.sonarqube_host }}
+        login: ${{ inputs.sonarqube_token }}
+        projectKey: amr-api
+#      - name: Run tests
+#        run: |
+#          old_line="DATABASE_URL="
+#          new_line='DATABASE_URL="${{secrets.DATABASE_URL_TEST}}"'
+#          sudo sed -i "s|$old_line|$new_line|g" .env.test
+#          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+#          ./vendor/bin/phpunit
