@@ -26,7 +26,7 @@ jobs:
           database_url_test: ${{ secrets.DATABASE_URL_TEST }}
   deploy:
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [test]
     steps:
       - name: Login to ghcr, pull and start api
         uses: appleboy/ssh-action@v1.0.0
