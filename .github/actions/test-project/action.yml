@@ -16,6 +16,14 @@ runs:
         old_line="DATABASE_URL="
         new_line='DATABASE_URL="${{inputs.database_url_test}}"'
         sudo sed -i "s|$old_line|$new_line|g" .env.test
+        
+        mkdir config/jwt
+        openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -aes256 -pass pass:MDP -pkeyopt rsa_keygen_bits:4096
+        openssl pkey -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:MDP
+        echo "JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem" > .env.local
+        echo "JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem" >> .env.local
+        echo "JWT_PASSPHRASE=MDP" >> .env.local
+        
         php bin/console doctrine:migrations:migrate --env=test --no-interaction
         ./vendor/bin/phpunit
     - name: SonarQube Scan
