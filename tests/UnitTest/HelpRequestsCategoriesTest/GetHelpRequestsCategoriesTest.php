@@ -5,6 +5,7 @@ use App\Service\ResponseValidatorService;
 use App\Tests\Factory\RandomStringFactory;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,19 +17,19 @@ use App\Tests\Factory\AuthentificationFactory as AuthentificationFactory;
 use App\Tests\Factory\Role;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 # GET /helprequests/categories
-final class GetHelpRequestsCategoriesTest extends TestCase
+final class GetHelpRequestsCategoriesTest extends WebTestCase
 {
     private ?string $api_url = null;
-    private HttpClientInterface $client;
+    private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
     private ResponseValidatorService $responseValidatorService;
 
     protected function setUp(): void {
-        $this->api_url = $_ENV["API_URL"];
-        $this->client = HttpClient::create();
+        $this->client = static::createClient();
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
         $validator = Validation::createValidator();
@@ -37,15 +38,13 @@ final class GetHelpRequestsCategoriesTest extends TestCase
     
     public function testGetHelpRequestsCategories(): void
     {
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/categories',
-            [
-                'verify_peer' => false
-            ]
+            '/helprequests/categories'
         );
+        $response = $this->client->getResponse();
 
-        $data = json_decode($response->getContent(false), true);
+        $data = json_decode($response->getContent(), true);
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank]

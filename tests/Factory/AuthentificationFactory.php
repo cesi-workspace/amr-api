@@ -1,10 +1,13 @@
 <?php
 namespace App\Tests\Factory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class Role {
     const SUPERADMIN = 0;
@@ -18,7 +21,7 @@ class Role {
 
 class AuthentificationFactory
 {
-    public function getToken(int $role) : string
+    public function getToken(KernelBrowser $client, int $role) : string
     {
         $email = "";
         $password = "";
@@ -52,17 +55,17 @@ class AuthentificationFactory
                 $password = "HgçsàÖm*}";
                 break;
         }
-
-        $client = HttpClient::create();
-        $apiurl = $_ENV["API_URL"];
-        $response = $client->request(
+        
+        $client->request(
             'POST',
-            $apiurl.'/session',
-            [
-                'verify_peer' => false,
-                'json' => ['email' => $email, 'password' => $password]
-            ],
+            '/session',
+            [],
+            [],
+            [],
+            json_encode(['email' => $email, 'password' => $password])
         );
+        
+        $response = $client->getResponse();
 
         $data = json_decode($response->getContent(), true);
 

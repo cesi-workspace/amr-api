@@ -16,31 +16,31 @@ use App\Tests\Factory\AuthentificationFactory as AuthentificationFactory;
 use App\Tests\Factory\Role;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-final class NotFoundTest extends TestCase
+final class NotFoundTest extends WebTestCase
 {
     private ?string $api_url = null;
-    private HttpClientInterface $client;
+    private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
     private ResponseValidatorService $responseValidatorService;
 
     protected function setUp(): void {
-        $this->api_url = $_ENV["API_URL"];
-        $this->client = HttpClient::create();
+        $this->client = static::createClient();
     }
     
     public function testGetHelpRequestsCategories(): void
     {
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/nothing',
-            [
-                'verify_peer' => false
-            ]
+            '/nothing'
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
 
         $this->assertEquals(404, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Ressource ou route non trouvée'], $data);

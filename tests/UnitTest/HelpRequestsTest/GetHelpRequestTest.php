@@ -16,20 +16,22 @@ use App\Tests\Factory\AuthentificationFactory as AuthentificationFactory;
 use App\Tests\Factory\Role;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 # GET /helprequests/{helprequest_id}
-final class GetHelpRequestTest extends TestCase 
+final class GetHelpRequestTest extends WebTestCase 
 {
-    private ?string $api_url = null;
-    private HttpClientInterface $client;
+    private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
     private ResponseValidatorService $responseValidatorService;
     private HelpRequestFactory $helpRequestFactory;
 
     protected function setUp(): void {
-        $this->api_url = $_ENV["API_URL"];
-        $this->client = HttpClient::create();
+        $this->client = static::createClient([
+            'CONTENT_TYPE' => 'application/json'
+        ]);
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
         $validator = Validation::createValidator();
@@ -39,19 +41,23 @@ final class GetHelpRequestTest extends TestCase
     
     public function testGetHelpRequestAdmin(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::ADMIN);
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::ADMIN);
+        $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::ADMIN);
 
-        $response = $this->client->request(
+        
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false
+            '/helprequests/'.$helprequest['id']
+            ,[]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -95,19 +101,24 @@ final class GetHelpRequestTest extends TestCase
     
     public function testGetHelpRequestOwnerOk(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::OWNER);
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::OWNER);
+        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::OWNER);
 
-        $response = $this->client->request(
+        
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false
+            '/helprequests/'.$helprequest['id']
+            ,[]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
+
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -151,38 +162,46 @@ final class GetHelpRequestTest extends TestCase
     
     public function testGetHelpRequestOwnerUnAuthorized(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::OWNER);
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::ADMIN);
+        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::ADMIN);
 
-        $response = $this->client->request(
+        
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false
+            '/helprequests/'.$helprequest['id']
+            ,[]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Récupération de demande d'aide non associé à l'utilisateur interdite"], $data);
     }
     
     public function testGetHelpRequestModerator(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::MODERATOR);
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::OWNER);
+        $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::OWNER);
 
-        $response = $this->client->request(
+        
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false
+            '/helprequests/'.$helprequest['id']
+            ,[]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -226,19 +245,22 @@ final class GetHelpRequestTest extends TestCase
     
     public function testGetHelpRequestHelper(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::HELPER);
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::OWNER);
+        $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::OWNER);
 
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false
+            '/helprequests/'.$helprequest['id']
+            ,[]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -283,17 +305,18 @@ final class GetHelpRequestTest extends TestCase
     public function testGetHelpRequestNoAuth(): void
     {
         
-        $helprequest = $this->helpRequestFactory->getExistHelpRequest(Role::OWNER);
+        $helprequest = $this->helpRequestFactory->getExistHelpRequest($this->client, Role::OWNER);
 
-        $response = $this->client->request(
+        
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/'.$helprequest['id'],
-            [
-                'verify_peer' => false
-            ]
+            '/helprequests/'.$helprequest['id']
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
+
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -336,15 +359,14 @@ final class GetHelpRequestTest extends TestCase
     }
     public function testGetHelpRequestsNoExist(): void
     {
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests/0',
-            [
-                'verify_peer' => false
-            ]
+            '/helprequests/0'
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
         $this->assertEquals(404, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Ressource ou route non trouvée'], $data);
     }

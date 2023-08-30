@@ -16,19 +16,21 @@ use App\Tests\Factory\AuthentificationFactory as AuthentificationFactory;
 use App\Tests\Factory\Role;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 # GET /helprequests
-final class GetHelpRequestsTest extends TestCase 
+final class GetHelpRequestsTest extends WebTestCase 
 {
-    private ?string $api_url = null;
-    private HttpClientInterface $client;
+    private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
     private ResponseValidatorService $responseValidatorService;
 
     protected function setUp(): void {
-        $this->api_url = $_ENV["API_URL"];
-        $this->client = HttpClient::create();
+        $this->client = static::createClient([
+            'CONTENT_TYPE' => 'application/json'
+        ]);
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
         $validator = Validation::createValidator();
@@ -37,16 +39,16 @@ final class GetHelpRequestsTest extends TestCase
     
     public function testGetHelpRequest(): void
     {
-
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests',
-            [
-                'verify_peer' => false
-            ]
+            '/helprequests'
         );
 
-        $data = json_decode($response->getContent(false), true);
+
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
+        
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -91,19 +93,18 @@ final class GetHelpRequestsTest extends TestCase
     
     public function testGetHelpRequestByCategory(): void
     {
-
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests',
-            [
-                'verify_peer' => false,
-                'query' => [
-                    'category' => 'Courses'
-                ]
+            '/helprequests'
+            ,[
+                'category' => 'Courses'
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
+
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -148,22 +149,21 @@ final class GetHelpRequestsTest extends TestCase
     
     public function testGetHelpRequestByGeoAndCategory(): void
     {
-
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests',
-            [
-                'verify_peer' => false,
-                'query' => [
-                    'latitude' => 48.0,
-                    'longitude' => 1.0,
-                    'range' => 100,
-                    'category' => 'Courses'
-                ]
+            '/helprequests'
+            ,[
+                'latitude' => 48.0,
+                'longitude' => 1.0,
+                'range' => 100,
+                'category' => 'Courses'
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
+
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
@@ -208,21 +208,19 @@ final class GetHelpRequestsTest extends TestCase
     
     public function testGetHelpRequestTooFar(): void
     {
-
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests',
-            [
-                'verify_peer' => false,
-                'query' => [
-                    'latitude' => 48.0,
-                    'longitude' => 48.0,
-                    'range' => 100
-                ]
+            '/helprequests'
+            ,[
+                'latitude' => 48.0,
+                'longitude' => 48.0,
+                'range' => 100
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+
+        $data = json_decode($response->getContent(), true);
 
         $this->assertEquals(204, $response->getStatusCode(), json_encode($data));
         
@@ -230,25 +228,27 @@ final class GetHelpRequestsTest extends TestCase
     
     public function testGetHelpRequestAdmin(): void
     {
-        $token = $this->authentificationFactory->getToken(Role::ADMIN);
+        $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
 
-        $response = $this->client->request(
+        $this->client->request(
             'GET',
-            $this->api_url.'/helprequests',
-            [
-                'headers' => ['Authorization' => 'Bearer '.$token],
-                'verify_peer' => false,
-                'query' => [
-                    'latitude' => 48.0,
-                    'longitude' => 48.0,
-                    'range' => 100,
-                    'owner_id' => 4,
-                    'status' => 'Créée'
-                ]
+            '/helprequests'
+            ,[
+                'latitude' => 48.0,
+                'longitude' => 48.0,
+                'range' => 100,
+                'owner_id' => 4,
+                'status' => 'Créée'
+            ]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$token
             ]
         );
 
-        $data = json_decode($response->getContent(false), true);
+        $response = $this->client->getResponse();
+        $data = json_decode($response->getContent(), true);
+
         $constraints = new Assert\Collection([
             'id' => [new Assert\Type('int'), new Assert\NotBlank],
             'title' => [new Assert\Type('string'), new Assert\NotBlank],
