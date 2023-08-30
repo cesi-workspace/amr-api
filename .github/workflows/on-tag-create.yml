@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.SSH_USER_SRV_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_SRV_PROD }}
           script: |
-            cd /home/amr-api
+            cd /home/amr-api-prod
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
             new_line="image: ghcr.io/cesi-workspace/amr-api:${{github.ref_name}}"
             sudo sed -i "s|$old_line|$new_line|g" docker-compose.yaml
