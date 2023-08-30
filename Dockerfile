@@ -35,8 +35,8 @@ RUN wget https://get.symfony.com/cli/installer -O - | bash
 RUN export PATH="$HOME/.symfony5/bin:$PATH"
 RUN mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 RUN symfony -V
-# mkdir config/jwt
-# openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096 -passout pass:votre_mot_de_passe
-# openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
+RUN mkdir config/jwt
+RUN openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -aes256 -pass pass:MDP -pkeyopt rsa_keygen_bits:4096
+RUN openssl pkey -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:MDP
 CMD php bin/console doctrine:migrations:migrate && symfony server:start 
 EXPOSE 80
