@@ -46,7 +46,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST_SRV_PROD }}
           username: ${{ secrets.SSH_USER_SRV_PROD }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_SRV_PROD }}
+          key: ${{ secrets.SSH_KEY_SRV_PROD }}
           script: |
             cd /home/amr-api-prod
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
