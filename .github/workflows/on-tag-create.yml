@@ -12,17 +12,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Setup project
-#        uses: ./.github/actions/setup-project
-#      - name: Run tests
-#        run: ./vendor/bin/phpunit
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+      - name: Run tests
+        run: |
+          old_line="DATABASE_URL="
+          new_line='DATABASE_URL="${{secrets.DATABASE_URL_TEST}}"'
+          sudo sed -i "s|$old_line|$new_line|g" .env.test
+          php bin/console doctrine:migrations:migrate --env=test --no-interaction
+          ./vendor/bin/phpunit
   build:
     runs-on: ubuntu-latest
-#    needs: [test]
+    needs: [test]
     steps:
       - uses: actions/checkout@v3
       - name: Setup project
