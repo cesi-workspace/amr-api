@@ -38,5 +38,8 @@ RUN symfony -V
 RUN mkdir config/jwt
 RUN openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -aes256 -pass pass:MDP -pkeyopt rsa_keygen_bits:4096
 RUN openssl pkey -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:MDP
+RUN echo "JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem" > .env.local
+RUN echo "JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem" >> .env.local
+RUN echo "JWT_PASSPHRASE=MDP" >> .env.local
 CMD php bin/console doctrine:migrations:migrate && symfony server:start 
 EXPOSE 80
