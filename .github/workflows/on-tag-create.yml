@@ -52,8 +52,8 @@ jobs:
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
             new_line="image: ghcr.io/cesi-workspace/amr-api:${{github.ref_name}}"
             sudo sed -i "s|$old_line|$new_line|g" docker-compose.yaml
-            docker-compose down
+            docker compose down
             docker image rm $(docker images --filter=reference="ghcr.io/cesi-workspace/amr-api" -q)
             echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{secrets.GCRH_USER}} --password-stdin
             docker pull ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
-            docker-compose up -d
+            docker compose up -d
