@@ -1,5 +1,4 @@
-name: Deploy on recipe environment
-run-name: Deploy recipe
+name: Pull request on recipe
 
 on:
   pull_request:
@@ -24,25 +23,3 @@ jobs:
           sonarqube_host: ${{ secrets.SONARQUBE_HOST }}
           sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
           database_url_test: ${{ secrets.DATABASE_URL_TEST }}
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Login to ghcr, pull and start api
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST_SRV_PROD }}
-          username: ${{ secrets.SSH_USER_SRV_PROD }}
-          key: ${{ secrets.SSH_KEY_SRV_PROD }}
-          script: |
-            docker compose -f docker-compose-recipe.yml down
-            cd /home
-            if [ -d amr-api ]; then
-              cd amr-api
-              git reset --hard HEAD
-              git pull
-            else
-              git clone https://github.com/cesi-workspace/amr-api.git
-              cd amr-api
-            fi
-            docker compose -f docker-compose-recipe.yml up -d
