@@ -45,4 +45,5 @@ jobs:
               git clone https://github.com/cesi-workspace/amr-api.git
               cd amr-api
             fi
+            docker image rm $(docker images --filter=reference="*amr-api*" -q)
             docker compose -f docker-compose-recipe.yml up -d
