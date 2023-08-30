@@ -2,7 +2,7 @@ name: Develop CI
 run-name: Develop CI
 
 on:
-  push:
+  pull_request:
     branches: [ develop ]
 
 # cancel workflow when there is already one launched
@@ -11,11 +11,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup project
         uses: ./.github/actions/setup-project
-      - name: Run tests
-        run: ./vendor/bin/phpunit
+      - name: Test project
+        uses: ./.github/actions/test-project
+        with:
+          sonarqube_host: ${{ secrets.SONARQUBE_HOST }}
+          sonarqube_token: ${{ secrets.SONARQUBE_TOKEN }}
+          database_url_test: ${{ secrets.DATABASE_URL_TEST }}
