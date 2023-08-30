@@ -1,4 +1,5 @@
 name: Deploy on recipe environment
+run-name: Deploy on recipe environment
 
 on:
   push:
