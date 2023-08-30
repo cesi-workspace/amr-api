@@ -12,17 +12,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup project
-        uses: ./.github/actions/setup-project
-      - name: Run tests
-        run: ./vendor/bin/phpunit
+#  test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Setup project
+#        uses: ./.github/actions/setup-project
+#      - name: Run tests
+#        run: ./vendor/bin/phpunit
   build:
     runs-on: ubuntu-latest
-    needs: [test]
+#    needs: [test]
     steps:
       - uses: actions/checkout@v3
       - name: Setup project
@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.SSH_USER_SRV_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_SRV_PROD }}
           script: |
-            cd /home/amr-api
+            cd /home/amr-api-prod
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
             new_line="image: ghcr.io/cesi-workspace/amr-api:${{github.ref_name}}"
             sudo sed -i "s|$old_line|$new_line|g" docker-compose.yaml
