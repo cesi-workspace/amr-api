@@ -39,6 +39,10 @@ jobs:
           password: ${{secrets.GCRH_TOKEN}}
       - name: Docker build
         run: |
+          old_line='DATABASE_URL='
+          new_line='DATABASE_URL="mysql://${{secrets.MARIADB_PROD_USER}}:${{secrets.MARIADB_PROD_PASSWORD}}@mariadb:3306/amr?serverVersion=8&charset=utf8mb4"'
+          sudo sed -i "s|$old_line|$new_line|g" .env
+          
           docker build . --tag ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
           docker push ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
   deploy:
@@ -53,9 +57,21 @@ jobs:
           key: ${{ secrets.SSH_KEY_SRV_PROD }}
           script: |
             cd /home/amr-api-prod
+            rm docker-compose-prod.yml
+            curl https://raw.githubusercontent.com/cesi-workspace/amr-api/main/docker-compose-prod.yml > docker-compose-prod.yml
+            
             old_line="image: ghcr.io/cesi-workspace/amr-api:.*"
             new_line="image: ghcr.io/cesi-workspace/amr-api:${{github.ref_name}}"
-            sudo sed -i "s|$old_line|$new_line|g" docker-compose.yaml
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-prod.yml
+            
+            old_line="MARIADB_USER:.*"
+            new_line="MARIADB_USER: ${{secrets.MARIADB_PROD_USER}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-prod.yml
+            
+            old_line="MARIADB_PASSWORD:.*"
+            new_line="MARIADB_PASSWORD: ${{secrets.MARIADB_PROD_PASSWORD}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-prod.yml
+            
             docker compose down
             docker image rm $(docker images --filter=reference="ghcr.io/cesi-workspace/amr-api" -q)
             echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{secrets.GCRH_USER}} --password-stdin
