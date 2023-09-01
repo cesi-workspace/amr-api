@@ -14,7 +14,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to ghcr, pull and start api
+      - name: Deploy on recipe
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST_SRV_RECIPE }}
@@ -27,18 +27,22 @@ jobs:
               git reset --hard HEAD
               git pull
             else
-              git clone https://github.com/cesi-workspace/amr-api.git
+              git clone https://github.com/cesi-workspace/amr-api.git -b recipe
               cd amr-api
             fi
             docker compose -f docker-compose-recipe.yml down
             
             old_line="MARIADB_USER:.*"
-            new_line="MARIADB_USER:${{secrets.MARIADB_RECIPE_USER}}"
-            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yaml
+            new_line="MARIADB_USER: ${{secrets.MARIADB_RECIPE_USER}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yml
             
             old_line="MARIADB_PASSWORD:.*"
-            new_line="MARIADB_PASSWORD:${{secrets.MARIADB_RECIPE_PASSWORD}}"
-            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yaml
+            new_line="MARIADB_PASSWORD: ${{secrets.MARIADB_RECIPE_PASSWORD}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yml
+            
+            old_line='DATABASE_URL='
+            new_line='DATABASE_URL="mysql://${{secrets.MARIADB_RECIPE_USER}}:${{secrets.MARIADB_RECIPE_PASSWORD}}@mariadb:3306/amr?serverVersion=8&charset=utf8mb4"'
+            sudo sed -i "s|$old_line|$new_line|g" .env
             
             docker image rm $(docker images --filter=reference="*amr-api*" -q)
             docker compose -f docker-compose-recipe.yml up -d
