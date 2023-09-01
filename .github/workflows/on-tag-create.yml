@@ -72,8 +72,8 @@ jobs:
             new_line="MARIADB_PASSWORD: ${{secrets.MARIADB_PROD_PASSWORD}}"
             sudo sed -i "s|$old_line|$new_line|g" docker-compose-prod.yml
             
-            docker compose down
+            docker compose -f docker-compose-prod.yml down
             docker image rm $(docker images --filter=reference="ghcr.io/cesi-workspace/amr-api" -q)
             echo ${{secrets.GCRH_TOKEN}} | docker login ghcr.io -u ${{secrets.GCRH_USER}} --password-stdin
             docker pull ghcr.io/cesi-workspace/amr-api:${{  github.ref_name }}
-            docker compose up -d
+            docker compose -f docker-compose-prod.yml up -d
