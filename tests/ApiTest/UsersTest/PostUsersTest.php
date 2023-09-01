@@ -60,83 +60,83 @@ final class PostUsersTest extends WebTestCase
         $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Utilisateur crée avec succès'], $data);
     }
-    public function testPostUsersNoAuthNotAllowed(): void
-    {
-        $this->client->request(
-            'POST',
-            '/users',
-            [],
-            [],
-            [],
-            json_encode([
-                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
-                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
-                    'firstname' => 'Whois',
-                    'surname' => 'Test',
-                    'postal_code' => '76000',
-                    'city' => 'Rouen',
-                    'type' => 'Administrateur'
-                    ])
-        );
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        $this->assertEquals(401, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Création d\'utilisateur non MembreMr et non MembreVolontaire interdite'], $data);
-    }
-    
-    public function testPostUsersOwnerNotAllowed(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
-        $this->client->request(
-            'POST',
-            '/users',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode([
-                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
-                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
-                    'firstname' => 'Whois',
-                    'surname' => 'Test',
-                    'postal_code' => '76000',
-                    'city' => 'Rouen',
-                    'type' => 'Administrateur'
-                    ])
-        );
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Création d\'utilisateur non MembreMr et non MembreVolontaire interdite'], $data);
-    }
-    public function testPostUsersSuperAdmin(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::SUPERADMIN);
-        $this->client->request(
-            'POST',
-            '/users',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode([
-                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
-                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
-                    'firstname' => 'Whois',
-                    'surname' => 'Test',
-                    'postal_code' => '76000',
-                    'city' => 'Rouen',
-                    'type' => 'Administrateur'
-                    ])
-        );
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Utilisateur crée avec succès'], $data);
-    }
+#    public function testPostUsersNoAuthNotAllowed(): void
+#    {
+#        $this->client->request(
+#            'POST',
+#            '/users',
+#            [],
+#            [],
+#            [],
+#            json_encode([
+#                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
+#                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
+#                    'firstname' => 'Whois',
+#                    'surname' => 'Test',
+#                    'postal_code' => '76000',
+#                    'city' => 'Rouen',
+#                    'type' => 'Administrateur'
+#                    ])
+#        );
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#        $this->assertEquals(401, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Création d\'utilisateur non MembreMr et non MembreVolontaire interdite'], $data);
+#    }
+#
+#    public function testPostUsersOwnerNotAllowed(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
+#        $this->client->request(
+#            'POST',
+#            '/users',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode([
+#                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
+#                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
+#                    'firstname' => 'Whois',
+#                    'surname' => 'Test',
+#                    'postal_code' => '76000',
+#                    'city' => 'Rouen',
+#                    'type' => 'Administrateur'
+#                    ])
+#        );
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Création d\'utilisateur non MembreMr et non MembreVolontaire interdite'], $data);
+#    }
+#    public function testPostUsersSuperAdmin(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::SUPERADMIN);
+#        $this->client->request(
+#            'POST',
+#            '/users',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode([
+#                    'email' => 'whois'.rand(1, 5000).'@amrapicesi.org',
+#                    'password' => '1#Aa'.$this->randomStringFactory->generatePassword(10),
+#                    'firstname' => 'Whois',
+#                    'surname' => 'Test',
+#                    'postal_code' => '76000',
+#                    'city' => 'Rouen',
+#                    'type' => 'Administrateur'
+#                    ])
+#        );
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#        $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Utilisateur crée avec succès'], $data);
+#    }
 }

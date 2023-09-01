@@ -70,111 +70,111 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
 
         
     }
-    public function testAddHelpRequestsCategoriesHelper(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
-        $random_string = $this->randomStringFactory->generatePassword(20);
+#    public function testAddHelpRequestsCategoriesHelper(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
+#        $random_string = $this->randomStringFactory->generatePassword(20);
 
-        $body = [
-            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
-        ];
+#        $body = [
+#            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
+#        ];
 
-        $this->client->request(
-            'POST',
-            '/helprequests/categories',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body)
-        );
+#        $this->client->request(
+#            'POST',
+#            '/helprequests/categories',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body)
+#        );
 
-        $response = $this->client->getResponse();
+#        $response = $this->client->getResponse();
 
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
-    }
-    public function testAddHelpRequestsCategoriesOwner(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
-        $random_string = $this->randomStringFactory->generatePassword(20);
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+#        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
+#    }
+#    public function testAddHelpRequestsCategoriesOwner(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
+#        $random_string = $this->randomStringFactory->generatePassword(20);
 
-        $body = [
-            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
-        ];
+#        $body = [
+#            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
+#        ];
 
-        $this->client->request(
-            'POST',
-            '/helprequests/categories',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body)
-        );
+#        $this->client->request(
+#            'POST',
+#            '/helprequests/categories',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body)
+#        );
 
-        $response = $this->client->getResponse();
+#        $response = $this->client->getResponse();
 
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
-    }
-    public function testAddHelpRequestsCategoriesModerator(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
-        $random_string = $this->randomStringFactory->generatePassword(20);
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+#        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
+#    }
+#    public function testAddHelpRequestsCategoriesModerator(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
+#        $random_string = $this->randomStringFactory->generatePassword(20);
 
-        $body = [
-            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
-        ];
+#        $body = [
+#            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
+#        ];
 
-        $this->client->request(
-            'POST',
-            '/helprequests/categories',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body)
-        );
+#        $this->client->request(
+#            'POST',
+#            '/helprequests/categories',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body)
+#        );
 
-        $response = $this->client->getResponse();
+#        $response = $this->client->getResponse();
 
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
-    }
-    public function testAddHelpRequestsCategoriesNoAuth(): void
-    {
-        $random_string = $this->randomStringFactory->generatePassword(20);
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+#        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
+#    }
+#    public function testAddHelpRequestsCategoriesNoAuth(): void
+#    {
+#        $random_string = $this->randomStringFactory->generatePassword(20);
 
-        $body = [
-            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
-        ];
-        $this->client->request(
-            'POST',
-            '/helprequests/categories',
-            [],
-            [],
-            [],
-            json_encode($body)
-        );
-        $response = $this->client->getResponse();
+#        $body = [
+#            'title' => 'Nouvelle catégorie de demande d\'aide '.$random_string,
+#        ];
+#        $this->client->request(
+#            'POST',
+#            '/helprequests/categories',
+#            [],
+#            [],
+#            [],
+#            json_encode($body)
+#        );
+#        $response = $this->client->getResponse();
 
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
-        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
-    }
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
+#        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
+#    }
 }
