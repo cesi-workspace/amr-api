@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface IConversationService
 {
-    function createMessage(Request $request, User $userto) : JsonResponse;
-    function getConversationMessages(User $user) : JsonResponse;
-    function getConversations() : JsonResponse;
+    public function createMessage(Request $request, User $userto) : JsonResponse;
+    public function getConversationMessages(User $user) : JsonResponse;
+    public function getConversations() : JsonResponse;
 }

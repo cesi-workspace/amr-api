@@ -9,6 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface IMessageService
 {
-    function getInfo(Message $message) : array;
+    public function getInfo(Message $message) : array;
     public function getInfos(array $helpmessages): array;
 }
