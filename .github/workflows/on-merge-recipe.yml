@@ -42,7 +42,7 @@ jobs:
             
             old_line='DATABASE_URL=.*'
             new_line='DATABASE_URL="mysql://${{secrets.MARIADB_RECIPE_USER}}:${{secrets.MARIADB_RECIPE_PASSWORD}}@mariadb:3306/amr?serverVersion=8&charset=utf8mb4"'
-            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yml
+            sudo sed -i "s|$old_line|$new_line|g" .env
             
             docker image rm $(docker images --filter=reference="*amr-api*" -q)
             docker compose -f docker-compose-recipe.yml up -d
