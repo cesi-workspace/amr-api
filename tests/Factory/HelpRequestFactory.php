@@ -1,6 +1,7 @@
 <?php
 namespace App\Tests\Factory;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,12 +16,10 @@ class HelpRequestFactory
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
     }
-    function getExistHelpRequest(int $role)
+    function getExistHelpRequest(KernelBrowser $client, int $role)
     {
-        $tokenAdmin = $this->authentificationFactory->getToken(Role::ADMIN);
-        $tokenOwner = $this->authentificationFactory->getToken(Role::OWNER);
-
-        $client = HttpClient::create();
+        $tokenAdmin = $this->authentificationFactory->getToken($client, Role::ADMIN);
+        $tokenOwner = $this->authentificationFactory->getToken($client, Role::OWNER);
 
         $body = [
             'title' => 'Nouvelle HelpRequest '.$this->randomStringFactory->generatePassword(20),
@@ -31,34 +30,37 @@ class HelpRequestFactory
             'category' => 'Espaces verts'
         ];
         
-        $response = $client->request(
+        $client->request(
             'POST',
-            $_ENV['API_URL'].'/helprequests',
+            '/helprequests',
+            [],
+            [],
             [
-                'verify_peer' => false,
-                'headers' => ['Authorization' => 'Bearer '.($role == Role::ADMIN ? $tokenAdmin : $tokenOwner)],
-                'json' => $body
-            ]
+                'HTTP_AUTHORIZATION' => 'Bearer '.($role == Role::ADMIN ? $tokenAdmin : $tokenOwner)
+            ],
+            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
         );
 
-        $client=HttpClient::create();
+        $response = $client->getResponse();
+        $data = json_decode($response->getContent(), true);
 
-        $response2 = $client->request(
+
+        $client->request(
             'GET',
-            $_ENV['API_URL'].'/helprequests',
-            [
-                'verify_peer' => false,
-                'headers' => ['Authorization' => 'Bearer '.$tokenAdmin],
-                'query' => [
-                    'owner_id' => ($role == Role::ADMIN ? 2 : 4)
-                ]
+            '/helprequests'
+            ,[
+                'owner_id' => ($role == Role::ADMIN ? 2 : 4)
+            ]
+            ,[]
+            ,[
+                'HTTP_AUTHORIZATION' => 'Bearer '.$tokenAdmin
             ]
         );
 
+        $response2 = $client->getResponse();
+        $data2 = json_decode($response2->getContent(), true);
 
-        $data = json_decode($response2->getContent(false), true);
-
-        $body['id'] = $data['data'][0]['id'];
+        $body['id'] = $data2['data'][0]['id'];
 
         return $body;
 

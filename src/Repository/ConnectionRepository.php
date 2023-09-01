@@ -38,7 +38,21 @@ class ConnectionRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
+    public function findConnectionsInLastDay($ip_address): array
+    {
+        $datenow = new \DateTime();
+        $intervalle = new \DateInterval('P1D'); // P1D signifie "Période d'1 Jour"
+        $dateReculee = $datenow->sub($intervalle);
+        
+        return $this->createQueryBuilder('c')
+            ->where('c.ipAddress = :val1')
+            ->setParameter('val1', $ip_address)
+            ->andWhere('c.loginDate > :val2')
+            ->setParameter('val2', $dateReculee)
+            ->orderBy('c.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Connection[] Returns an array of Connection objects
 //     */

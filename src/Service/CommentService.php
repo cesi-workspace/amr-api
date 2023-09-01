@@ -100,7 +100,7 @@ class CommentService implements ICommentService
         return $data;
     }
 
-    function createComment(Request $request) : JsonResponse
+    public function createComment(Request $request) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = json_decode($request->getContent(), true);
@@ -144,7 +144,7 @@ class CommentService implements ICommentService
         return new JsonResponse(['message' => 'Commentaire ajouté'], Response::HTTP_CREATED);
     }
 
-    function getComments(Request $request) : JsonResponse
+    public function getComments(Request $request) : JsonResponse
     {
         $parameters = $request->query->all();
 
@@ -189,7 +189,7 @@ class CommentService implements ICommentService
         }
     }
 
-    function postReportOnComment(Comment $comment) : JsonResponse
+    public function postReportOnComment(Comment $comment) : JsonResponse
     {
         $userconnect = $this->security->getUser();
 
@@ -210,7 +210,7 @@ class CommentService implements ICommentService
         return new JsonResponse(["message" => "Commentaire signalée"], Response::HTTP_CREATED);
     }
 
-    function deleteComment(Comment $comment) : JsonResponse
+    public function deleteComment(Comment $comment) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -225,12 +225,12 @@ class CommentService implements ICommentService
 
     }
 
-    function getComment(Comment $comment) : JsonResponse
+    public function getComment(Comment $comment) : JsonResponse
     {
         return new JsonResponse(["message" => "Détails du commentaire récupérés", "data" => $this->getInfo($comment, true)]);
     }
 
-    function postAnswerToComment(Request $request, Comment $comment) : JsonResponse
+    public function postAnswerToComment(Request $request, Comment $comment) : JsonResponse
     {
         $userconnect = $this->security->getUser();
 
@@ -258,7 +258,7 @@ class CommentService implements ICommentService
         return new JsonResponse(["message" => "Réponse au commentaire ajoutée"], Response::HTTP_OK);
     }
 
-    function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse
+    public function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse
     {
         $userconnect = $this->security->getUser();
 

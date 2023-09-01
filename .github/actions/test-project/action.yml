@@ -1,0 +1,33 @@
+name: Test
+description: Group of actions used to test entire project
+inputs:
+  sonarqube_host:
+    description: SonarQube hostname
+  sonarqube_token:
+    description: SonarQube project analysis token
+  database_url_test:
+    description: Database url for tests
+runs:
+  using: composite
+  steps:
+    - name: Run tests
+      shell: bash
+      run: |
+        old_line="DATABASE_URL="
+        new_line='DATABASE_URL="${{inputs.database_url_test}}"'
+        sudo sed -i "s|$old_line|$new_line|g" .env.test
+        
+        mkdir config/jwt
+        openssl genpkey -algorithm RSA -out config/jwt/private.pem
+        openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+        echo "JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem" > .env.local
+        echo "JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem" >> .env.local
+        
+        php bin/console doctrine:migrations:migrate --env=test --no-interaction
+        ./vendor/bin/phpunit
+    - name: SonarQube Scan
+      uses: kitabisa/sonarqube-action@v1.2.0
+      with:
+        host: ${{ inputs.sonarqube_host }}
+        login: ${{ inputs.sonarqube_token }}
+        projectKey: amr-api

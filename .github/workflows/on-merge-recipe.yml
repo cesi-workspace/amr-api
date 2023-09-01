@@ -1,0 +1,35 @@
+name: Deploy on recipe environment
+run-name: Deploy on recipe environment
+
+on:
+  push:
+    branches: [ recipe ]
+
+# cancel workflow when there is already one launched
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to ghcr, pull and start api
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST_SRV_RECIPE }}
+          username: ${{ secrets.SSH_USER_SRV_RECIPE }}
+          key: ${{ secrets.SSH_KEY_SRV_RECIPE }}
+          script: |
+            cd /home
+            if [ -d amr-api ]; then
+              cd amr-api
+              git reset --hard HEAD
+              git pull
+            else
+              git clone https://github.com/cesi-workspace/amr-api.git
+              cd amr-api
+            fi
+            docker compose -f docker-compose-recipe.yml down
+            docker image rm $(docker images --filter=reference="*amr-api*" -q)
+            docker compose -f docker-compose-recipe.yml up -d

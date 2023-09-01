@@ -1,9 +1,10 @@
-name: Develop CI
-run-name: Develop CI
+name: Pull request on recipe
+run-name: Pull request on recipe
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ recipe ]
+
 
 # cancel workflow when there is already one launched
 concurrency:

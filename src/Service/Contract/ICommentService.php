@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface ICommentService
 {
-    function createComment(Request $request): JsonResponse;
-    function getComments(Request $request) : JsonResponse;
-    function postReportOnComment(Comment $comment) : JsonResponse;
-    function deleteComment(Comment $comment) : JsonResponse;
-    function getComment(Comment $comment) : JsonResponse;
-    function postAnswerToComment(Request $request, Comment $comment) : JsonResponse;
-    function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse;
+    public function createComment(Request $request): JsonResponse;
+    public function getComments(Request $request) : JsonResponse;
+    public function postReportOnComment(Comment $comment) : JsonResponse;
+    public function deleteComment(Comment $comment) : JsonResponse;
+    public function getComment(Comment $comment) : JsonResponse;
+    public function postAnswerToComment(Request $request, Comment $comment) : JsonResponse;
+    public function deleteAnswerToComment(Comment $comment, Answer $answer) : JsonResponse;
 }
