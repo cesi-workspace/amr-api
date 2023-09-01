@@ -23,7 +23,7 @@ final class PostHelpRequestsTest extends WebTestCase
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
     private EntityManagerInterface $entityManager;
-    private EntityRepository $helprequestcategoryRepository;
+    private EntityRepository $helprequestRepository;
 
     protected function setUp(): void {        
         $this->client = static::createClient([
@@ -32,13 +32,13 @@ final class PostHelpRequestsTest extends WebTestCase
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->helprequestcategoryRepository = $this->entityManager->getRepository(HelpRequest::class);
+        $this->helprequestRepository = $this->entityManager->getRepository(HelpRequest::class);
     }
     
     public function testAddHelpRequestsOwner(): void
     {
         $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
-        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(5);
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
         $body = [
             'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
@@ -65,12 +65,14 @@ final class PostHelpRequestsTest extends WebTestCase
         
         $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Demande créée'], $data);
+        $this->assertEquals(1, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide n'a visiblement pas été ajoutée en base");
 
     }
     public function testAddHelpRequestsNoAuth(): void
     {
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
         $body = [
-            'title' => 'HelpRequest n°1',
+            'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
             'latitude' => 49.0,
             'longitude' => 1.0,
@@ -93,13 +95,15 @@ final class PostHelpRequestsTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
+        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
 
     }
     public function testAddHelpRequestsHelper(): void
     {
         $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
         $body = [
-            'title' => 'HelpRequest n°1',
+            'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
             'latitude' => 49.0,
             'longitude' => 1.0,
@@ -124,13 +128,14 @@ final class PostHelpRequestsTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-
+        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
     }
     public function testAddHelpRequestsModerator(): void
     {
         $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
         $body = [
-            'title' => 'HelpRequest n°1',
+            'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
             'latitude' => 49.0,
             'longitude' => 1.0,
@@ -155,13 +160,15 @@ final class PostHelpRequestsTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
 
     }
     public function testAddHelpRequestsAdmin(): void
     {
         $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
         $body = [
-            'title' => 'HelpRequest n°1',
+            'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
             'latitude' => 49.0,
             'longitude' => 1.0,
@@ -186,7 +193,7 @@ final class PostHelpRequestsTest extends WebTestCase
         
         $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Demande créée'], $data);
-
+        $this->assertEquals(1, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide n'a visiblement pas été ajoutée en base");
     }
     
 }
