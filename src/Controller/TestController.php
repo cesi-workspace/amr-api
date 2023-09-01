@@ -11,7 +11,7 @@ class TestController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstract
     #[Route('/test', name: 'app_test')]
     public function test(): Response
     {
-        return new Response('Test CI/CD');
+        return new Response('Test');
     }
 
 }
