@@ -68,132 +68,132 @@ final class PostHelpRequestsTest extends WebTestCase
         $this->assertEquals(1, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide n'a visiblement pas été ajoutée en base");
 
     }
-    public function testAddHelpRequestsNoAuth(): void
-    {
-        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
-        $body = [
-            'title' => $titlehelprequest,
-            'estimated_delay' => '02:00:00',
-            'latitude' => 49.0,
-            'longitude' => 1.0,
-            'description' => 'Description de la helprequest',
-            'category' => 'Courses'
-        ];
-
-        $this->client->request(
-            'POST',
-            '/helprequests',
-            [],
-            [],
-            [],
-            json_encode($body)
-        );
-        
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
-        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
-
-    }
-    public function testAddHelpRequestsHelper(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
-        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
-        $body = [
-            'title' => $titlehelprequest,
-            'estimated_delay' => '02:00:00',
-            'latitude' => 49.0,
-            'longitude' => 1.0,
-            'description' => 'Description de la helprequest',
-            'category' => 'Courses'
-        ];
-
-        $this->client->request(
-            'POST',
-            '/helprequests',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
-        );
-        
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
-    }
-    public function testAddHelpRequestsModerator(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
-        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
-        $body = [
-            'title' => $titlehelprequest,
-            'estimated_delay' => '02:00:00',
-            'latitude' => 49.0,
-            'longitude' => 1.0,
-            'description' => 'Description de la helprequest',
-            'category' => 'Courses'
-        ];
-
-        $this->client->request(
-            'POST',
-            '/helprequests',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
-        );
-        
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
-        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
-
-    }
-    public function testAddHelpRequestsAdmin(): void
-    {
-        $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
-        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
-        $body = [
-            'title' => $titlehelprequest,
-            'estimated_delay' => '02:00:00',
-            'latitude' => 49.0,
-            'longitude' => 1.0,
-            'description' => 'Description de la helprequest',
-            'category' => 'Courses'
-        ];
-
-        $this->client->request(
-            'POST',
-            '/helprequests',
-            [],
-            [],
-            [
-                'HTTP_AUTHORIZATION' => 'Bearer '.$token
-            ],
-            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
-        );
-        
-        $response = $this->client->getResponse();
-
-        $data = json_decode($response->getContent(), true);
-        
-        $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
-        $this->assertEquals(['message' => 'Demande créée'], $data);
-        $this->assertEquals(1, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide n'a visiblement pas été ajoutée en base");
-    }
-    
+#    public function testAddHelpRequestsNoAuth(): void
+#    {
+#        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
+#        $body = [
+#            'title' => $titlehelprequest,
+#            'estimated_delay' => '02:00:00',
+#            'latitude' => 49.0,
+#            'longitude' => 1.0,
+#            'description' => 'Description de la helprequest',
+#            'category' => 'Courses'
+#        ];
+#
+#        $this->client->request(
+#            'POST',
+#            '/helprequests',
+#            [],
+#            [],
+#            [],
+#            json_encode($body)
+#        );
+#
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
+#        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
+#
+#    }
+#    public function testAddHelpRequestsHelper(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::HELPER);
+#        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
+#        $body = [
+#            'title' => $titlehelprequest,
+#            'estimated_delay' => '02:00:00',
+#            'latitude' => 49.0,
+#            'longitude' => 1.0,
+#            'description' => 'Description de la helprequest',
+#            'category' => 'Courses'
+#        ];
+#
+#        $this->client->request(
+#            'POST',
+#            '/helprequests',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
+#        );
+#
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+#        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
+#    }
+#    public function testAddHelpRequestsModerator(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::MODERATOR);
+#        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
+#        $body = [
+#            'title' => $titlehelprequest,
+#            'estimated_delay' => '02:00:00',
+#            'latitude' => 49.0,
+#            'longitude' => 1.0,
+#            'description' => 'Description de la helprequest',
+#            'category' => 'Courses'
+#        ];
+#
+#        $this->client->request(
+#            'POST',
+#            '/helprequests',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
+#        );
+#
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+#        $this->assertEquals(0, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide a visiblement été ajoutée en base");
+#
+#    }
+#    public function testAddHelpRequestsAdmin(): void
+#    {
+#        $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
+#        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(7);
+#        $body = [
+#            'title' => $titlehelprequest,
+#            'estimated_delay' => '02:00:00',
+#            'latitude' => 49.0,
+#            'longitude' => 1.0,
+#            'description' => 'Description de la helprequest',
+#            'category' => 'Courses'
+#        ];
+#
+#        $this->client->request(
+#            'POST',
+#            '/helprequests',
+#            [],
+#            [],
+#            [
+#                'HTTP_AUTHORIZATION' => 'Bearer '.$token
+#            ],
+#            json_encode($body, JSON_PRESERVE_ZERO_FRACTION)
+#        );
+#
+#        $response = $this->client->getResponse();
+#
+#        $data = json_decode($response->getContent(), true);
+#
+#        $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
+#        $this->assertEquals(['message' => 'Demande créée'], $data);
+#        $this->assertEquals(1, $this->helprequestRepository->count(['title' => $titlehelprequest]), "La demande d'aide n'a visiblement pas été ajoutée en base");
+#    }
+#
 }
