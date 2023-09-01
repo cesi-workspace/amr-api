@@ -1,8 +1,12 @@
 <?php
-namespace App\Tests\UnitTest\HelpRequestsCategoriesTest;
-use App\Entity\HelpRequest;
+namespace App\Tests\ApiTest\HelpRequestsCategoriesTest;
+use App\Entity\HelpRequestCategory;
+use App\Repository\HelpRequestCategoryRepository;
 use App\Tests\Factory\RandomStringFactory;
 use DateTime;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -22,6 +26,8 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
     private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
+    private EntityManagerInterface $entityManager;
+    private EntityRepository $helprequestcategoryRepository;
 
     protected function setUp(): void {
         $this->client = static::createClient([
@@ -29,14 +35,14 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         ]);
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
+        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->helprequestcategoryRepository = $this->entityManager->getRepository(HelpRequestCategory::class);
     }
 
     public function testAddHelpRequestsCategoriesAdmin(): void
     {
 
         $token = $this->authentificationFactory->getToken($this->client, Role::ADMIN);
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $this->client->loginUser($userRepository->find(2));
         $random_string = $this->randomStringFactory->generatePassword(20);
 
         $body = [
@@ -60,6 +66,9 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         
         $this->assertEquals(201, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Catégorie de demandes d\'aide ajoutée'], $data);
+        $this->assertEquals(1, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie n'a visiblement pas été ajoutée en base");
+
+        
     }
     public function testAddHelpRequestsCategoriesHelper(): void
     {
@@ -87,6 +96,7 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
     }
     public function testAddHelpRequestsCategoriesOwner(): void
     {
@@ -114,6 +124,7 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
     }
     public function testAddHelpRequestsCategoriesModerator(): void
     {
@@ -141,6 +152,7 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => "Accès interdit, votre habilitation ne vous permet d'accéder à cette route ou à cette ressource"], $data);
+        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
     }
     public function testAddHelpRequestsCategoriesNoAuth(): void
     {
@@ -163,5 +175,6 @@ final class PostHelpRequestsCategoriesTest extends WebTestCase
         
         $this->assertEquals(403, $response->getStatusCode(), json_encode($data));
         $this->assertEquals(['message' => 'Accès interdit, il faut être connecté pour accéder à cette route ou à cette ressource'], $data);
+        $this->assertEquals(0, $this->helprequestcategoryRepository->count(['title' => 'Nouvelle catégorie de demande d\'aide '.$random_string]), "La catégorie a visiblement été ajoutée en base");
     }
 }

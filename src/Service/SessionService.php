@@ -28,7 +28,7 @@ class SessionService implements ISessionService
         private readonly CryptService $cryptservice
     ) {}
 
-    function login(Request $request): JsonResponse
+    public function login(Request $request): JsonResponse
     {
         $connection = $this->connectionService->initConnection($request);
 
@@ -40,6 +40,13 @@ class SessionService implements ISessionService
                 'password' => [new Assert\Type('string'), new Assert\NotBlank]
             ])
         );
+        if($this->connectionService->isTooMany($request))
+        {
+            $connection->setSuccess(false);
+            $this->connectionService->save($connection);
+            return new JsonResponse(['message' => 'Trop de tentatives de connexion'], Response::HTTP_UNAUTHORIZED);
+        }
+
         
         if(!$this->userService->isUserExists(
             [
@@ -76,7 +83,7 @@ class SessionService implements ISessionService
         return new JsonResponse(['message' => 'Authentification réussie', 'data' => ['token' => $authToken, 'user' => $infouser]], Response::HTTP_OK);
     }
 
-    function logout(User $connectedUser): JsonResponse
+    public function logout(User $connectedUser): JsonResponse
     {
         $connection = $this->connectionService->findOneBy(
             [

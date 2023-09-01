@@ -49,38 +49,38 @@ class UserService implements IUserService
         private readonly EmailService $emailService
     ){}
 
-    function isUserExists(array $findQuery): bool
+    public function isUserExists(array $findQuery): bool
     {
         return $this->entityManager->getRepository(User::class)->count($findQuery) > 0;
     }
 
-    function findUser(array $findQuery): User|null
+    public function findUser(array $findQuery): User|null
     {
         return $this->entityManager->getRepository(User::class)->findOneBy($findQuery);
     }
 
-    function findUsers(array $findQuery): array | null
+    public function findUsers(array $findQuery): array | null
     {
         return $this->entityManager->getRepository(User::class)->findBy($findQuery);
     }
 
-    function findUserType(array $findQuery): UserType|null
+    public function findUserType(array $findQuery): UserType|null
     {
         return $this->entityManager->getRepository(UserType::class)->findOneBy($findQuery);
     }
 
-    function findUserStatus(array $findQuery): UserStatus|null
+    public function findUserStatus(array $findQuery): UserStatus|null
     {
         return $this->entityManager->getRepository(UserStatus::class)->findOneBy($findQuery);
     }
 
-    function findUserStatusByLabel(UserStatusLabel|string $userStatusLabel): UserStatus|null
+    public function findUserStatusByLabel(UserStatusLabel|string $userStatusLabel): UserStatus|null
     {
         return $this->findUserStatus([
             'label' => $userStatusLabel
         ]);
     }
-    function findUserTypeByLabel(UserTypeLabel|string $userTypeLabel): UserType|null
+    public function findUserTypeByLabel(UserTypeLabel|string $userTypeLabel): UserType|null
     {
         return $this->findUserType([
             'label' => $userTypeLabel
@@ -109,7 +109,7 @@ class UserService implements IUserService
             'type' => $user->getType()->getLabel(),
         ];
     }
-    function createUser(Request $request) : JsonResponse
+    public function createUser(Request $request) : JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
 
@@ -129,7 +129,7 @@ class UserService implements IUserService
             'surname' => [new Assert\Type('string'), new Assert\NotBlank],
             'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
             'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-            'password' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Regex("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
+            'password' => [new Assert\Type('string'), new Assert\NotBlank, new Assert\Regex("/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(.{10,})$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
             'city' => [new Assert\Type('string'), new Assert\NotBlank],
             'postal_code' => [new Assert\Type('string'), new Assert\NotBlank],
             'type' => [new Assert\Type('string'), new Assert\NotBlank, new CustomAssert\ExistDB(Usertype::class, 'label', true)],
@@ -141,7 +141,7 @@ class UserService implements IUserService
                 'surname' => [new Assert\Type('string'), new Assert\NotBlank],
                 'email' => [new Assert\Type('string'), new Assert\Email(), new Assert\NotBlank, new CustomAssert\ExistDB(User::class, 'email', false, true)],
                 'firstname' => [new Assert\Type('string'), new Assert\NotBlank],
-                'password' => [new Assert\Type('string'), new Assert\NotBlank,  new Assert\Regex("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
+                'password' => [new Assert\Type('string'), new Assert\NotBlank,  new Assert\Regex("/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(.{10,})$/", message:"Le mot de passe ne correspond pas aux critères de sécurité (au moins 10 caratères dont au moins 1 chiffres, 1 lettre majuscule, 1 lettre miniscule et 1 caractère spécial")],
                 'city' => [new Assert\Optional(
                     [new Assert\Type('string'), new Assert\NotBlank]
                 )],
@@ -446,7 +446,7 @@ class UserService implements IUserService
         return new JsonResponse(['message' => 'Utilisateurs favoris récupérés', 'data' => $this->getInfos($favorites)], Response::HTTP_OK);
     }
 
-    function getUserTypes() : JsonResponse
+    public function getUserTypes() : JsonResponse
     {
         $userTypes = $this->entityManager->getRepository(UserType::class)->findAll();
 
@@ -458,7 +458,7 @@ class UserService implements IUserService
         return new JsonResponse(["message" => "Types d'utilisateurs récupérées", "data" => $arrayUserTypes], Response::HTTP_OK);
     }
 
-    function getUserStatus() : JsonResponse
+    public function getUserStatus() : JsonResponse
     {
         $userStatus = $this->entityManager->getRepository(UserStatus::class)->findAll();
 
@@ -470,7 +470,7 @@ class UserService implements IUserService
         return new JsonResponse(["message" => "Statuts d'utilisateurs récupérées", "data" => $arrayUserStatus], Response::HTTP_OK);
     }
 
-    function sendProofIdentity(Request $request, User $user) : JsonResponse
+    public function sendProofIdentity(Request $request, User $user) : JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
 

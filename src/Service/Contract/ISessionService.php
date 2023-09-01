@@ -9,7 +9,7 @@ use App\Entity\User;
 interface ISessionService
 {
 
-    function login(Request $request): JsonResponse;
-    function logout(User $user): JsonResponse;
+    public function login(Request $request): JsonResponse;
+    public function logout(User $user): JsonResponse;
 
 }

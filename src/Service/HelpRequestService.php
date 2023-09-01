@@ -60,11 +60,11 @@ class HelpRequestService implements IHelpRequestService
         private readonly EmailService $emailService
     ) {}
 
-    function findOneBy(array $query, array $orderBy = []): HelpRequest |null
+    public function findOneBy(array $query, array $orderBy = []): HelpRequest |null
     {
         return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
     }
-    function findHelpRequest(array $query, bool $single = true, array $orderBy = []): HelpRequest |null|array
+    public function findHelpRequest(array $query, bool $single = true, array $orderBy = []): HelpRequest |null|array
     {
         if($single){
             return $this->entityManager->getRepository(HelpRequest::class)->findOneBy($query, $orderBy);
@@ -73,7 +73,7 @@ class HelpRequestService implements IHelpRequestService
         }
     }
     
-    function findHelpRequestTreatment(array $query, bool $single = true, array $orderBy = []): HelpRequestTreatment|null|array
+    public function findHelpRequestTreatment(array $query, bool $single = true, array $orderBy = []): HelpRequestTreatment|null|array
     {
         if($single){
             return $this->entityManager->getRepository(HelpRequestTreatment::class)->findOneBy($query, $orderBy);
@@ -82,36 +82,36 @@ class HelpRequestService implements IHelpRequestService
         }
     }
 
-    function findHelpRequestCategory(array $findQuery): HelpRequestCategory|null
+    public function findHelpRequestCategory(array $findQuery): HelpRequestCategory|null
     {
         return $this->entityManager->getRepository(HelpRequestCategory::class)->findOneBy($findQuery);
     }
 
-    function findHelpRequestStatus(array $findQuery): HelpRequestStatus|null
+    public function findHelpRequestStatus(array $findQuery): HelpRequestStatus|null
     {
         return $this->entityManager->getRepository(HelpRequestStatus::class)->findOneBy($findQuery);
     }
 
-    function findHelpRequestTreatmentType(array $findQuery): HelpRequestTreatmentType|null
+    public function findHelpRequestTreatmentType(array $findQuery): HelpRequestTreatmentType|null
     {
         return $this->entityManager->getRepository(HelpRequestTreatmentType::class)->findOneBy($findQuery);
     }
 
-    function findHelpRequestCategoryByTitle(HelpRequestCategoryTitle|string $helpRequestCategory): HelpRequestCategory|null
+    public function findHelpRequestCategoryByTitle(HelpRequestCategoryTitle|string $helpRequestCategory): HelpRequestCategory|null
     {
         return $this->findHelpRequestCategory([
             'title' => $helpRequestCategory
         ]);
     }
 
-    function findHelpRequestStatusByLabel(HelpRequestStatusLabel|string $helpRequestStatusLabel): HelpRequestStatus|null
+    public function findHelpRequestStatusByLabel(HelpRequestStatusLabel|string $helpRequestStatusLabel): HelpRequestStatus|null
     {
         return $this->findHelpRequestStatus([
             'label' => $helpRequestStatusLabel
         ]);
     }
 
-    function findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel|string $helpRequestTreatmentTypeLabel): HelpRequestTreatmentType|null
+    public function findHelpRequestTreatmentTypeByLabel(HelpRequestTreatmentTypeLabel|string $helpRequestTreatmentTypeLabel): HelpRequestTreatmentType|null
     {
         return $this->findHelpRequestTreatmentType([
             'label' => $helpRequestTreatmentTypeLabel
@@ -157,7 +157,7 @@ class HelpRequestService implements IHelpRequestService
         return $arrayhelprequests;
     }
 
-    function createHelprequest(Request $request) : JsonResponse
+    public function createHelprequest(Request $request) : JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
 
@@ -193,7 +193,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(['message' => 'Demande créée'], Response::HTTP_CREATED);
     }
 
-    function getHelpRequest(HelpRequest $helpRequest) : JsonResponse
+    public function getHelpRequest(HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -207,7 +207,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(['message' => '', 'data' => $data], Response::HTTP_OK);
     }
 
-    function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
+    public function postHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = json_decode($request->getContent(), true);
@@ -244,7 +244,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Traitement de la demande d'aide bien enregistrée : ".$parameters['type']], Response::HTTP_OK);
     }
 
-    function deleteHelpRequestTreatment(HelpRequest $helpRequest) : JsonResponse
+    public function deleteHelpRequestTreatment(HelpRequest $helpRequest) : JsonResponse
     {
         $helpRequestTreatment = $this->findHelpRequestTreatment([
             'helpRequest' => $helpRequest,
@@ -261,7 +261,7 @@ class HelpRequestService implements IHelpRequestService
         }
     }
 
-    function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
+    public function acceptHelpRequestTreatment(Request $request, HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -331,7 +331,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function finishHelpRequest(Request $request, HelpRequest $helpRequest) : JsonResponse
+    public function finishHelpRequest(Request $request, HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -371,7 +371,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse
+    public function deleteHelpRequest(HelpRequest $helpRequest) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         if(!$this->security->isGranted('ROLE_ADMIN') && $this->security->isGranted('ROLE_OWNER') && $helpRequest->getOwner()->getId()!=$userconnect->getId())
@@ -390,7 +390,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function getHelpRequestCategories() : JsonResponse
+    public function getHelpRequestCategories() : JsonResponse
     {
         $helpRequestCategories = $this->entityManager->getRepository(HelpRequestCategory::class)->findAll();
 
@@ -405,7 +405,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Catégories des demandes d'aides récupérées", "data" => $arrayHelpRequestCategories], Response::HTTP_OK);
     }
 
-    function getHelpRequests(Request $request) : JsonResponse
+    public function getHelpRequests(Request $request) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
@@ -494,7 +494,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function getOwnHelpRequests(User $user, Request $request) : JsonResponse
+    public function getOwnHelpRequests(User $user, Request $request) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
@@ -560,7 +560,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
-    function addHelpRequestCategory(Request $request) : JsonResponse
+    public function addHelpRequestCategory(Request $request) : JsonResponse
     {
         $parameters = json_decode($request->getContent(), true);
 
@@ -578,7 +578,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Catégorie de demandes d'aide ajoutée"], Response::HTTP_CREATED);
         
     }
-    function removeHelpRequestCategory(HelpRequestCategory $helpRequestCategory) : JsonResponse
+    public function removeHelpRequestCategory(HelpRequestCategory $helpRequestCategory) : JsonResponse
     {
         if($this->findHelpRequest(['category' => $helpRequestCategory])){
             return new JsonResponse(["message" => "Suppression impossible car cette catégorie est associée au moins une demande d'aide"], Response::HTTP_BAD_REQUEST);
@@ -590,7 +590,7 @@ class HelpRequestService implements IHelpRequestService
         return new JsonResponse(["message" => "Catégorie de demandes d'aide supprimée"], Response::HTTP_OK);
     }
 
-    function editHelpRequestCategory(Request $request, HelpRequestCategory $helpRequestCategory) : JsonResponse
+    public function editHelpRequestCategory(Request $request, HelpRequestCategory $helpRequestCategory) : JsonResponse
     {
 
         $parameters = json_decode($request->getContent(), true);
@@ -609,7 +609,7 @@ class HelpRequestService implements IHelpRequestService
 
     
 
-    function getHelpRequestStats(Request $request) : JsonResponse
+    public function getHelpRequestStats(Request $request) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = $request->query->all();
@@ -648,7 +648,7 @@ class HelpRequestService implements IHelpRequestService
 
     }
 
-    function getHelpRequestsHistory(Request $request): JsonResponse
+    public function getHelpRequestsHistory(Request $request): JsonResponse
     {
         $user = $this->security->getUser();
 

@@ -26,7 +26,6 @@ class MessageService implements IMessageService
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security,
         private readonly IResponseValidatorService $responseValidatorService,
         private readonly IUserService $userService,
     ) {}
@@ -40,7 +39,7 @@ class MessageService implements IMessageService
         }
         return $arraymessages;
     }
-    function getInfo(Message $message) : array
+    public function getInfo(Message $message) : array
     {
         return [
             'id' => $message->getId(),

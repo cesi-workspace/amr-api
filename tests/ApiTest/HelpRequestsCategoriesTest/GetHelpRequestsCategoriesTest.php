@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\UnitTest\HelpRequestsCategoriesTest;
+namespace App\Tests\ApiTest\HelpRequestsCategoriesTest;
 use App\Entity\HelpRequest;
 use App\Service\ResponseValidatorService;
 use App\Tests\Factory\RandomStringFactory;

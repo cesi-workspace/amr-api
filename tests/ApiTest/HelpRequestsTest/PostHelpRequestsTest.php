@@ -1,8 +1,10 @@
 <?php
-namespace App\Tests\UnitTest\HelpRequestsTest;
+namespace App\Tests\ApiTest\HelpRequestsTest;
 use App\Entity\HelpRequest;
 use App\Tests\Factory\RandomStringFactory;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -20,6 +22,8 @@ final class PostHelpRequestsTest extends WebTestCase
     private KernelBrowser $client;
     private AuthentificationFactory $authentificationFactory;
     private RandomStringFactory $randomStringFactory;
+    private EntityManagerInterface $entityManager;
+    private EntityRepository $helprequestcategoryRepository;
 
     protected function setUp(): void {        
         $this->client = static::createClient([
@@ -27,14 +31,16 @@ final class PostHelpRequestsTest extends WebTestCase
         ]);
         $this->authentificationFactory = new AuthentificationFactory();
         $this->randomStringFactory = new RandomStringFactory();
+        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->helprequestcategoryRepository = $this->entityManager->getRepository(HelpRequest::class);
     }
     
     public function testAddHelpRequestsOwner(): void
     {
         $token = $this->authentificationFactory->getToken($this->client, Role::OWNER);
-
+        $titlehelprequest = 'HelpRequest n°'.$this->randomStringFactory->generatePassword(5);
         $body = [
-            'title' => 'HelpRequest n°1',
+            'title' => $titlehelprequest,
             'estimated_delay' => '02:00:00',
             'latitude' => 49.0,
             'longitude' => 1.0,
