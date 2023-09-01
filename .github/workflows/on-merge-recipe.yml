@@ -27,7 +27,7 @@ jobs:
               git reset --hard HEAD
               git pull
             else
-              git clone https://github.com/cesi-workspace/amr-api.git
+              git clone https://github.com/cesi-workspace/amr-api.git -b recipe
               cd amr-api
             fi
             docker compose -f docker-compose-recipe.yml down
