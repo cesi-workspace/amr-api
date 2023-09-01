@@ -39,7 +39,7 @@ jobs:
           password: ${{secrets.GCRH_TOKEN}}
       - name: Docker build
         run: |
-          old_line='DATABASE_URL='
+          old_line='DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"'
           new_line='DATABASE_URL="mysql://${{secrets.MARIADB_PROD_USER}}:${{secrets.MARIADB_PROD_PASSWORD}}@mariadb:3306/amr?serverVersion=8&charset=utf8mb4"'
           sudo sed -i "s|$old_line|$new_line|g" .env
           
