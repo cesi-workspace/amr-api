@@ -31,5 +31,14 @@ jobs:
               cd amr-api
             fi
             docker compose -f docker-compose-recipe.yml down
+            
+            old_line="MARIADB_USER:.*"
+            new_line="MARIADB_USER:${{secrets.MARIADB_RECIPE_USER}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yaml
+            
+            old_line="MARIADB_PASSWORD:.*"
+            new_line="MARIADB_PASSWORD:${{secrets.MARIADB_RECIPE_PASSWORD}}"
+            sudo sed -i "s|$old_line|$new_line|g" docker-compose-recipe.yaml
+            
             docker image rm $(docker images --filter=reference="*amr-api*" -q)
             docker compose -f docker-compose-recipe.yml up -d
