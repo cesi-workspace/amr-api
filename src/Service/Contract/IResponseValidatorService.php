@@ -4,5 +4,5 @@ namespace App\Service\Contract;
 
 interface IResponseValidatorService
 {
-    function getErrorMessagesValidation($parameters, $constraints): array;
+    public function getErrorMessagesValidation($parameters, $constraints): array;
 }

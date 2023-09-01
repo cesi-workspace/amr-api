@@ -13,26 +13,26 @@ use App\Service\UserStatusLabel;
 interface IUserService
 {
 
-    function isUserExists(array $findQuery): bool;
-    function findUser(array $findQuery): User | null;
-    function findUsers(array $findQuery): array | null;
-    function findUserType(array $findQuery): UserType|null;
-    function findUserStatus(array $findQuery): UserStatus|null;
-    function findUserStatusByLabel(UserStatusLabel|string $userStatusLabel): UserStatus|null;
-    function findUserTypeByLabel(UserTypeLabel|string $userTypeLabel): UserType|null;
+    public function isUserExists(array $findQuery): bool;
+    public function findUser(array $findQuery): User | null;
+    public function findUsers(array $findQuery): array | null;
+    public function findUserType(array $findQuery): UserType|null;
+    public function findUserStatus(array $findQuery): UserStatus|null;
+    public function findUserStatusByLabel(UserStatusLabel|string $userStatusLabel): UserStatus|null;
+    public function findUserTypeByLabel(UserTypeLabel|string $userTypeLabel): UserType|null;
     public function getInfos(array $users): array;
-    function getInfo(User $user) : array;
-    function createUser(Request $request) : JsonResponse;
-    function getUser(Request $request, User $user) : JsonResponse;
-    function getUsers(Request $request) : JsonResponse;
-    function editUser(Request $request, User $user) : JsonResponse;
-    function removeUser(Request $request, User $user) : JsonResponse;
-    function editStatusUser(Request $request, User $user) : JsonResponse;
-    function sendProofsUser(Request $request, User $user) : JsonResponse;
-    function addFavoriteUser(Request $request, User $user) : JsonResponse;
-    function removeFavoriteUser(User $owner, User $helper) : JsonResponse;
-    function getUserTypes() : JsonResponse;
-    function getUserStatus() : JsonResponse;
+    public function getInfo(User $user) : array;
+    public function createUser(Request $request) : JsonResponse;
+    public function getUser(Request $request, User $user) : JsonResponse;
+    public function getUsers(Request $request) : JsonResponse;
+    public function editUser(Request $request, User $user) : JsonResponse;
+    public function removeUser(Request $request, User $user) : JsonResponse;
+    public function editStatusUser(Request $request, User $user) : JsonResponse;
+    public function sendProofsUser(Request $request, User $user) : JsonResponse;
+    public function addFavoriteUser(Request $request, User $user) : JsonResponse;
+    public function removeFavoriteUser(User $owner, User $helper) : JsonResponse;
+    public function getUserTypes() : JsonResponse;
+    public function getUserStatus() : JsonResponse;
     public function getFavoriteUser(User $owner) : JsonResponse;
-    function sendProofIdentity(Request $request, User $user) : JsonResponse;
+    public function sendProofIdentity(Request $request, User $user) : JsonResponse;
 }

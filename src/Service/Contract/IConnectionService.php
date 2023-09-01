@@ -8,7 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 interface IConnectionService
 {
 
-    function initConnection(Request $request): Connection;
-    function findOneBy(array $query, array $orderBy = []): Connection;
-    function save(Connection $connection): void;
+    public function initConnection(Request $request): Connection;
+    public function findOneBy(array $query, array $orderBy = []): Connection;
+    public function save(Connection $connection): void;
+    public function isTooMany(Request $request) : bool;
 }

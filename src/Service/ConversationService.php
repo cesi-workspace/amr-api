@@ -26,7 +26,7 @@ use App\Service\UserTypeLabel as UserTypeLabel;
 class ConversationService implements IConversationService
 {
 
-    public function __construct(
+    function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
         private readonly IResponseValidatorService $responseValidatorService,
@@ -35,7 +35,7 @@ class ConversationService implements IConversationService
         private readonly RequestAmrService $requestAmrService
     ) {}
 
-    function createMessage(Request $request, User $userto) : JsonResponse
+    public function createMessage(Request $request, User $userto) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         $parameters = json_decode($request->getContent(), true);
@@ -67,7 +67,7 @@ class ConversationService implements IConversationService
 
     }
 
-    function getConversationMessages(User $user) : JsonResponse
+    public function getConversationMessages(User $user) : JsonResponse
     {
         $userconnect = $this->security->getUser();
         
@@ -89,7 +89,7 @@ class ConversationService implements IConversationService
         }
         return $arrayconversations;
     }
-    function getInfo(array $conversation) : array
+    public function getInfo(array $conversation) : array
     {
         $lastmessage = $this->entityManager->getRepository(Message::class)->find((int)$conversation['last_message_id']);
         $user = $this->userService->findUser([
@@ -102,7 +102,7 @@ class ConversationService implements IConversationService
         ];
     }
 
-    function getConversations() : JsonResponse
+    public function getConversations() : JsonResponse
     {
         $userconnect=$this->security->getUser();
         $conversations = $this->entityManager->getRepository(User::class)->getLastMessageByUsers($userconnect);

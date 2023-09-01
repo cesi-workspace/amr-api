@@ -1,4 +1,5 @@
 name: Pull request on recipe
+run-name: Pull request on recipe
 
 on:
   pull_request:
